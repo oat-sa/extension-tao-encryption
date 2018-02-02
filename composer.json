@@ -1,0 +1,40 @@
+{
+    "name": "oat-sa/lib-tao-encryption",
+    "description" : "Tao Encryption",
+    "version": "0.1.0",
+    "type": "library",
+    "authors" : [
+        {
+            "name": "Open Assessment Technologies SA",
+            "homepage": "http://www.taotesting.com"
+        },
+        {
+            "name": "Ionut Padurariu",
+            "role": "Developer"
+        }
+    ],
+    "keywords" : [
+        "tao",
+        "computer-based-assessment",
+        "encryption"
+    ],
+    "homepage" : "http://www.taotesting.com",
+    "license" : [
+        "GPL-2.0-only"
+    ],
+    "minimum-stability" : "dev",
+    "require-dev":{
+        "phpunit/phpunit": "6.5.0"
+    },
+    "require": {
+        "php" : ">=5.5",
+        "phpseclib/phpseclib": "~2.0.0",
+        "league/flysystem": "^1.1.0"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "oat\\Encryption\\" : "src",
+            "oat\\Test\\Encryption\\" : "test"
+        }
+    } 
+}
