@@ -17,9 +17,9 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\Encryption\Test\Model;
+namespace oat\taoEncryption\Test\Model;
 
-use oat\Encryption\Model\AlgorithmFactory;
+use oat\taoEncryption\Model\AlgorithmFactory;
 use phpseclib\Crypt\Base;
 use PHPUnit\Framework\TestCase;
 
@@ -33,7 +33,7 @@ class AlgorithmFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException \oat\Encryption\Model\Exception\AlgorithmNotAvailableException
+     * @expectedException \oat\taoEncryption\Model\Exception\AlgorithmNotAvailableException
      */
     public function testIncorectAlgorithm()
     {

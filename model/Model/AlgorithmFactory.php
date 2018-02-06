@@ -18,9 +18,9 @@
  *
  */
 
-namespace oat\Encryption\Model;
+namespace oat\taoEncryption\Model;
 
-use oat\Encryption\Model\Exception\AlgorithmNotAvailableException;
+use oat\taoEncryption\Model\Exception\AlgorithmNotAvailableException;
 use phpseclib\Crypt\AES;
 use phpseclib\Crypt\Base;
 use phpseclib\Crypt\Blowfish;

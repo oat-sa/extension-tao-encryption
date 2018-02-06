@@ -17,9 +17,28 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\Encryption\Model\Exception;
 
-class AlgorithmNotAvailableException extends \Exception
+namespace oat\taoEncryption\ExtendedService;
+
+use oat\taoEncryption\Model\Exception\DecryptionFailedException;
+
+interface EncryptResult
 {
+    /**
+     * @param string $data
+     * @return string
+     */
+    public function encryptVariable($data);
 
+    /**
+     * @param string $data
+     * @throws DecryptionFailedException
+     * @return string
+     */
+    public function decryptVariable($data);
+
+    /**
+     * @return bool
+     */
+    public function decryptAndSave();
 }

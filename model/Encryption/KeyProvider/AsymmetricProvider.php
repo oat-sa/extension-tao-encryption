@@ -17,40 +17,14 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\Encryption\Model;
 
-class KeyPairEncryption
+namespace oat\taoEncryption\Encryption\KeyProvider;
+
+interface AsymmetricProvider
 {
-    /** @var PrivateKey */
-    private $privateKey;
-
-    /** @var PublicKey */
-    private $publicKey;
-
     /**
-     * KeyPairEncryption constructor.
-     * @param PrivateKey $privateKey
-     * @param PublicKey $publicKey
+     * @param AsymmetricKeyPairProviderService $keyPairProviderService
+     * @return mixed
      */
-    public function __construct(PrivateKey $privateKey, PublicKey $publicKey)
-    {
-        $this->privateKey = $privateKey;
-        $this->publicKey = $publicKey;
-    }
-
-    /**
-     * @return PrivateKey
-     */
-    public function getPrivateKey()
-    {
-        return $this->privateKey;
-    }
-
-    /**
-     * @return PublicKey
-     */
-    public function getPublicKey()
-    {
-        return $this->publicKey;
-    }
+    public function setKeyPairProvider(AsymmetricKeyPairProviderService $keyPairProviderService);
 }

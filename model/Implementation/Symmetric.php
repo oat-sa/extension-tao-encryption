@@ -19,22 +19,44 @@
  */
 namespace oat\taoEncryption\Implementation;
 
+use oat\taoEncryption\Interfaces\Encrypt;
 use oat\taoEncryption\Model\Key;
+use phpseclib\Crypt\Base;
 use phpseclib\Crypt\RC4;
-use PHPUnit\Framework\TestCase;
 
-class SymmetricTest extends TestCase
+class Symmetric implements Encrypt
 {
-    public function testSuccessFlow()
+    /** @var RC4 */
+    private $crypter;
+
+    /**
+     * Symmetric constructor.
+     * @param Base $cripter
+     */
+    public function __construct(Base $cripter)
     {
-        $sym = new Symmetric(new RC4());
+        $this->crypter = $cripter;
+    }
 
-        $myKey = new Key('secret key');
+    /**
+     * @param string $data
+     * @return mixed|string
+     */
+    public function encrypt(Key $key, $data)
+    {
+        $this->crypter->setKey($key->getKey());
 
-        $encrypted = $sym->encrypt($myKey, 'secret banana');
+        return $this->crypter->encrypt($data);
+    }
 
-        $this->assertInternalType('string', $encrypted);
+    /**
+     * @param $data
+     * @return string
+     */
+    public function decrypt(Key $key, $data)
+    {
+        $this->crypter->setKey($key->getKey());
 
-        $this->assertSame('secret banana',  $sym->decrypt($myKey, $encrypted));
+        return $this->crypter->decrypt($data);
     }
 }

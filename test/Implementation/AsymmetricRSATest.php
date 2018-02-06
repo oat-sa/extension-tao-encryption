@@ -17,11 +17,11 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\Encryption\Test\Implementation;
+namespace oat\taoEncryption\Test\Implementation;
 
-use oat\Encryption\Implementation\AsymmetricRSA;
-use oat\Encryption\Model\PrivateKey;
-use oat\Encryption\Model\PublicKey;
+use oat\taoEncryption\Implementation\AsymmetricRSA;
+use oat\taoEncryption\Model\PrivateKey;
+use oat\taoEncryption\Model\PublicKey;
 use PHPUnit\Framework\TestCase;
 
 class AsymmetricRSATest extends TestCase

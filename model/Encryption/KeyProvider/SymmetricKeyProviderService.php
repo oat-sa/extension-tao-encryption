@@ -17,24 +17,12 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Implementation;
 
-use oat\taoEncryption\Model\Key;
-use phpseclib\Crypt\RC4;
-use PHPUnit\Framework\TestCase;
+namespace oat\taoEncryption\Encryption\KeyProvider;
 
-class SymmetricTest extends TestCase
+use oat\oatbox\service\ConfigurableService;
+use oat\taoEncryption\Interfaces\SymmetricKeyProvider;
+
+abstract class SymmetricKeyProviderService extends ConfigurableService implements SymmetricKeyProvider
 {
-    public function testSuccessFlow()
-    {
-        $sym = new Symmetric(new RC4());
-
-        $myKey = new Key('secret key');
-
-        $encrypted = $sym->encrypt($myKey, 'secret banana');
-
-        $this->assertInternalType('string', $encrypted);
-
-        $this->assertSame('secret banana',  $sym->decrypt($myKey, $encrypted));
-    }
 }

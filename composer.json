@@ -1,8 +1,7 @@
 {
-    "name": "oat-sa/lib-tao-encryption",
+    "name": "oat-sa/extension-tao-encryption",
     "description" : "Tao Encryption",
-    "version": "0.1.0",
-    "type": "library",
+    "type": "tao-extension",
     "authors" : [
         {
             "name": "Open Assessment Technologies SA",
@@ -22,6 +21,9 @@
     "license" : [
         "GPL-2.0-only"
     ],
+    "extra": {
+        "tao-extension-name": "taoEncryption"
+    },
     "minimum-stability" : "dev",
     "require-dev":{
         "phpunit/phpunit": "6.5.0"
@@ -33,8 +35,10 @@
     },
     "autoload" : {
         "psr-4" : {
-            "oat\\Encryption\\" : "src",
-            "oat\\Test\\Encryption\\" : "test"
+            "oat\\taoEncryption\\" : "model",
+            "oat\\taoEncryption\\ExtendedService\\" : "ExtendedService",
+            "oat\\taoEncryption\\scripts\\" : "scripts",
+            "oat\\taoEncryption\\Test\\" : "test"
         }
     } 
 }

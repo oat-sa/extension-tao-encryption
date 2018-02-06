@@ -17,24 +17,6 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Implementation;
+namespace oat\taoEncryption\Model;
 
-use oat\taoEncryption\Model\Key;
-use phpseclib\Crypt\RC4;
-use PHPUnit\Framework\TestCase;
-
-class SymmetricTest extends TestCase
-{
-    public function testSuccessFlow()
-    {
-        $sym = new Symmetric(new RC4());
-
-        $myKey = new Key('secret key');
-
-        $encrypted = $sym->encrypt($myKey, 'secret banana');
-
-        $this->assertInternalType('string', $encrypted);
-
-        $this->assertSame('secret banana',  $sym->decrypt($myKey, $encrypted));
-    }
-}
+class PublicKey extends Key{}

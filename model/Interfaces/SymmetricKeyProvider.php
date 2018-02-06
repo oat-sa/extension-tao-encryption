@@ -17,6 +17,15 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\Encryption\Model;
 
-class PublicKey extends Key{}
+namespace oat\taoEncryption\Interfaces;
+
+use oat\taoEncryption\Model\Key;
+
+interface SymmetricKeyProvider
+{
+    /**
+     * @return Key
+     */
+    public function getKey();
+}

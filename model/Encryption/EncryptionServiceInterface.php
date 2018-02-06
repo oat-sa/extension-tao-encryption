@@ -17,15 +17,22 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+namespace oat\taoEncryption\Encryption;
 
-namespace oat\Encryption\Interfaces;
+use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 
-use oat\Encryption\Model\Key;
-
-interface SymmetricKeyProvider
+interface EncryptionServiceInterface
 {
     /**
-     * @return Key
+     * @param string $data
+     * @return string
      */
-    public function getKey();
+    public function encrypt($data);
+
+    /**
+     * @param string $data
+     * @throws DecryptionFailedException
+     * @return string
+     */
+    public function decrypt($data);
 }

@@ -17,27 +17,6 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\Encryption\Model;
+namespace oat\taoEncryption\Model;
 
-class Key
-{
-    /** @var string */
-    protected $key;
-
-    /**
-     * Key constructor.
-     * @param $key
-     */
-    public function __construct($key)
-    {
-        $this->key = $key;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
-}
+class PrivateKey extends Key{}

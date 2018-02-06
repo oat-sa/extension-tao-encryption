@@ -14,29 +14,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
+ *
  *
  */
-namespace oat\Encryption\Interfaces;
+namespace oat\taoEncryption\update;
 
-use oat\Encryption\Model\KeyPairEncryption;
-use oat\Encryption\Model\PrivateKey;
-use oat\Encryption\Model\PublicKey;
+use common_ext_ExtensionUpdater;
 
-interface AsymmetricKeyPairProvider
+class Updater extends common_ext_ExtensionUpdater
 {
-    /** @return KeyPairEncryption */
-    public function generate();
-
-    /** @param $key PublicKey */
-    public function savePublicKey(PublicKey $key);
-
-    /** @return PublicKey */
-    public function getPublicKey();
-
-    /** @param $key PrivateKey */
-    public function savePrivateKey(PrivateKey $key);
-
-    /** @return   PrivateKey */
-    public function getPrivateKey();
+    public function update($initialVersion)
+    {
+    }
 }

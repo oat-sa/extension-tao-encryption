@@ -17,12 +17,13 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\Encryption\Implementation;
+namespace oat\taoEncryption\Implementation;
 
-use oat\Encryption\Interfaces\Encrypt;
-use oat\Encryption\Model\Key;
-use oat\Encryption\Model\PrivateKey;
-use oat\Encryption\Model\PublicKey;
+use oat\taoEncryption\Interfaces\Encrypt;
+use oat\taoEncryption\Model\Exception\DecryptionFailedException;
+use oat\taoEncryption\Model\Key;
+use oat\taoEncryption\Model\PrivateKey;
+use oat\taoEncryption\Model\PublicKey;
 use phpseclib\Crypt\RSA;
 
 class AsymmetricRSA implements Encrypt
@@ -60,6 +61,16 @@ class AsymmetricRSA implements Encrypt
         }
         $this->crypter->loadKey($key->getKey());
 
-        return $this->crypter->decrypt($data);
+        set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontext) {
+            if ($errstr === 'Decryption error'){
+                throw new DecryptionFailedException('Decryption failed');
+            }
+        });
+
+        $decrypted = $this->crypter->decrypt($data);
+
+        restore_error_handler();
+
+        return $decrypted;
     }
 }

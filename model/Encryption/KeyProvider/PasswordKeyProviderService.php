@@ -18,19 +18,25 @@
  *
  */
 
-namespace oat\Encryption\Interfaces;
+namespace oat\taoEncryption\Encryption\KeyProvider;
 
-use oat\Encryption\Model\Key;
+use common_session_SessionManager;
+use oat\generis\model\GenerisRdf;
+use oat\taoEncryption\Model\Key;
 
-interface Encrypt
+class PasswordKeyProviderService extends SymmetricKeyProviderService
 {
-    /**
-     * @return string
-     */
-    public function encrypt(Key $key, $data);
+    const SERVICE_ID = 'taoEncryption/symmetricPasswordProvider';
 
     /**
-     * @return string
+     * @return Key
+     * @throws \common_exception_Error
      */
-    public function decrypt(Key $key, $data);
+    public function getKey()
+    {
+        $session = common_session_SessionManager::getSession();
+        $password = $session->getUser()->getPropertyValues(GenerisRdf::PROPERTY_USER_PASSWORD);
+
+        return new Key(base64_encode(json_encode($password))) ;
+    }
 }

@@ -17,24 +17,40 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Implementation;
+namespace oat\taoEncryption\Model;
 
-use oat\taoEncryption\Model\Key;
-use phpseclib\Crypt\RC4;
-use PHPUnit\Framework\TestCase;
-
-class SymmetricTest extends TestCase
+class KeyPairEncryption
 {
-    public function testSuccessFlow()
+    /** @var PrivateKey */
+    private $privateKey;
+
+    /** @var PublicKey */
+    private $publicKey;
+
+    /**
+     * KeyPairEncryption constructor.
+     * @param PrivateKey $privateKey
+     * @param PublicKey $publicKey
+     */
+    public function __construct(PrivateKey $privateKey, PublicKey $publicKey)
     {
-        $sym = new Symmetric(new RC4());
+        $this->privateKey = $privateKey;
+        $this->publicKey = $publicKey;
+    }
 
-        $myKey = new Key('secret key');
+    /**
+     * @return PrivateKey
+     */
+    public function getPrivateKey()
+    {
+        return $this->privateKey;
+    }
 
-        $encrypted = $sym->encrypt($myKey, 'secret banana');
-
-        $this->assertInternalType('string', $encrypted);
-
-        $this->assertSame('secret banana',  $sym->decrypt($myKey, $encrypted));
+    /**
+     * @return PublicKey
+     */
+    public function getPublicKey()
+    {
+        return $this->publicKey;
     }
 }

@@ -17,24 +17,35 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Implementation;
+namespace oat\taoEncryption\Encryption;
 
-use oat\taoEncryption\Model\Key;
-use phpseclib\Crypt\RC4;
-use PHPUnit\Framework\TestCase;
+use oat\oatbox\service\ConfigurableService;
+use oat\taoEncryption\Encryption\Algorithm\AlgorithmServiceInterface;
 
-class SymmetricTest extends TestCase
+abstract class EncryptionServiceAbstract extends ConfigurableService implements EncryptionServiceInterface
 {
-    public function testSuccessFlow()
+    /**
+     * @return AlgorithmServiceInterface
+     */
+    public abstract function getAlgorithm();
+
+    /**
+     * @param string $data
+     * @return string
+     * @throws \Exception
+     */
+    public function encrypt($data)
     {
-        $sym = new Symmetric(new RC4());
+        return $this->getAlgorithm()->encrypt($data);
+    }
 
-        $myKey = new Key('secret key');
-
-        $encrypted = $sym->encrypt($myKey, 'secret banana');
-
-        $this->assertInternalType('string', $encrypted);
-
-        $this->assertSame('secret banana',  $sym->decrypt($myKey, $encrypted));
+    /**
+     * @param string $data
+     * @return string
+     * @throws \Exception
+     */
+    public function decrypt($data)
+    {
+        return $this->getAlgorithm()->decrypt($data);
     }
 }
