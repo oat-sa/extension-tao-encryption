@@ -55,6 +55,8 @@ class SetupDefaultResultStorage extends InstallAction
                 $this->registerService(taoAltResultStorage_models_classes_KeyValueResultStorage::SERVICE_ID, $keyValueResult);
 
                 $report->add(Report::createSuccess('taoAltResultStorage_models_classes_KeyValueResultStorage set'));
+            }else {
+                $report->add(Report::createInfo('EncryptedKeyValueResultStorage not registered'));
             }
         } else {
             $report->add(Report::createInfo('EncryptedKeyValueResultStorage not registered'));
@@ -72,6 +74,9 @@ class SetupDefaultResultStorage extends InstallAction
                 $this->registerService(RdsResultStorage::SERVICE_ID, $rdsResult);
 
                 $report->add(Report::createSuccess('RdsResultStorage set'));
+            }else {
+                $report->add(Report::createInfo('EncryptedRdsResultStorage not registered'));
+
             }
         } else {
             $report->add(Report::createInfo('EncryptedRdsResultStorage not registered'));
