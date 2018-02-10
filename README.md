@@ -44,16 +44,16 @@ The public key it's used for encryption and private key for decryption. In case 
 
 #### 2. Setup decryption
 
-In order to decrypt you results use the fallowing script by passing a delivery id.
+In order to decrypt your results use the fallowing script by passing a delivery id.
 
 ```bash
- $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' http://www.act-actpg.dev/ontologies/tao.rdf#i1517506138420834557
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' <delivery_id>
 ```
 _Note_: 
-> This command will decrypt results and storing in the same database model.
+> This command will decrypt results and store in the same database model.
 
 _Important_:
-> After running this command you should to switch back to the previous result storage in order to read the results in the back office of tao.
+> After running this command you should switch back to the previous result storage in order to read the results in the back office of tao.
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupDefaultResultStorage'
@@ -69,6 +69,5 @@ In order to use the encrypted state test service you have to run the fallowing c
 
 This service it's using the symmetric algorithm in order to encrypt.
 
-The default key encryption of this it's based on user password, this is a configurable option which can be changed in the config file of taoEncryption extension.
-
-
+The default key encryption of this it's based on user password. 
+This is a configurable option which can be changed in the config files of taoEncryption extension.
