@@ -22,6 +22,7 @@ namespace oat\taoEncryption\Test\Implementation;
 use oat\taoEncryption\Implementation\AsymmetricRSA;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
+use phpseclib\Crypt\AES;
 use PHPUnit\Framework\TestCase;
 
 class AsymmetricRSATest extends TestCase
@@ -55,14 +56,16 @@ EOD;
 
     public function testFlow()
     {
-        $rsa = new AsymmetricRSA();
+        $rsa = new AsymmetricRSA(new AES());
 
-        $encrypted = $rsa->encrypt(new PublicKey($this->publicKey), 'secret banana');
+        $content = 'my secret';
+
+        $encrypted = $rsa->encrypt(new PublicKey($this->publicKey), $content);
 
         $this->assertInternalType('string', $encrypted);
 
         $decrypted = $rsa->decrypt(new PrivateKey($this->privateKey), $encrypted);
 
-        $this->assertSame('secret banana', $decrypted);
+        $this->assertSame($content, $decrypted);
     }
 }
