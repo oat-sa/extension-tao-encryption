@@ -19,11 +19,11 @@
  *
  */
 
+use oat\taoEncryption\scripts\install\RegisterDecryptResultStorage;
 use oat\taoEncryption\scripts\install\RegisterEncryptionAsymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptionSymmetricService;
+use oat\taoEncryption\scripts\install\RegisterEncryptResultStorage;
 use oat\taoEncryption\scripts\install\RegisterKeyPairProviderService;
-use oat\taoEncryption\scripts\tools\RegisterDecryptResultStorage;
-use oat\taoEncryption\scripts\tools\RegisterEncryptResultStorage;
 
 return array(
     'name' => 'taoEncryption',
