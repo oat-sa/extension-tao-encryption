@@ -318,7 +318,7 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
      */
     protected function buildStoreKey($deliveryResultIdentifier, $id, $variable_id)
     {
-        return $deliveryResultIdentifier . '_' . $id . '_'. $variable_id;
+        return md5($deliveryResultIdentifier . '_' . $id . '_'. $variable_id);
     }
 
     /**
