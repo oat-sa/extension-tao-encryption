@@ -21,7 +21,7 @@ namespace oat\taoEncryption\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
 use oat\oatbox\filesystem\FileSystemService;
-use oat\taoEncryption\Encryption\KeyProvider\AsymmetricKeyPairProviderService;
+use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 
 class RegisterKeyPairProviderService extends InstallAction
 {

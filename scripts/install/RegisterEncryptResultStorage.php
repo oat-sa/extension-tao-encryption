@@ -17,20 +17,17 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
  *
  */
-namespace oat\taoEncryption\scripts\tools;
+namespace oat\taoEncryption\scripts\install;
 
 use common_report_Report as Report;
 use oat\oatbox\extension\InstallAction;
+use oat\taoEncryption\Service\EncryptionAsymmetricService;
 use oat\taoEncryption\Service\Result\EncryptResultService;
-use oat\taoResultServer\models\classes\implementation\ResultServerService;
 
 /**
- * Class SetupAsymmetricKeys
- * @package oat\taoEncryption\tools
- *
- * sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedResultStorage'
+ * sudo -u www-data php index.php 'oat\taoEncryption\scripts\install\RegisterEncryptResultStorage'
  */
-class SetupEncryptedResultStorage extends InstallAction
+class RegisterEncryptResultStorage extends InstallAction
 {
     /**
      * @param $params
@@ -41,11 +38,23 @@ class SetupEncryptedResultStorage extends InstallAction
     {
         $report = Report::createSuccess();
 
-        /** @var ResultServerService $resultServer */
-        $resultServer = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
-        $resultServer->setOption(ResultServerService::OPTION_RESULT_STORAGE, EncryptResultService::SERVICE_ID);
+        $persistenceId = 'kvMySql';
 
-        $this->registerService(ResultServerService::SERVICE_ID, $resultServer);
+        try {
+            \common_persistence_Manager::getPersistence($persistenceId);
+        } catch (\common_Exception $e) {
+            \common_persistence_Manager::addPersistence($persistenceId,  array(
+                'driver' => 'SqlKvWrapper',
+                'sqlPersistence' => 'default',
+            ));
+        }
+
+        $encryptedKeyValueResult = new EncryptResultService([
+            EncryptResultService::OPTION_PERSISTENCE => $persistenceId,
+            EncryptResultService::OPTION_ENCRYPTION_SERVICE => EncryptionAsymmetricService::SERVICE_ID,
+        ]);
+
+        $this->registerService(EncryptResultService::SERVICE_ID, $encryptedKeyValueResult);
 
         return $report;
     }

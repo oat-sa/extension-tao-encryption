@@ -22,6 +22,8 @@
 use oat\taoEncryption\scripts\install\RegisterEncryptionAsymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptionSymmetricService;
 use oat\taoEncryption\scripts\install\RegisterKeyPairProviderService;
+use oat\taoEncryption\scripts\tools\RegisterDecryptResultStorage;
+use oat\taoEncryption\scripts\tools\RegisterEncryptResultStorage;
 
 return array(
     'name' => 'taoEncryption',
@@ -38,7 +40,9 @@ return array(
         'php' => [
             RegisterKeyPairProviderService::class,
             RegisterEncryptionAsymmetricService::class,
-            RegisterEncryptionSymmetricService::class
+            RegisterEncryptionSymmetricService::class,
+            RegisterEncryptResultStorage::class,
+            RegisterDecryptResultStorage::class,
         ]
     ),
     'uninstall' => array(

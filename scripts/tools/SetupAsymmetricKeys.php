@@ -22,7 +22,7 @@ namespace oat\taoEncryption\scripts\tools;
 use common_report_Report as Report;
 use oat\oatbox\action\Action;
 use oat\oatbox\action\ResolutionException;
-use oat\taoEncryption\Encryption\KeyProvider\AsymmetricKeyPairProviderService;
+use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 

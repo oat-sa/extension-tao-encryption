@@ -22,7 +22,7 @@ namespace oat\taoEncryption\scripts\tools;
 use oat\oatbox\extension\InstallAction;
 use common_report_Report as Report;
 use oat\tao\model\state\StateStorage;
-use oat\taoEncryption\ExtendedService\EncryptedStateStorage;
+use oat\taoEncryption\Service\SessionState\EncryptedStateStorage;
 
 /**
  * Class SetupAsymmetricKeys

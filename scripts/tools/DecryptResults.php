@@ -21,13 +21,8 @@ namespace oat\taoEncryption\scripts\tools;
 
 use common_report_Report as Report;
 use oat\oatbox\action\Action;
-use oat\taoEncryption\ExtendedService\EncryptedKeyValueResultStorage;
-use oat\taoEncryption\ExtendedService\EncryptedRdsResultStorage;
-use oat\taoEncryption\ExtendedService\EncryptResult;
+use oat\taoEncryption\Service\Result\DecryptResultService;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
-use oat\taoResultServer\models\classes\implementation\StorageAggregation;
-use oat\taoResultServer\models\classes\NoResultStorageException;
-use oat\taoResultServer\models\classes\ResultServerService;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
@@ -35,7 +30,7 @@ use Zend\ServiceManager\ServiceLocatorAwareTrait;
  * Class SetupAsymmetricKeys
  * @package oat\taoEncryption\tools
  *
- * sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' http://www.act-actpg.dev/ontologies/tao.rdf#i1517506138420834557
+ * sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' <delivery_id>
  */
 class DecryptResults implements Action, ServiceLocatorAwareInterface
 {
@@ -57,17 +52,13 @@ class DecryptResults implements Action, ServiceLocatorAwareInterface
             return Report::createFailure('incorrect result id provided: '. $deliveryExecId);
         }
 
-        /** @var ResultServerService $resultServerService */
-        $resultServerService = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
-        $resultStorage = $resultServerService->getResultStorage($deliveryExecId);
-
-        if (!$resultStorage instanceof EncryptResult){
-            return Report::createFailure('results not encrypted ');
-        }
+        /** @var DecryptResultService $service */
+        $service = $this->getServiceLocator()->get(DecryptResultService::SERVICE_ID);
 
         $this->report = Report::createSuccess('Decrypting Results');
         try {
-            $resultStorage->decryptAndSave();
+
+            $service->decrypt($deliveryExecId);
 
         }catch (DecryptionFailedException $exception){
             $this->report = Report::createFailure($exception->getMessage());

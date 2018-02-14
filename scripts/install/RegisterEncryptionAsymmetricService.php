@@ -21,8 +21,9 @@
 namespace oat\taoEncryption\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
-use oat\taoEncryption\Encryption\Algorithm\AlgorithmAsymmetricRSAService;
-use oat\taoEncryption\Encryption\EncryptionAsymmetricService;
+use oat\taoEncryption\Service\Algorithm\AlgorithmAsymmetricRSAService;
+use oat\taoEncryption\Service\EncryptionAsymmetricService;
+use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 
 class RegisterEncryptionAsymmetricService extends InstallAction
 {
@@ -33,12 +34,14 @@ class RegisterEncryptionAsymmetricService extends InstallAction
      */
     public function __invoke($params)
     {
-        $algorithm = new AlgorithmAsymmetricRSAService();
+        $algorithm = new AlgorithmAsymmetricRSAService([
+            AlgorithmAsymmetricRSAService::OPTION_ALGORITHM => 'AES'
+        ]);
         $this->registerService(AlgorithmAsymmetricRSAService::SERVICE_ID, $algorithm);
 
         $encryption = new EncryptionAsymmetricService([
-            EncryptionAsymmetricService::OPTION_ENCRYPTION_ALGORITHM => 'taoEncryption/asymmetricAlgorithm',
-            EncryptionAsymmetricService::OPTION_KEY_PAIR_PROVIDER => 'taoEncryption/asymmetricKeyPairProvider'
+            EncryptionAsymmetricService::OPTION_ENCRYPTION_ALGORITHM => AlgorithmAsymmetricRSAService::SERVICE_ID,
+            EncryptionAsymmetricService::OPTION_KEY_PAIR_PROVIDER => AsymmetricKeyPairProviderService::SERVICE_ID
         ]);
 
         $this->registerService(EncryptionAsymmetricService::SERVICE_ID, $encryption);
