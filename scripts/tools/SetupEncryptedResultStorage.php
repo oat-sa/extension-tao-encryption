@@ -47,6 +47,8 @@ class SetupEncryptedResultStorage extends InstallAction
 
         $this->registerService(ResultServerService::SERVICE_ID, $resultServer);
 
+        $report = Report::createSuccess('EncryptResultService setup with success');
+
         return $report;
     }
 }
