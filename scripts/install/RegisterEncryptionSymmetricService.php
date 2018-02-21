@@ -22,7 +22,6 @@ namespace oat\taoEncryption\scripts\install;
 use oat\oatbox\extension\InstallAction;
 use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
-use oat\taoEncryption\Service\KeyProvider\PasswordKeyProviderService;
 
 class RegisterEncryptionSymmetricService extends InstallAction
 {
@@ -38,12 +37,8 @@ class RegisterEncryptionSymmetricService extends InstallAction
         ]);
         $this->registerService(AlgorithmSymmetricService::SERVICE_ID, $algo);
 
-        $keyProvider = new PasswordKeyProviderService();
-        $this->registerService(PasswordKeyProviderService::SERVICE_ID, $keyProvider);
-
         $encryption = new EncryptionSymmetricService([
-            EncryptionSymmetricService::OPTION_ENCRYPTION_ALGORITHM => AlgorithmSymmetricService::SERVICE_ID,
-            EncryptionSymmetricService::OPTION_KEY_PROVIDER => PasswordKeyProviderService::SERVICE_ID,
+            EncryptionSymmetricService::OPTION_ENCRYPTION_ALGORITHM => AlgorithmSymmetricService::SERVICE_ID
         ]);
 
         $this->registerService(EncryptionSymmetricService::SERVICE_ID, $encryption);

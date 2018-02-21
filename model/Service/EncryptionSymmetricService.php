@@ -21,6 +21,7 @@ namespace oat\taoEncryption\Service;
 
 use oat\taoEncryption\Service\Algorithm\AlgorithmServiceInterface;
 use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\DummyKeyProvider;
 use oat\taoEncryption\Service\KeyProvider\SymmetricKeyProviderService;
 
 class EncryptionSymmetricService extends EncryptionServiceAbstract
@@ -29,8 +30,11 @@ class EncryptionSymmetricService extends EncryptionServiceAbstract
 
     const OPTION_ENCRYPTION_ALGORITHM = 'encryptionAlgorithm';
 
-    const OPTION_KEY_PROVIDER = 'keyPairProvider';
+    /** @var AlgorithmSymmetricService */
+    private $algorithm;
 
+    /** @var SymmetricKeyProviderService */
+    private $keyProvider;
 
     /**
      * @return AlgorithmServiceInterface
@@ -38,18 +42,32 @@ class EncryptionSymmetricService extends EncryptionServiceAbstract
      */
     public function getAlgorithm()
     {
-        $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_ALGORITHM));
-        if (!$service instanceof AlgorithmSymmetricService) {
-            throw new  \Exception('Incorrect algorithm service provided');
+        if (is_null($this->algorithm)) {
+            $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_ALGORITHM));
+
+            if (!$service instanceof AlgorithmSymmetricService) {
+                throw new  \Exception('Incorrect algorithm service provided');
+            }
+
+            if (is_null($this->keyProvider)) {
+                $keyProvider = new DummyKeyProvider();
+            } else {
+                $keyProvider = $this->keyProvider;
+            }
+
+            $service->setKeyProvider($keyProvider);
+
+            $this->algorithm = $service;
         }
 
-        $keyProvider = $this->getServiceLocator()->get($this->getOption(static::OPTION_KEY_PROVIDER));
-        if (!$keyProvider instanceof SymmetricKeyProviderService) {
-            throw new \Exception('Incorrect service key provided');
-        }
+        return $this->algorithm;
+    }
 
-        $service->setKeyProvider($keyProvider);
-
-        return $service;
+    /**
+     * @param SymmetricKeyProviderService $keyProviderService
+     */
+    public function setKeyProvider(SymmetricKeyProviderService $keyProviderService)
+    {
+        $this->keyProvider = $keyProviderService;
     }
 }

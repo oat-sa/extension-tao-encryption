@@ -19,25 +19,41 @@
  */
 namespace oat\taoEncryption\Service\SessionState;
 
-use oat\taoEncryption\Service\EncryptionServiceInterface;
+use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\SymmetricKeyProviderService;
 use tao_models_classes_service_StateStorage;
 
 class EncryptedStateStorage extends tao_models_classes_service_StateStorage
 {
     const OPTION_ENCRYPTION_SERVICE = 'symmetricEncryptionService';
 
+    const OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE = 'keyProviderService';
+
+    /** @var EncryptionSymmetricService */
+    private $encryptionService;
+
     /**
-     * @return EncryptionServiceInterface
+     * @return EncryptionSymmetricService
      * @throws \Exception
      */
     public function getEncryptionService()
     {
-        $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_SERVICE));
-        if (!$service instanceof EncryptionServiceInterface) {
-            throw new  \Exception('Incorrect algorithm service provided');
+        if (is_null($this->encryptionService)) {
+            /** @var EncryptionSymmetricService $service */
+            $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_SERVICE));
+
+            if (!$service instanceof EncryptionSymmetricService) {
+                throw new  \Exception('Incorrect algorithm service provided');
+            }
+
+            /** @var SymmetricKeyProviderService $keyProvider */
+            $keyProvider = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE));
+            $service->setKeyProvider($keyProvider);
+
+            $this->encryptionService = $service;
         }
 
-        return $service;
+        return $this->encryptionService;
     }
 
     /**

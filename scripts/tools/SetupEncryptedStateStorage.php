@@ -22,6 +22,8 @@ namespace oat\taoEncryption\scripts\tools;
 use oat\oatbox\extension\InstallAction;
 use common_report_Report as Report;
 use oat\tao\model\state\StateStorage;
+use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\DeliveryExecutionStateKeyProviderService;
 use oat\taoEncryption\Service\SessionState\EncryptedStateStorage;
 
 /**
@@ -40,25 +42,21 @@ class SetupEncryptedStateStorage extends InstallAction
      */
     public function __invoke($params)
     {
-        if ($this->getServiceLocator()->has(StateStorage::SERVICE_ID)){
+        $keyProvider = new DeliveryExecutionStateKeyProviderService();
+        $this->registerService(DeliveryExecutionStateKeyProviderService::SERVICE_ID, $keyProvider);
 
-            /** @var StateStorage $stateStorage */
-            $stateStorage = $this->getServiceLocator()->get(StateStorage::SERVICE_ID);
-            $options = $stateStorage->getOptions();
+        /** @var StateStorage $stateStorage */
+        $stateStorage = $this->getServiceLocator()->get(StateStorage::SERVICE_ID);
+        $options = $stateStorage->getOptions();
 
-            $encryptedStateStorage = new EncryptedStateStorage(array_merge([
-                    EncryptedStateStorage::OPTION_ENCRYPTION_SERVICE => 'taoEncryption/symmetricEncryptionService'
-                ], $options)
-            );
+        $encryptedStateStorage = new EncryptedStateStorage(array_merge([
+                EncryptedStateStorage::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
+                EncryptedStateStorage::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => DeliveryExecutionStateKeyProviderService::SERVICE_ID
+            ], $options)
+        );
 
-            $this->registerService(EncryptedStateStorage::SERVICE_ID, $encryptedStateStorage);
+        $this->registerService(EncryptedStateStorage::SERVICE_ID, $encryptedStateStorage);
 
-            return Report::createSuccess('EncryptedStateStorage configured');
-
-        } else {
-            return Report::createFailure('StateStorage not registered');
-        }
-
-        return Report::createFailure('No StateStorage configured');
+        return Report::createSuccess('EncryptedStateStorage configured');
     }
 }
