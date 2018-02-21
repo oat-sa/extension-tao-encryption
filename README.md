@@ -1,4 +1,4 @@
-N# Tao Encryption 
+# Tao Encryption 
 
 > This article describes the functioning of tao encryption, focusing of encryption of sensitive data information on a database level.
 
@@ -53,5 +53,5 @@ In order to use the encrypted state test service you have to run the fallowing c
 
 This service it's using the symmetric algorithm in order to encrypt.
 
-The default key encryption of this it's based on user password. 
-This is a configurable option which can be changed in the config files of taoEncryption extension.
+The key provider is a configurable option which can be changed in the config file:
+`taoEncryption/symmetricDeliveryExecutionProvider`
