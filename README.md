@@ -14,7 +14,7 @@ You can add the Tao Encryption as a standard TAO extension to your current TAO i
 
 ### 1. Results data encryption
 
-In order to use the encrypted results service you have to run the fallowing command
+In order to use the encrypted results service you have to run the following command
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedResultStorage'
@@ -35,7 +35,7 @@ The public key it's used for encryption and private key for decryption.
 
 #### 2. Setup decryption
 
-In order to decrypt your results use the fallowing script by passing a delivery id.
+In order to decrypt your results use the following script by passing a delivery id.
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' <delivery_id>
@@ -45,7 +45,7 @@ _Note_:
 
 ### 2. Test State data encryption
 
-In order to use the encrypted state test service you have to run the fallowing command:
+In order to use the encrypted state test service you have to run the following command:
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedStateStorage'
