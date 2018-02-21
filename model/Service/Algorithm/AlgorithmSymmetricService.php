@@ -21,12 +21,11 @@
 namespace oat\taoEncryption\Service\Algorithm;
 
 use oat\oatbox\service\ConfigurableService;
-use oat\taoEncryption\Service\KeyProvider\SymmetricProvider;
 use oat\taoEncryption\Service\KeyProvider\SymmetricKeyProviderService;
 use oat\taoEncryption\Model\Symmetric\Symmetric;
 use oat\taoEncryption\Model\AlgorithmFactory;
 
-class AlgorithmSymmetricService extends ConfigurableService implements AlgorithmServiceInterface, SymmetricProvider
+class AlgorithmSymmetricService extends ConfigurableService implements AlgorithmSymmetricServiceInterface
 {
     const SERVICE_ID = 'taoEncryption/symmetricAlgorithm';
 

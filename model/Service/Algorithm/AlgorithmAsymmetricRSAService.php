@@ -20,13 +20,11 @@
 namespace oat\taoEncryption\Service\Algorithm;
 
 use oat\oatbox\service\ConfigurableService;
-use oat\taoEncryption\Service\KeyProvider\AsymmetricProvider;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 use oat\taoEncryption\Model\Asymmetric\AsymmetricRSA;
 use oat\taoEncryption\Model\AlgorithmFactory;
-use phpseclib\Crypt\AES;
 
-class AlgorithmAsymmetricRSAService extends ConfigurableService implements AlgorithmServiceInterface, AsymmetricProvider
+class AlgorithmAsymmetricRSAService extends ConfigurableService implements AlgorithmAsymmetricRSAServiceInterface
 {
     const SERVICE_ID = 'taoEncryption/asymmetricAlgorithm';
 

@@ -20,7 +20,7 @@
 namespace oat\taoEncryption\Service;
 
 use oat\taoEncryption\Service\Algorithm\AlgorithmServiceInterface;
-use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
+use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricServiceInterface;
 use oat\taoEncryption\Service\KeyProvider\DummyKeyProvider;
 use oat\taoEncryption\Service\KeyProvider\SymmetricKeyProviderService;
 
@@ -30,7 +30,7 @@ class EncryptionSymmetricService extends EncryptionServiceAbstract
 
     const OPTION_ENCRYPTION_ALGORITHM = 'encryptionAlgorithm';
 
-    /** @var AlgorithmSymmetricService */
+    /** @var AlgorithmSymmetricServiceInterface */
     private $algorithm;
 
     /** @var SymmetricKeyProviderService */
@@ -45,7 +45,7 @@ class EncryptionSymmetricService extends EncryptionServiceAbstract
         if (is_null($this->algorithm)) {
             $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_ALGORITHM));
 
-            if (!$service instanceof AlgorithmSymmetricService) {
+            if (!$service instanceof AlgorithmSymmetricServiceInterface) {
                 throw new  \Exception('Incorrect algorithm service provided');
             }
 

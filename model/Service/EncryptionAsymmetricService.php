@@ -20,7 +20,7 @@
 
 namespace oat\taoEncryption\Service;
 
-use oat\taoEncryption\Service\Algorithm\AlgorithmAsymmetricRSAService;
+use oat\taoEncryption\Service\Algorithm\AlgorithmAsymmetricRSAServiceInterface;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 
 class EncryptionAsymmetricService extends EncryptionServiceAbstract
@@ -31,17 +31,17 @@ class EncryptionAsymmetricService extends EncryptionServiceAbstract
 
     const OPTION_KEY_PAIR_PROVIDER = 'keyPairProvider';
 
-    /** @var AlgorithmAsymmetricRSAService */
+    /** @var AlgorithmAsymmetricRSAServiceInterface */
     private $service;
     /**
-     * @return AlgorithmAsymmetricRSAService
+     * @return AlgorithmAsymmetricRSAServiceInterface
      * @throws \Exception
      */
     protected function getAlgorithm()
     {
         if (is_null($this->service)){
             $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_ALGORITHM));
-            if (!$service instanceof AlgorithmAsymmetricRSAService) {
+            if (!$service instanceof AlgorithmAsymmetricRSAServiceInterface) {
                 throw new \Exception('Incorrect algorithm service');
             }
 
