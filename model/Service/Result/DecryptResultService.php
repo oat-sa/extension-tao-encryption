@@ -46,6 +46,11 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
     const PREFIX_TEST_TAKER = EncryptResultService::PREFIX_TEST_TAKER;
 
+    /** @var  common_persistence_KvDriver */
+    private $persistence;
+
+    /** @var  EncryptionServiceInterface*/
+    private $encryptionService;
     /**
      * @inheritdoc
      */
@@ -104,10 +109,14 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function getEncryptionService()
     {
-        /** @var EncryptionServiceInterface $service */
-        $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_SERVICE));
+        if (is_null($this->encryptionService)){
+            /** @var EncryptionServiceInterface $service */
+            $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_SERVICE));
 
-        return $service;
+            $this->encryptionService = $service;
+        }
+
+        return $this->encryptionService;
     }
 
     /**
@@ -116,14 +125,18 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function getPersistence()
     {
-        $persistenceId = $this->getOption(self::OPTION_PERSISTENCE);
-        $persistence = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID)->getPersistenceById($persistenceId);
+        if (is_null($this->persistence)){
+            $persistenceId = $this->getOption(self::OPTION_PERSISTENCE);
+            $persistence = $this->getServiceLocator()->get(\common_persistence_Manager::SERVICE_ID)->getPersistenceById($persistenceId);
 
-        if (!$persistence instanceof common_persistence_KeyValuePersistence) {
-            throw new \Exception('Only common_persistence_KeyValuePersistence supported');
+            if (!$persistence instanceof common_persistence_KeyValuePersistence) {
+                throw new \Exception('Only common_persistence_KeyValuePersistence supported');
+            }
+
+            $this->persistence = $persistence;
         }
 
-        return $persistence;
+        return $this->persistence;
     }
 
     /**
