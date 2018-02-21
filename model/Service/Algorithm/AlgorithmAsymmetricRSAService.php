@@ -40,17 +40,6 @@ class AlgorithmAsymmetricRSAService extends ConfigurableService implements Algor
     private $algorithmRsa;
 
     /**
-     * @param array $options
-     * @throws \Exception
-     */
-    public function __construct(array $options = array())
-    {
-        parent::__construct($options);
-
-        $this->algorithmRsa = new AsymmetricRSA(AlgorithmFactory::create($this->getOption(static::OPTION_ALGORITHM)));
-    }
-
-    /**
      * @param AsymmetricKeyPairProviderService $keyPairProviderService
      * @return mixed|void
      */
@@ -66,7 +55,7 @@ class AlgorithmAsymmetricRSAService extends ConfigurableService implements Algor
      */
     public function encrypt($data)
     {
-        return $this->algorithmRsa->encrypt($this->getKeyPairService()->getPublicKey(), $data);
+        return $this->getAlgorithm()->encrypt($this->getKeyPairService()->getPublicKey(), $data);
     }
 
     /**
@@ -76,7 +65,7 @@ class AlgorithmAsymmetricRSAService extends ConfigurableService implements Algor
      */
     public function decrypt($data)
     {
-        return $this->algorithmRsa->decrypt($this->getKeyPairService()->getPrivateKey(), $data);
+        return $this->getAlgorithm()->decrypt($this->getKeyPairService()->getPrivateKey(), $data);
     }
 
     /**
@@ -90,5 +79,18 @@ class AlgorithmAsymmetricRSAService extends ConfigurableService implements Algor
         }
 
         return $this->keyPairService;
+    }
+
+    /**
+     * @return AsymmetricRSA
+     * @throws \Exception
+     */
+    protected function getAlgorithm()
+    {
+        if (is_null($this->algorithmRsa)){
+            $this->algorithmRsa = new AsymmetricRSA(AlgorithmFactory::create($this->getOption(static::OPTION_ALGORITHM)));
+        }
+
+        return $this->algorithmRsa;
     }
 }
