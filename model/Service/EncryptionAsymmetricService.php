@@ -31,23 +31,28 @@ class EncryptionAsymmetricService extends EncryptionServiceAbstract
 
     const OPTION_KEY_PAIR_PROVIDER = 'keyPairProvider';
 
+    /** @var AlgorithmAsymmetricRSAService */
+    private $service;
     /**
      * @return AlgorithmAsymmetricRSAService
      * @throws \Exception
      */
-    public function getAlgorithm()
+    protected function getAlgorithm()
     {
-        $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_ALGORITHM));
-        if (!$service instanceof AlgorithmAsymmetricRSAService) {
-            throw new  \Exception('Incorrect algorithm service');
+        if (is_null($this->service)){
+            $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_ALGORITHM));
+            if (!$service instanceof AlgorithmAsymmetricRSAService) {
+                throw new \Exception('Incorrect algorithm service');
+            }
+
+            $keyPairProvider = $this->getServiceLocator()->get($this->getOption(static::OPTION_KEY_PAIR_PROVIDER));
+            if (!$keyPairProvider instanceof AsymmetricKeyPairProviderService) {
+                throw new \Exception('Incorrect service key pair provided');
+            }
+            $service->setKeyPairProvider($keyPairProvider);
+            $this->service = $service;
         }
 
-        $keyPairProvider = $this->getServiceLocator()->get($this->getOption(static::OPTION_KEY_PAIR_PROVIDER));
-        if (!$keyPairProvider instanceof AsymmetricKeyPairProviderService) {
-            throw new  \Exception('Incorrect service key pair provided');
-        }
-        $service->setKeyPairProvider($keyPairProvider);
-
-        return $service;
+        return $this->service;
     }
 }

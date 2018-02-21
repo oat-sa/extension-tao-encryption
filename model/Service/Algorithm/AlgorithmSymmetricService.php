@@ -73,7 +73,7 @@ class AlgorithmSymmetricService extends ConfigurableService implements Algorithm
      * @return array|SymmetricKeyProviderService|object
      * @throws \Exception
      */
-    public function getKeyProviderService()
+    protected function getKeyProviderService()
     {
         if (is_null($this->keyProvider)) {
             throw new \Exception('Incorrect Key provider service, call setKeyProvider before.');

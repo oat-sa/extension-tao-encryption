@@ -17,35 +17,17 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Service;
+namespace oat\taoEncryption\Test\Service\KeyProvider;
 
-use oat\oatbox\service\ConfigurableService;
-use oat\taoEncryption\Service\Algorithm\AlgorithmServiceInterface;
+use oat\taoEncryption\Model\Key;
+use oat\taoEncryption\Service\KeyProvider\DeliveryExecutionStateKeyProviderService;
 
-abstract class EncryptionServiceAbstract extends ConfigurableService implements EncryptionServiceInterface
+class DeliveryExecutionStateKeyProviderServiceTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @return AlgorithmServiceInterface
-     */
-    protected abstract function getAlgorithm();
-
-    /**
-     * @param string $data
-     * @return string
-     * @throws \Exception
-     */
-    public function encrypt($data)
+    public function testGetKey()
     {
-        return $this->getAlgorithm()->encrypt($data);
-    }
+        $service = new DeliveryExecutionStateKeyProviderService();
 
-    /**
-     * @param string $data
-     * @return string
-     * @throws \Exception
-     */
-    public function decrypt($data)
-    {
-        return $this->getAlgorithm()->decrypt($data);
+        $this->assertInstanceOf(Key::class, $service->getKey());
     }
 }
