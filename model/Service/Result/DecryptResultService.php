@@ -193,9 +193,9 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function getItemsTestsRefs($resultId)
     {
-        $values = $this->getPersistence()->get(static::PREFIX_DELIVERY_RESULTS_ITEMS . $resultId);
-
-        return json_decode($values, true);
+        $values = (string)$this->getPersistence()->get(static::PREFIX_DELIVERY_RESULTS_ITEMS . $resultId);
+        $values = $values === '' ? [] : json_decode($values, true);
+        return $values;
     }
 
     /**
@@ -248,8 +248,10 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function getResults($deliveryIdentifier)
     {
-        $results = $this->getPersistence()->get(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier);
-        return json_decode($results, true);
+        $results = (string)$this->getPersistence()->get(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier);
+        $results = $results === '' ? [] : json_decode($results, true);
+
+        return $results;
     }
 
     /**
