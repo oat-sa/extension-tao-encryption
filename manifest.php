@@ -33,7 +33,8 @@ return array(
     'version' => '0.1.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=16.0.0'
+        'tao' => '>=16.0.0',
+        'taoResultServer' => '>=6.2.0'
     ),
 
     'install' => array(
