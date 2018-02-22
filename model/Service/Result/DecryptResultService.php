@@ -66,13 +66,15 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             $relatedDelivery  = $this->getRelatedDelivery($resultId);
             $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
 
+            $deliveryResultIdentifier = $relatedDelivery['deliveryResultIdentifier'];
+
             $resultStorage->storeRelatedDelivery(
-                $relatedDelivery['deliveryResultIdentifier'],
+                $deliveryResultIdentifier,
                 $relatedDelivery['deliveryIdentifier']
             );
 
             $resultStorage->storeRelatedTestTaker(
-                $relatedTestTaker['deliveryResultIdentifier'],
+                $deliveryResultIdentifier,
                 $relatedTestTaker['testTakerIdentifier']
             );
 
@@ -80,7 +82,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 $resultRow = $this->getResultRow($ref);
                 if ($resultRow instanceof ItemVariableStorable) {
                     $resultStorage->storeItemVariable(
-                        $resultRow->getDeliveryResultIdentifier(),
+                        $deliveryResultIdentifier,
                         $resultRow->getTestIdentifier(),
                         $resultRow->getItemIdentifier(),
                         $resultRow->getVariable(),
@@ -89,7 +91,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
                 } else if ($resultRow instanceof TestVariableStorable) {
                     $resultStorage->storeTestVariable(
-                        $resultRow->getDeliveryResultIdentifier(),
+                        $deliveryResultIdentifier,
                         $resultRow->getTestIdentifier(),
                         $resultRow->getVariable(),
                         $resultRow->getCallTestId()

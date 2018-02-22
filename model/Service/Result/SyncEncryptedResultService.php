@@ -64,12 +64,14 @@ class SyncEncryptedResultService extends ResultService
                 $this->checkResultFormat($result);
 
                 $deliveryId = $result['deliveryId'];
-                $deliveryExecutionId = $result['deliveryExecutionId'];
                 $details = $result['details'];
                 $variables = $result['variables'];
 
                 $delivery = $this->getResource($deliveryId);
                 $testtaker = $this->getResource($details['test-taker']);
+
+                $deliveryExecution = $this->spawnDeliveryExecution($delivery, $testtaker);
+                $deliveryExecutionId = $deliveryExecution->getIdentifier();
 
                 $this->getPersistence()->set(
                     EncryptResultService::PREFIX_TEST_TAKER . $deliveryExecutionId,
