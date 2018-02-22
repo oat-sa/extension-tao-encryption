@@ -34,8 +34,7 @@ return array(
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=16.0.0',
-        'taoResultServer' => '>=6.2.0',
-        'taoSync' => '>=0.1.0',
+        'taoResultServer' => '>=6.2.0'
     ),
 
     'install' => array(
@@ -49,5 +48,5 @@ return array(
     ),
     'uninstall' => array(
     ),
-    'update' => \oat\taoEncryption\update\Updater::class,
+    'update' => \oat\taoEncryption\scripts\update\Updater::class,
 );

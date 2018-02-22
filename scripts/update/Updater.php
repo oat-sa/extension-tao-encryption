@@ -18,7 +18,7 @@
  *
  *
  */
-namespace oat\taoEncryption\update;
+namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
 
