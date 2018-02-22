@@ -17,7 +17,6 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-
 namespace oat\taoEncryption\Service\Result;
 
 use common_persistence_KeyValuePersistence;
@@ -40,10 +39,6 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
 
     const PREFIX_DELIVERY_EXECUTION = 'encryptResultsDeliveryExecution_';
 
-    const PREFIX_DELIVERY_RESULTS = 'encryptDeliveryResults';
-
-    const PREFIX_DELIVERY_RESULTS_ITEMS = 'encryptMappingResultsItems';
-
     const PREFIX_TEST_TAKER = 'encryptTestTakerResultsDelivery_';
 
     /** @var  common_persistence_KvDriver*/
@@ -51,6 +46,12 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
 
     /** @var  EncryptionServiceInterface*/
     private $encryptionService;
+
+    /** @var DeliveryResultsModel */
+    private $deliveryResultsModel;
+
+    /** @var DeliveryResultVarsRefsModel */
+    public $deliveryResultVarsRefs;
 
     /**
      * @inheritdoc
@@ -93,11 +94,10 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
             "deliveryIdentifier" => $deliveryIdentifier
         ])));
 
-        $results = (string) $this->getPersistence()->get(self::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier);
-        $results = $results === '' ? [] : json_decode($results, true);
+        $results = $this->getDeliveryResultsModel()->getResults($deliveryIdentifier);
         $results[] = $deliveryResultIdentifier;
 
-        $this->getPersistence()->set(self::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier, json_encode($results));
+        $this->getDeliveryResultsModel()->setResults($deliveryIdentifier, $results);
     }
 
     /**
@@ -244,7 +244,7 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
 
     /**
      * @throws \Exception
-     * @return common_persistence_KvDriver
+     * @return common_persistence_KeyValuePersistence
      */
     protected function getPersistence()
     {
@@ -260,6 +260,32 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
         }
 
         return $this->persistence;
+    }
+
+    /**
+     * @return DeliveryResultsModel
+     * @throws \Exception
+     */
+    protected function getDeliveryResultsModel()
+    {
+        if (is_null($this->deliveryResultsModel)){
+            $this->deliveryResultsModel = new DeliveryResultsModel($this->getPersistence());
+        }
+
+        return $this->deliveryResultsModel;
+    }
+
+    /**
+     * @return DeliveryResultVarsRefsModel
+     * @throws \Exception
+     */
+    protected function getDeliveryResultVarsRefsModel()
+    {
+        if (is_null($this->deliveryResultVarsRefs)){
+            $this->deliveryResultVarsRefs = new DeliveryResultVarsRefsModel($this->getPersistence());
+        }
+
+        return $this->deliveryResultVarsRefs;
     }
 
     /**
@@ -342,13 +368,11 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
      */
     protected function storeReferenceOfKeysToResult($resultIdentifier, $keyStore)
     {
-        $mapping = (string) $this->getPersistence()->get(self::PREFIX_DELIVERY_RESULTS_ITEMS . $resultIdentifier);
-        $mapping = $mapping === '' ? [] : json_decode($mapping, true);
+        $mapping = $this->getDeliveryResultVarsRefsModel()->getResultsVariablesRefs($resultIdentifier);
 
         if (!in_array($keyStore, $mapping)){
             $mapping[] = $keyStore;
-
-            $this->getPersistence()->set(self::PREFIX_DELIVERY_RESULTS_ITEMS . $resultIdentifier, json_encode($mapping));
+            $this->getDeliveryResultVarsRefsModel()->setResultsVariablesRefs($resultIdentifier, $mapping);
         }
     }
 }

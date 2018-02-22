@@ -32,7 +32,6 @@ _Note_:
 The public key it's used for encryption and private key for decryption.
  In case we need encryption on different server passing the public key should be enough.
 
-
 #### 2. Setup decryption
 
 In order to decrypt your results use the following script by passing a delivery id.
@@ -42,6 +41,15 @@ In order to decrypt your results use the following script by passing a delivery 
 ```
 _Note_: 
 > This command will decrypt results and store in the delivery result storage setup.
+
+
+#### 3. Setup Sync Encrypted Result
+In order to sync encrypted results the script needs to be run on the server tao instance and client as well.
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedSyncResult'
+ ```
+
 
 ### 2. Test State data encryption
 
