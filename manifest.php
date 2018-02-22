@@ -30,11 +30,12 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.1.0',
+    'version' => '0.2.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=16.0.0',
-        'taoResultServer' => '>=6.2.0'
+        'taoResultServer' => '>=6.2.0',
+        'taoSync' => '>=0.1.0',
     ),
 
     'install' => array(
