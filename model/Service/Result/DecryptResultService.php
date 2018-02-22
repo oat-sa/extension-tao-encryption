@@ -64,6 +64,16 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             $relatedDelivery  = $this->getRelatedDelivery($resultId);
             $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
 
+            $resultStorage->storeRelatedDelivery(
+                $relatedDelivery['deliveryResultIdentifier'],
+                $relatedDelivery['deliveryIdentifier']
+            );
+
+            $resultStorage->storeRelatedTestTaker(
+                $relatedTestTaker['deliveryResultIdentifier'],
+                $relatedTestTaker['testTakerIdentifier']
+            );
+
             foreach ($itemsTestsRefs as $ref) {
                 $resultRow = $this->getResultRow($ref);
                 if ($resultRow instanceof ItemVariableStorable) {
@@ -87,17 +97,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 }
             }
 
-            $resultStorage->storeRelatedDelivery(
-                $relatedDelivery['deliveryResultIdentifier'],
-                $relatedDelivery['deliveryIdentifier']
-            );
             $this->deleteRelatedDelivery($resultId);
-
-            $resultStorage->storeRelatedTestTaker(
-                $relatedTestTaker['deliveryResultIdentifier'],
-                $relatedTestTaker['testTakerIdentifier']
-            );
-
             $this->deleteRelatedTestTaker($resultId);
             $this->deleteItemsTestsRefs($resultId);
             $this->deleteResult($deliveryIdentifier, $resultId);
