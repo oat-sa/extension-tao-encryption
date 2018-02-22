@@ -86,7 +86,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                         $resultRow->getTestIdentifier(),
                         $resultRow->getItemIdentifier(),
                         $resultRow->getVariable(),
-                        $resultRow->getCallItemId()
+                        $deliveryResultIdentifier .'.'.$resultRow->getCallItemId()
                     );
 
                 } else if ($resultRow instanceof TestVariableStorable) {
@@ -94,7 +94,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                         $deliveryResultIdentifier,
                         $resultRow->getTestIdentifier(),
                         $resultRow->getVariable(),
-                        $resultRow->getCallTestId()
+                        $deliveryResultIdentifier .'.'.$resultRow->getCallTestId()
                     );
                 }
             }
