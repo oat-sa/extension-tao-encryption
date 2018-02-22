@@ -19,6 +19,7 @@
  *
  */
 namespace oat\taoEncryption\scripts\tools;
+use common_ext_ExtensionsManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoEncryption\Service\EncryptionAsymmetricService;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
@@ -35,6 +36,13 @@ class SetupEncryptedSyncResult extends InstallAction
 {
     public function __invoke($params)
     {
+        /** @var common_ext_ExtensionsManager $extManger */
+        $extManger = $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
+
+        if (!$extManger->isInstalled('taoSync')) {
+            return Report::createFailure('taoSync extension not installed.');
+        }
+
         /** @var ResultService $stateStorage */
         $stateStorage = $this->getServiceLocator()->get(ResultService::SERVICE_ID);
         $options = $stateStorage->getOptions();
