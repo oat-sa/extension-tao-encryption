@@ -21,6 +21,7 @@ namespace oat\taoEncryption\scripts\tools;
 
 use common_report_Report as Report;
 use oat\oatbox\extension\script\ScriptAction;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 
@@ -49,8 +50,15 @@ class DecryptResults extends ScriptAction
             'delivery_id' => [
                 'prefix' => 'd',
                 'longPrefix' => 'delivery_id',
-                'required' => true,
+                'required' => false,
                 'description' => 'A delivery id identifier'
+            ],
+            'all' => [
+                'flag' => true,
+                'prefix' => 'all',
+                'longPrefix' => 'all',
+                'required' => false,
+                'description' => 'All deliveries results will be decrypted'
             ],
         ];
     }
@@ -71,25 +79,49 @@ class DecryptResults extends ScriptAction
      */
     protected function run()
     {
-        $deliveryExecId = $this->getOption('delivery_id');
-        if ($deliveryExecId === null){
-            return Report::createFailure('incorrect result id provided: '. $deliveryExecId);
+        $this->report = Report::createSuccess('Decrypting Results');
+
+        if ($this->hasOption('all')){
+            /** @var \core_kernel_classes_Resource $delivery */
+            foreach ($this->getDeliveryAssemblyService()->getAllAssemblies() as $delivery) {
+                $deliveryId = $delivery->getUri();
+                $this->decryptResultsForDelivery($deliveryId);
+            }
+        } elseif ($this->hasOption('delivery_id')) {
+            $deliveryId = $this->getOption('delivery_id');
+            if ($deliveryId === null){
+                return Report::createFailure('incorrect result id provided: '. $deliveryId);
+            }
+            $this->decryptResultsForDelivery($deliveryId);
         }
 
+        return $this->report;
+    }
+
+    /**
+     * @param $deliveryId
+     * @throws \common_exception_Error
+     */
+    protected function decryptResultsForDelivery($deliveryId)
+    {
         /** @var DecryptResultService $service */
         $service = $this->getServiceLocator()->get(DecryptResultService::SERVICE_ID);
-
-        $this->report = Report::createSuccess('Decrypting Results');
         try {
 
-            $service->decrypt($deliveryExecId);
+            $service->decrypt($deliveryId);
 
         }catch (DecryptionFailedException $exception){
             $this->report = Report::createFailure($exception->getMessage());
         }
 
-        $this->report->add(Report::createSuccess('Delivery: '. $deliveryExecId . ' results successfully decrypted'));
+        $this->report->add(Report::createSuccess('Delivery: '. $deliveryId . ' results successfully decrypted'));
+    }
 
-        return $this->report;
+    /**
+     * @return DeliveryAssemblyService
+     */
+    protected function getDeliveryAssemblyService()
+    {
+        return DeliveryAssemblyService::singleton();
     }
 }
