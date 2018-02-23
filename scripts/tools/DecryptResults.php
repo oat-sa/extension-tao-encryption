@@ -57,7 +57,7 @@ class DecryptResults extends ScriptAction
 
     protected function provideDescription()
     {
-        return 'Decrypt Results of a delivery execution.';
+        return 'Decrypt Results of a delivery.';
     }
 
     /**
@@ -88,7 +88,7 @@ class DecryptResults extends ScriptAction
             $this->report = Report::createFailure($exception->getMessage());
         }
 
-        $this->report->add(Report::createSuccess('Delivery execution: '. $deliveryExecId . ' results successfully decrypted'));
+        $this->report->add(Report::createSuccess('Delivery: '. $deliveryExecId . ' results successfully decrypted'));
 
         return $this->report;
     }
