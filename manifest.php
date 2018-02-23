@@ -30,7 +30,7 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.1.0',
+    'version' => '0.2.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=16.0.0',
@@ -48,5 +48,5 @@ return array(
     ),
     'uninstall' => array(
     ),
-    'update' => \oat\taoEncryption\update\Updater::class,
+    'update' => \oat\taoEncryption\scripts\update\Updater::class,
 );

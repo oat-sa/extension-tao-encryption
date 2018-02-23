@@ -117,7 +117,7 @@ class EncryptResultServiceTest extends TestCase
 
 
         $service = new EncryptResultService(array(
-            EncryptResultService::OPTION_PERSISTENCE => 'kvSql',
+            EncryptResultService::OPTION_PERSISTENCE => 'encryptedResults',
             EncryptResultService::OPTION_ENCRYPTION_SERVICE => 'taoEncryption/asymmetricEncryptionService',
         ));
         $service->setServiceLocator($serviceLocator);

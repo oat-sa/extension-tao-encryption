@@ -18,7 +18,7 @@
  *
  *
  */
-namespace oat\taoEncryption\update;
+namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
 
@@ -26,5 +26,6 @@ class Updater extends common_ext_ExtensionUpdater
 {
     public function update($initialVersion)
     {
+        $this->skip('0.1.0', '0.2.0');
     }
 }

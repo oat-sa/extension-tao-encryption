@@ -40,10 +40,6 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
     const PREFIX_DELIVERY_EXECUTION = EncryptResultService::PREFIX_DELIVERY_EXECUTION;
 
-    const PREFIX_DELIVERY_RESULTS_ITEMS = EncryptResultService::PREFIX_DELIVERY_RESULTS_ITEMS;
-
-    const PREFIX_DELIVERY_RESULTS = EncryptResultService::PREFIX_DELIVERY_RESULTS;
-
     const PREFIX_TEST_TAKER = EncryptResultService::PREFIX_TEST_TAKER;
 
     /** @var  common_persistence_KvDriver */
@@ -51,6 +47,12 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
     /** @var  EncryptionServiceInterface*/
     private $encryptionService;
+
+    /** @var DeliveryResultsModel */
+    private $deliveryResultsModel;
+
+    /** @var DeliveryResultVarsRefsModel */
+    public $deliveryResultVarsRefs;
     /**
      * @inheritdoc
      */
@@ -64,13 +66,15 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             $relatedDelivery  = $this->getRelatedDelivery($resultId);
             $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
 
+            $deliveryResultIdentifier = $relatedDelivery['deliveryResultIdentifier'];
+
             $resultStorage->storeRelatedDelivery(
-                $relatedDelivery['deliveryResultIdentifier'],
+                $deliveryResultIdentifier,
                 $relatedDelivery['deliveryIdentifier']
             );
 
             $resultStorage->storeRelatedTestTaker(
-                $relatedTestTaker['deliveryResultIdentifier'],
+                $deliveryResultIdentifier,
                 $relatedTestTaker['testTakerIdentifier']
             );
 
@@ -78,22 +82,20 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 $resultRow = $this->getResultRow($ref);
                 if ($resultRow instanceof ItemVariableStorable) {
                     $resultStorage->storeItemVariable(
-                        $resultRow->getDeliveryResultIdentifier(),
+                        $deliveryResultIdentifier,
                         $resultRow->getTestIdentifier(),
                         $resultRow->getItemIdentifier(),
                         $resultRow->getVariable(),
-                        $resultRow->getCallItemId()
+                        $deliveryResultIdentifier .'.'.$resultRow->getCallItemId()
                     );
-                    $this->getPersistence()->del($ref);
 
                 } else if ($resultRow instanceof TestVariableStorable) {
                     $resultStorage->storeTestVariable(
-                        $resultRow->getDeliveryResultIdentifier(),
+                        $deliveryResultIdentifier,
                         $resultRow->getTestIdentifier(),
                         $resultRow->getVariable(),
-                        $resultRow->getCallTestId()
+                        $deliveryResultIdentifier .'.'.$resultRow->getCallTestId()
                     );
-                    $this->getPersistence()->del($ref);
                 }
             }
 
@@ -121,7 +123,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
     /**
      * @throws \Exception
-     * @return common_persistence_KvDriver
+     * @return common_persistence_KeyValuePersistence
      */
     protected function getPersistence()
     {
@@ -193,9 +195,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function getItemsTestsRefs($resultId)
     {
-        $values = (string)$this->getPersistence()->get(static::PREFIX_DELIVERY_RESULTS_ITEMS . $resultId);
-        $values = $values === '' ? [] : json_decode($values, true);
-        return $values;
+        return $this->getDeliveryResultVarsRefsModel()->getResultsVariablesRefs($resultId);
     }
 
     /**
@@ -205,7 +205,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function deleteItemsTestsRefs($resultId)
     {
-        return $this->getPersistence()->del(static::PREFIX_DELIVERY_RESULTS_ITEMS . $resultId);
+        return $this->getDeliveryResultVarsRefsModel()->deleteRefs($resultId);
     }
 
     /**
@@ -248,10 +248,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function getResults($deliveryIdentifier)
     {
-        $results = (string)$this->getPersistence()->get(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier);
-        $results = $results === '' ? [] : json_decode($results, true);
-
-        return $results;
+        return $this->getDeliveryResultsModel()->getResults($deliveryIdentifier);
     }
 
     /**
@@ -262,14 +259,40 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function deleteResult($deliveryIdentifier, $resultId)
     {
-        $results = $this->getPersistence()->get(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier);
-        $results = json_decode($results, true);;
+        $results = $this->getDeliveryResultsModel()->getResults($deliveryIdentifier);
 
         if (($key = array_search($resultId, $results)) !== false) {
             unset($results[$key]);
-            return $this->getPersistence()->set(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier, json_encode($results));
+
+            return $this->getDeliveryResultsModel()->setResults($deliveryIdentifier, $results);
         }
 
         return false;
+    }
+
+    /**
+     * @return DeliveryResultsModel
+     * @throws \Exception
+     */
+    protected function getDeliveryResultsModel()
+    {
+        if (is_null($this->deliveryResultsModel)){
+            $this->deliveryResultsModel = new DeliveryResultsModel($this->getPersistence());
+        }
+
+        return $this->deliveryResultsModel;
+    }
+
+    /**
+     * @return DeliveryResultVarsRefsModel
+     * @throws \Exception
+     */
+    protected function getDeliveryResultVarsRefsModel()
+    {
+        if (is_null($this->deliveryResultVarsRefs)){
+            $this->deliveryResultVarsRefs = new DeliveryResultVarsRefsModel($this->getPersistence());
+        }
+
+        return $this->deliveryResultVarsRefs;
     }
 }
