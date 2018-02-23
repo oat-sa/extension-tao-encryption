@@ -48,7 +48,7 @@ class SetupEncryptedSyncResult extends InstallAction
         $options = $stateStorage->getOptions();
 
         $encrypted = new SyncEncryptedResultService(array_merge([
-                SyncEncryptedResultService::OPTION_PERSISTENCE => 'kvSql',
+                SyncEncryptedResultService::OPTION_PERSISTENCE => 'encryptedResults',
                 SyncEncryptedResultService::OPTION_ENCRYPTION_SERVICE => EncryptionAsymmetricService::SERVICE_ID,
             ], $options)
         );

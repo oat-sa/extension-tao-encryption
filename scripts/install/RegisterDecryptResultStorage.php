@@ -38,7 +38,7 @@ class RegisterDecryptResultStorage extends InstallAction
     {
         $report = Report::createSuccess();
 
-        $persistenceId = 'kvSql';
+        $persistenceId = 'encryptedResults';
 
         try {
             \common_persistence_Manager::getPersistence($persistenceId);
