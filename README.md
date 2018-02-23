@@ -37,7 +37,7 @@ The public key it's used for encryption and private key for decryption.
 In order to decrypt your results use the following script by passing a delivery id.
 
 ```bash
- $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' <delivery_id>
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' -d <delivery_id>
 ```
 _Note_: 
 > This command will decrypt results and store in the delivery result storage setup.

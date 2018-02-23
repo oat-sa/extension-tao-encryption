@@ -20,11 +20,9 @@
 namespace oat\taoEncryption\scripts\tools;
 
 use common_report_Report as Report;
-use oat\oatbox\action\Action;
+use oat\oatbox\extension\script\ScriptAction;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
 /**
  * Class SetupAsymmetricKeys
@@ -32,22 +30,48 @@ use Zend\ServiceManager\ServiceLocatorAwareTrait;
  *
  * sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' <delivery_id>
  */
-class DecryptResults implements Action, ServiceLocatorAwareInterface
+class DecryptResults extends ScriptAction
 {
-    use ServiceLocatorAwareTrait;
-
     /** @var Report */
     private $report;
+
     /**
-     * @param $params
-     * @return Report
+     * @return bool
+     */
+    protected function showTime()
+    {
+        return true;
+    }
+
+    protected function provideOptions()
+    {
+        return [
+            'delivery_id' => [
+                'prefix' => 'd',
+                'longPrefix' => 'delivery_id',
+                'required' => true,
+                'description' => 'A delivery id identifier'
+            ],
+        ];
+    }
+
+    protected function provideDescription()
+    {
+        return 'Decrypt Results of a delivery execution.';
+    }
+
+    /**
+     * Run Script.
+     *
+     * Run the userland script. Implementers will use this method
+     * to implement the main logic of the script.
+     *
+     * @return \common_report_Report
      * @throws \common_exception_Error
      */
-    public function __invoke($params)
+    protected function run()
     {
-        $time_start = microtime(true);
-
-        $deliveryExecId = isset($params[0]) ? $params[0] : null;
+        $deliveryExecId = $this->getOption('delivery_id');
         if ($deliveryExecId === null){
             return Report::createFailure('incorrect result id provided: '. $deliveryExecId);
         }
@@ -64,10 +88,7 @@ class DecryptResults implements Action, ServiceLocatorAwareInterface
             $this->report = Report::createFailure($exception->getMessage());
         }
 
-        $time_end = microtime(true);
-        $execution_time = ($time_end - $time_start)/60;
-
-        $this->report->add(new Report(Report::TYPE_INFO, 'Time:' . round($execution_time, 4) .' Minutes.' ));
+        $this->report->add(Report::createSuccess('Delivery execution: '. $deliveryExecId . ' results successfully decrypted'));
 
         return $this->report;
     }
