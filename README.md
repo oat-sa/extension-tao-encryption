@@ -26,7 +26,7 @@ _Note_:
 > On Client Tao instance. You have to copy the public key.
 
 _Note_: 
-> On Server Tao instance. You need both kesy
+> On Server Tao instance. You need both keys
     
 - ### Setup encryption on tao client instance
 
