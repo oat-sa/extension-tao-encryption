@@ -34,7 +34,7 @@ class TestTakerUpdatedHandler
         $userResource = new \core_kernel_classes_Resource($eventData['testTakerUri']);
         $salt = openssl_random_pseudo_bytes(16);
 
-        $userResource->setPropertyValue(
+        $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
             GenerateKey::generate($eventData['properties']['plainPassword'], $salt)
         );
