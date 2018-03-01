@@ -22,8 +22,9 @@ namespace oat\taoEncryption\Service\Sync;
 
 
 use oat\taoSync\model\synchronizer\user\administrator\RdfAdministratorSynchronizerTrait;
+use oat\taoSync\model\synchronizer\user\proctor\ProctorSynchronizer;
 
-class EncryptAdministratorSynchronizer extends EncryptUserSynchronizer
+class EncryptAdministratorSynchronizer extends EncryptUserSynchronizer implements ProctorSynchronizer
 {
     const SERVICE_ID = 'taoEncryption/encryptAdministratorSynchronizer';
 

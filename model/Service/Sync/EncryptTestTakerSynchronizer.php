@@ -20,8 +20,9 @@
 namespace oat\taoEncryption\Service\Sync;
 
 use oat\taoSync\model\synchronizer\user\testtaker\RdfTestTakerSynchronizerTrait;
+use oat\taoSync\model\synchronizer\user\testtaker\TestTakerSynchronizer;
 
-class EncryptTestTakerSynchronizer extends EncryptUserSynchronizer
+class EncryptTestTakerSynchronizer extends EncryptUserSynchronizer implements TestTakerSynchronizer
 {
     const SERVICE_ID = 'taoEncryption/encryptTestTakerSynchronizer';
 
