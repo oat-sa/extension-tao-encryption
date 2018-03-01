@@ -20,6 +20,7 @@
 namespace oat\taoEncryption\Service\Sync;
 
 use core_kernel_classes_Literal;
+use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
@@ -27,6 +28,8 @@ use oat\taoSync\model\synchronizer\user\UserSynchronizer;
 
 abstract class EncryptUserSynchronizer extends UserSynchronizer
 {
+    use LoggerAwareTrait;
+
     const OPTION_ENCRYPTION_SERVICE = 'symmetricEncryptionService';
 
     const OPTION_ENCRYPTED_PROPERTIES = 'encryptedProperties';

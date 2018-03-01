@@ -36,7 +36,7 @@ class TestTakerUpdatedHandler
 
         $userResource->setPropertyValue(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
-            hash_pbkdf2("sha256", $eventData['plainPassword'], $salt, $iterations, 20)
+            hash_pbkdf2("sha256", $eventData['properties']['plainPassword'], $salt, $iterations, 20)
         );
     }
 }

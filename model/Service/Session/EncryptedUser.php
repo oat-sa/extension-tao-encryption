@@ -46,7 +46,7 @@ class EncryptedUser extends core_kernel_users_GenerisUser
 
         $password = $this->getPropertyValues(GenerisRdf::PROPERTY_USER_PASSWORD);
         $salt     = $password[0];
-        $this->key =  hash_pbkdf2("sha256", $passwordPlain, $salt, 1000, 32);
+        $this->key = $this->generateKey($passwordPlain, $salt);
     }
 
     /**
@@ -119,6 +119,16 @@ class EncryptedUser extends core_kernel_users_GenerisUser
     }
 
     /**
+     * @param string $key
+     * @return \oat\oatbox\service\ConfigurableService|EncryptTestTakerSynchronizer
+     * @throws \Exception
+     */
+    public function getDecryptionService()
+    {
+        return ServiceManager::getServiceManager()->get(EncryptTestTakerSynchronizer::SERVICE_ID);
+    }
+
+    /**
      * @return string
      */
     protected function getKey()
@@ -127,12 +137,12 @@ class EncryptedUser extends core_kernel_users_GenerisUser
     }
 
     /**
-     * @param string $key
-     * @return \oat\oatbox\service\ConfigurableService|EncryptTestTakerSynchronizer
-     * @throws \Exception
+     * @param $passwordPlain
+     * @param $salt
+     * @return mixed
      */
-    public function getDecryptionService()
+    protected function generateKey($passwordPlain, $salt)
     {
-        return ServiceManager::getServiceManager()->get(EncryptTestTakerSynchronizer::SERVICE_ID);
+        return hash_pbkdf2("sha256", $passwordPlain, $salt, 1000, 32);
     }
 }

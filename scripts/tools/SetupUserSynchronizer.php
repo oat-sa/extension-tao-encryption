@@ -46,6 +46,12 @@ class SetupUserSynchronizer extends InstallAction
      */
     public function __invoke($params)
     {
+        /** @var \common_ext_ExtensionsManager $extensionManager */
+        $extensionManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
+
+        if (!$extensionManager->isInstalled('taoSync')) {
+            return Report::createSuccess('Cannot setup sync, to taoSync extension installed');
+        }
         $testTakerService = new EncryptTestTakerSynchronizer([
             EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
             EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID,
