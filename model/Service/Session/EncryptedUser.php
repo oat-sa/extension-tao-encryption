@@ -46,7 +46,7 @@ class EncryptedUser extends core_kernel_users_GenerisUser
 
         $password = $this->getPropertyValues(GenerisRdf::PROPERTY_USER_PASSWORD);
         $salt     = $password[0];
-        $this->key = $this->generateKey($passwordPlain, $salt);
+        $this->key = GenerateKey::generate($passwordPlain, $salt);
     }
 
     /**
@@ -136,13 +136,4 @@ class EncryptedUser extends core_kernel_users_GenerisUser
         return $this->key;
     }
 
-    /**
-     * @param $passwordPlain
-     * @param $salt
-     * @return mixed
-     */
-    protected function generateKey($passwordPlain, $salt)
-    {
-        return hash_pbkdf2("sha256", $passwordPlain, $salt, 1000, 32);
-    }
 }

@@ -18,26 +18,17 @@
  *
  */
 
-namespace oat\taoEncryption\Event;
+namespace oat\taoEncryption\Service\Session;
 
-
-use oat\generis\model\GenerisRdf;
-use oat\tao\model\event\UserUpdatedEvent;
-use oat\taoEncryption\Rdf\EncryptedUserRdf;
-use oat\taoEncryption\Service\Session\GenerateKey;
-
-class UserUpdatedHandler
+class GenerateKey
 {
-    public static function handle(UserUpdatedEvent $event)
+    /**
+     * @param $passwordPlain
+     * @param $salt
+     * @return mixed
+     */
+    public static function generate($passwordPlain, $salt)
     {
-        $eventData = $event->jsonSerialize();
-
-        $userResource = new \core_kernel_classes_Resource($eventData['uri']);
-        $salt = $eventData['data'][GenerisRdf::PROPERTY_USER_PASSWORD];
-
-        $userResource->editPropertyValues(
-            new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
-            GenerateKey::generate($eventData['data']['plainPassword'], $salt)
-        );
+        return hash_pbkdf2("sha256", $passwordPlain, $salt, 1000, 32);
     }
 }

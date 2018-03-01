@@ -21,6 +21,7 @@
 namespace oat\taoEncryption\Event;
 
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
+use oat\taoEncryption\Service\Session\GenerateKey;
 use oat\taoTestTaker\models\events\TestTakerUpdatedEvent;
 
 class TestTakerUpdatedHandler
@@ -32,11 +33,10 @@ class TestTakerUpdatedHandler
 
         $userResource = new \core_kernel_classes_Resource($eventData['testTakerUri']);
         $salt = openssl_random_pseudo_bytes(16);
-        $iterations = 1000;
 
         $userResource->setPropertyValue(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
-            hash_pbkdf2("sha256", $eventData['properties']['plainPassword'], $salt, $iterations, 20)
+            GenerateKey::generate($eventData['properties']['plainPassword'], $salt)
         );
     }
 }
