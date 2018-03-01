@@ -24,6 +24,7 @@ use oat\taoEncryption\scripts\install\RegisterEncryptionAsymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptionSymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptResultStorage;
 use oat\taoEncryption\scripts\install\RegisterKeyPairProviderService;
+use oat\taoEncryption\scripts\install\RegisterSimpleKeyProviderService;
 
 return array(
     'name' => 'taoEncryption',
@@ -45,6 +46,7 @@ return array(
             RegisterEncryptionSymmetricService::class,
             RegisterEncryptResultStorage::class,
             RegisterDecryptResultStorage::class,
+            RegisterSimpleKeyProviderService::class,
         ]
     ),
     'uninstall' => array(

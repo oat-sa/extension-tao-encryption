@@ -19,10 +19,15 @@
  */
 namespace oat\taoEncryption\scripts\tools;
 
+use oat\generis\model\OntologyRdfs;
 use oat\oatbox\extension\InstallAction;
+use oat\tao\model\TaoOntology;
+use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Sync\EncryptAdministratorSynchronizer;
 use oat\taoEncryption\Service\Sync\EncryptProctorSynchronizer;
 use oat\taoEncryption\Service\Sync\EncryptTestTakerSynchronizer;
+use oat\taoSync\model\Entity;
 use oat\taoSync\model\SyncService;
 use common_report_Report as Report;
 
@@ -41,6 +46,58 @@ class SetupUserSynchronizer extends InstallAction
      */
     public function __invoke($params)
     {
+        $testTakerService = new EncryptTestTakerSynchronizer([
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID,
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTED_PROPERTIES => [
+                OntologyRdfs::RDFS_LABEL,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_FIRSTNAME,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_LASTNAME,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
+            ],
+            EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
+                TaoOntology::PROPERTY_UPDATED_AT,
+                Entity::CREATED_AT,
+            ]
+        ]);
+
+        $this->registerService(EncryptTestTakerSynchronizer::SERVICE_ID, $testTakerService);
+
+
+        $administratorService = new EncryptAdministratorSynchronizer([
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID,
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTED_PROPERTIES => [
+                OntologyRdfs::RDFS_LABEL,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_FIRSTNAME,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_LASTNAME,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
+            ],
+            EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
+                TaoOntology::PROPERTY_UPDATED_AT,
+                Entity::CREATED_AT,
+            ]
+        ]);
+
+        $this->registerService(EncryptAdministratorSynchronizer::SERVICE_ID, $administratorService);
+
+        $proctorService = new EncryptProctorSynchronizer([
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID,
+            EncryptTestTakerSynchronizer::OPTION_ENCRYPTED_PROPERTIES => [
+                OntologyRdfs::RDFS_LABEL,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_FIRSTNAME,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_LASTNAME,
+                \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
+            ],
+            EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
+                TaoOntology::PROPERTY_UPDATED_AT,
+                Entity::CREATED_AT,
+            ]
+        ]);
+
+        $this->registerService(EncryptProctorSynchronizer::SERVICE_ID, $proctorService);
+
         /** @var SyncService $syncService */
         $syncService = $this->getServiceLocator()->get(SyncService::SERVICE_ID);
         $synchronizers = $syncService->getOption(SyncService::OPTION_SYNCHRONIZERS);

@@ -16,31 +16,27 @@
  *
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
  *
- *
  */
-namespace oat\taoEncryption\scripts\update;
 
-use common_ext_ExtensionUpdater;
+namespace oat\taoEncryption\scripts\install;
+
+
+use oat\oatbox\extension\InstallAction;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 
-class Updater extends common_ext_ExtensionUpdater
+class RegisterSimpleKeyProviderService extends InstallAction
 {
     /**
-     * @param $initialVersion
-     * @return string|void
+     * @param $params
+     * @return \common_report_Report
      * @throws \common_Exception
      */
-    public function update($initialVersion)
+    public function __invoke($params)
     {
-        $this->skip('0.1.0', '0.2.0');
+        $simpleKeyProvider = new SimpleKeyProviderService([]);
 
-        if ($this->isVersion('0.2.0')){
-            $simpleKeyProvider = new SimpleKeyProviderService([]);
+        $this->registerService(SimpleKeyProviderService::SERVICE_ID, $simpleKeyProvider);
 
-            $this->getServiceManager()->register(SimpleKeyProviderService::SERVICE_ID, $simpleKeyProvider);
-
-
-            $this->setVersion('0.3.0');
-        }
+        return \common_report_Report::createSuccess('SimpleKeyProviderService successfully registered.');
     }
 }
