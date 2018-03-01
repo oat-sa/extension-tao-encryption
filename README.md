@@ -79,8 +79,5 @@ In order to use the encrypted state test service you have to run the following c
 
 This service it's using the symmetric algorithm in order to encrypt.
 
-The key provider is a configurable option which can be changed in the config file:
-`taoEncryption/symmetricDeliveryExecutionProvider`
-
 _Note_: 
 >  You should ran this command on client tao instance
