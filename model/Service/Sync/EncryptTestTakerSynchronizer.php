@@ -17,20 +17,13 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+namespace oat\taoEncryption\Service\Sync;
 
-namespace oat\taoEncryption\Service\KeyProvider;
+use oat\taoSync\model\synchronizer\user\testtaker\RdfTestTakerSynchronizerTrait;
 
-use oat\taoEncryption\Model\Key;
-
-class DeliveryExecutionStateKeyProviderService extends SymmetricKeyProviderService
+class EncryptTestTakerSynchronizer extends EncryptUserSynchronizer
 {
-    const SERVICE_ID = 'taoEncryption/symmetricDeliveryExecutionProvider';
+    const SERVICE_ID = 'taoEncryption/encryptTestTakerSynchronizer';
 
-    /**
-     * @return Key
-     */
-    public function getKey()
-    {
-        return new Key(base64_encode('')) ;
-    }
+    use RdfTestTakerSynchronizerTrait;
 }

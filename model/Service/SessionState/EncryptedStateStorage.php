@@ -19,39 +19,47 @@
  */
 namespace oat\taoEncryption\Service\SessionState;
 
+use core_kernel_classes_Property;
+use oat\generis\model\GenerisRdf;
+use oat\generis\model\OntologyAwareTrait;
+use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
-use oat\taoEncryption\Service\KeyProvider\SymmetricKeyProviderService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use tao_models_classes_service_StateStorage;
 
 class EncryptedStateStorage extends tao_models_classes_service_StateStorage
 {
+    use OntologyAwareTrait;
+    use LoggerAwareTrait;
+
     const OPTION_ENCRYPTION_SERVICE = 'symmetricEncryptionService';
 
     const OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE = 'keyProviderService';
 
-    /** @var EncryptionSymmetricService */
+    /** @var SimpleKeyProviderService */
     private $encryptionService;
 
     /**
+     * @param string $key
      * @return EncryptionSymmetricService
      * @throws \Exception
      */
-    public function getEncryptionService()
+    public function getEncryptionService($key)
     {
         if (is_null($this->encryptionService)) {
             /** @var EncryptionSymmetricService $service */
             $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_SERVICE));
-
             if (!$service instanceof EncryptionSymmetricService) {
                 throw new  \Exception('Incorrect algorithm service provided');
             }
 
-            /** @var SymmetricKeyProviderService $keyProvider */
-            $keyProvider = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE));
-            $service->setKeyProvider($keyProvider);
-
             $this->encryptionService = $service;
         }
+
+        /** @var SimpleKeyProviderService $keyProvider */
+        $keyProvider = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE));
+        $keyProvider->setKey($key);
+        $this->encryptionService->setKeyProvider($keyProvider);
 
         return $this->encryptionService;
     }
@@ -65,7 +73,7 @@ class EncryptedStateStorage extends tao_models_classes_service_StateStorage
      */
     public function set($userId, $callId, $data)
     {
-        return parent::set($userId, $callId, $this->getEncryptionService()->encrypt($data));
+        return parent::set($userId, $callId, base64_encode($this->getEncryptionService($this->getUserPassword($userId))->encrypt($data)));
     }
 
     /**
@@ -81,6 +89,27 @@ class EncryptedStateStorage extends tao_models_classes_service_StateStorage
             return null;
         }
 
-        return $this->getEncryptionService()->decrypt($value);
+        return $this->getEncryptionService($this->getUserPassword($userId))->decrypt(base64_decode($value));
+    }
+
+    /**
+     * @param string $userId
+     * @return string
+     */
+    private function getUserPassword($userId)
+    {
+        try {
+            $userResource = $this->getResource($userId);
+            $password = $userResource->getUniquePropertyValue(
+                new core_kernel_classes_Property(GenerisRdf::PROPERTY_USER_PASSWORD)
+            );
+
+        }catch (\common_Exception $exception){
+            $this->logAlert('User has no password to encrypt');
+
+            return '';
+        }
+
+        return $password->literal;
     }
 }

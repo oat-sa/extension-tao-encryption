@@ -44,21 +44,20 @@ class EncryptionSymmetricService extends EncryptionServiceAbstract
     {
         if (is_null($this->algorithm)) {
             $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_ALGORITHM));
-
             if (!$service instanceof AlgorithmSymmetricServiceInterface) {
                 throw new  \Exception('Incorrect algorithm service provided');
             }
 
-            if (is_null($this->keyProvider)) {
-                $keyProvider = new DummyKeyProvider();
-            } else {
-                $keyProvider = $this->keyProvider;
-            }
-
-            $service->setKeyProvider($keyProvider);
-
             $this->algorithm = $service;
         }
+
+        if (is_null($this->keyProvider)) {
+            $keyProvider = new DummyKeyProvider();
+        } else {
+            $keyProvider = $this->keyProvider;
+        }
+
+        $this->algorithm->setKeyProvider($keyProvider);
 
         return $this->algorithm;
     }

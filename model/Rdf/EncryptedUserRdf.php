@@ -18,25 +18,10 @@
  *
  */
 
-namespace oat\taoEncryption\Service\KeyProvider;
+namespace oat\taoEncryption\Rdf;
 
-use common_session_SessionManager;
-use oat\generis\model\GenerisRdf;
-use oat\taoEncryption\Model\Key;
-
-class PasswordKeyProviderService extends SymmetricKeyProviderService
+interface EncryptedUserRdf
 {
-    const SERVICE_ID = 'taoEncryption/symmetricPasswordProvider';
+    const PROPERTY_ENCRYPTION_KEY = 'http://www.tao.lu/Ontologies/generis.rdf#encryptionKey';
 
-    /**
-     * @return Key
-     * @throws \common_exception_Error
-     */
-    public function getKey()
-    {
-        $session = common_session_SessionManager::getSession();
-        $password = $session->getUser()->getPropertyValues(GenerisRdf::PROPERTY_USER_PASSWORD);
-
-        return new Key(base64_encode(json_encode($password))) ;
-    }
 }
