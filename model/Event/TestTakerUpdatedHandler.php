@@ -20,6 +20,7 @@
 
 namespace oat\taoEncryption\Event;
 
+use oat\generis\model\GenerisRdf;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\Session\GenerateKey;
 use oat\taoTestTaker\models\events\TestTakerUpdatedEvent;
@@ -32,7 +33,7 @@ class TestTakerUpdatedHandler
         $eventData = $event->jsonSerialize();
 
         $userResource = new \core_kernel_classes_Resource($eventData['testTakerUri']);
-        $salt = openssl_random_pseudo_bytes(16);
+        $salt = $eventData['properties'][GenerisRdf::PROPERTY_USER_PASSWORD];
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
