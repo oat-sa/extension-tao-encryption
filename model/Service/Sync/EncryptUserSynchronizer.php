@@ -24,45 +24,19 @@ use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
+use oat\taoEncryption\Service\EncryptionSymmetricServiceHelper;
 use oat\taoSync\model\synchronizer\user\UserSynchronizer;
 
 abstract class EncryptUserSynchronizer extends UserSynchronizer
 {
     use LoggerAwareTrait;
+    use EncryptionSymmetricServiceHelper;
 
     const OPTION_ENCRYPTION_SERVICE = 'symmetricEncryptionService';
 
     const OPTION_ENCRYPTED_PROPERTIES = 'encryptedProperties';
 
     const OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE = 'keyProviderService';
-
-    /** @var EncryptionSymmetricService */
-    private $encryptionService;
-
-    /**
-     * @param string $key
-     * @return EncryptionSymmetricService
-     * @throws \Exception
-     */
-    public function getEncryptionService($key)
-    {
-        if (is_null($this->encryptionService) ) {
-            /** @var EncryptionSymmetricService $service */
-            $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_SERVICE));
-            if (!$service instanceof EncryptionSymmetricService) {
-                throw new  \Exception('Incorrect algorithm service provided');
-            }
-
-            $this->encryptionService = $service;
-        }
-
-        /** @var SimpleKeyProviderService $keyProvider */
-        $keyProvider = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE));
-        $keyProvider->setKey($key);
-        $this->encryptionService->setKeyProvider($keyProvider);
-
-        return $this->encryptionService;
-    }
 
     /**
      * @param $properties

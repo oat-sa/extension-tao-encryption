@@ -131,9 +131,8 @@ class EncryptedUser extends core_kernel_users_GenerisUser
     /**
      * @return string
      */
-    protected function getKey()
+    public function getKey()
     {
         return $this->key;
     }
-
 }

@@ -39,7 +39,6 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->getServiceManager()->register(SimpleKeyProviderService::SERVICE_ID, $simpleKeyProvider);
 
-
             $this->setVersion('0.3.0');
         }
     }
