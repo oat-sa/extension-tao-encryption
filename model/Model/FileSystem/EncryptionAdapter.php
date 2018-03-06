@@ -43,7 +43,11 @@ class EncryptionAdapter extends Local
     public function writeStream($path, $resource, Config $config)
     {
         $contents = $this->encryptionService->encrypt(stream_get_contents($resource));
-        return parent::writeStream($path, $contents, $config);
+        $fp = fopen('php://temp','r+');
+        fwrite($fp, $contents);
+        rewind($fp);
+
+        return parent::writeStream($path, $fp, $config);
     }
 
     public function update($path, $contents, Config $config)
@@ -55,24 +59,28 @@ class EncryptionAdapter extends Local
     public function updateStream($path, $resource, Config $config)
     {
         $contents = $this->encryptionService->encrypt(stream_get_contents($resource));
+        $fp = fopen('php://temp','r+');
+        fwrite($fp, $contents);
+        rewind($fp);
         return parent::update($path, $contents, $config);
     }
 
     public function read($path)
     {
         $contents = parent::read($path);
-        return $this->encryptionService->decrypt($contents);
+        $contents['contents'] = $this->encryptionService->decrypt($contents['contents']);
 
+        return $contents;
     }
 
     public function readStream($path)
     {
         $stream = parent::readStream($path);
-        $fp = fopen('php://memory','r+');
-
-        fwrite($fp, stream_get_contents($stream));
+        $fp = fopen('php://temp','r+');
+        fwrite($fp, $this->encryptionService->decrypt(stream_get_contents($stream['stream'])));
         rewind($fp);
+        $stream['stream'] = $fp;
 
-        return $fp;
+        return $stream;
     }
 }
