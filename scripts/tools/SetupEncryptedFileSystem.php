@@ -25,13 +25,44 @@ use common_report_Report as Report;
 use oat\oatbox\filesystem\FileSystemService;
 use oat\taoEncryption\Model\FileSystem\EncryptionFlyWrapper;
 
+/**
+ * Encrypted File System Setup
+ *
+ * This script aims at configuring a given file system on the platform in order to make
+ * it encrypted. This script will NOT encrypt the existing data in the file system. In other words
+ * it is suitable for fresh installs only.
+ *
+ * Example usage:
+ *
+ * sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" --fileSystemId private -encryptionServiceId taoEncryption/symmetricEncryptionService
+ *
+ * Available options:
+ *
+ *
+ *
+ * @package oat\taoEncryption\scripts\tools
+ */
 class SetupEncryptedFileSystem extends ScriptAction
 {
+    /**
+     * Provide Description
+     *
+     * Provides the description of the script.
+     *
+     * @return string
+     */
     protected function provideDescription()
     {
         return 'TAO Encryption - Encrypted File System Setup';
     }
 
+    /**
+     * Provide Options
+     *
+     * Provide the options of the script.
+     *
+     * @return array
+     */
     protected function provideOptions()
     {
         return [
@@ -50,6 +81,13 @@ class SetupEncryptedFileSystem extends ScriptAction
         ];
     }
 
+    /**
+     * Provide Usage
+     *
+     * Provides information about how/when should usage information displayed.
+     *
+     * @return array
+     */
     protected function provideUsage()
     {
         return [
@@ -59,6 +97,16 @@ class SetupEncryptedFileSystem extends ScriptAction
         ];
     }
 
+    /**
+     * Run Script
+     *
+     * Runs the main behaviours of the script.
+     *
+     * @return Report
+     * @throws \common_Exception
+     * @throws \common_exception_Error
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     */
     protected function run()
     {
         // Main report.

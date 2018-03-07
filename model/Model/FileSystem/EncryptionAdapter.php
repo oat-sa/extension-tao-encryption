@@ -24,15 +24,45 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Config;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 
+/**
+ * Class EncryptionAdapter
+ *
+ * This Class implements a FlySystem Adapter able to deal with encryption. It is able to encrypt/decrypt
+ * encrypted data on the file system using the appropriate injected EncryptionServiceInterface object.
+ *
+ * Please note that at the time being, this adapter works for local filesystems only.
+ *
+ * @package oat\taoEncryption\Model\FileSystem
+ * @see EncryptionServiceInterface
+ */
 class EncryptionAdapter extends Local
 {
+    /**
+     * Encryption Service Interface
+     *
+     * The EncryptionServiceInterface object to be used for encryption/decryption.
+     *
+     * @var EncryptionServiceInterface
+     */
     private $encryptionService;
 
+    /**
+     * EncryptionAdapter constructor.
+     *
+     * Create a new Encryption FlySystem Adapter.
+     *
+     * @param $root The root path on which the adapter operates.
+     * @param EncryptionServiceInterface $encryptionService
+     * @param int $writeFlags
+     * @param int $linkHandling
+     * @param array $permissions
+     */
     public function __construct($root, EncryptionServiceInterface $encryptionService, $writeFlags = LOCK_EX, $linkHandling = self::DISALLOW_LINKS, array $permissions = [])
     {
         parent::__construct($root, $writeFlags, $linkHandling, $permissions);
         $this->encryptionService = $encryptionService;
     }
+
 
     public function write($path, $contents, Config $config)
     {

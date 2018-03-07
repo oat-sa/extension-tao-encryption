@@ -24,6 +24,14 @@ use League\Flysystem\AdapterInterface;
 use oat\oatbox\filesystem\utils\FlyWrapperTrait;
 use oat\oatbox\service\ConfigurableService;
 
+/**
+ * Class EncryptionFlyWrapper
+ *
+ * A Configurable Wrapper for the EncryptionAdapter FlySystem adapter.
+ *
+ * @package oat\taoEncryption\Model\FileSystem
+ * @see EncryptionAdapter
+ */
 class EncryptionFlyWrapper extends ConfigurableService implements AdapterInterface
 {
     use FlyWrapperTrait;
@@ -31,6 +39,13 @@ class EncryptionFlyWrapper extends ConfigurableService implements AdapterInterfa
     const OPTION_ENCRYPTIONSERVICEID = 'encryptionServiceId';
     const OPTION_ROOT = 'root';
 
+    /**
+     * Get Adapter
+     *
+     * Returns the actual underlying adapter in use for this wrapper.
+     *
+     * @return EncryptionAdapter
+     */
     public function getAdapter()
     {
         return new EncryptionAdapter(
