@@ -33,7 +33,7 @@ return array(
     'version' => '0.2.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=16.0.0',
+        'tao' => '>=17.7.0',
         'taoResultServer' => '>=6.2.0'
     ),
 
