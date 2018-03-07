@@ -85,7 +85,8 @@ The key provider is a configurable option which can be changed in the config fil
 _Note_: 
 >  You should ran this command on client tao instance
 
-### 3. Encrypted File Systems
+
+## Encrypted File Systems
 
 You can make TAO file systems encrypted. The following command line enables encryption
 for the `private` file system, using the service registered with ID 
