@@ -36,9 +36,17 @@ use oat\taoEncryption\Model\FileSystem\EncryptionFlyWrapper;
  *
  * sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" --fileSystemId private -encryptionServiceId taoEncryption/symmetricEncryptionService
  *
- * Available options:
+ * Available arguments:
  *
+ * Required Arguments:
+ *   -f fileSystemId, --fileSystemId fileSystemId
+ *     The File System ID as it appears in the TAO File System configuration
+ *   -e encryptionServiceId, --encryptionServiceId encryptionServiceId
+ *     The ID of the EncryptionService to be used for data encryption/decryption
  *
+ * Optional Arguments:
+ *   -h help, --help help
+ *     Prints a help statement
  *
  * @package oat\taoEncryption\scripts\tools
  */
