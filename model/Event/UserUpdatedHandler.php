@@ -31,8 +31,10 @@ class UserUpdatedHandler
     public static function handle(UserUpdatedEvent $event)
     {
         $eventData = $event->jsonSerialize();
-
         $userResource = new \core_kernel_classes_Resource($eventData['uri']);
+        if (!isset($eventData['data'][GenerisRdf::PROPERTY_USER_PASSWORD])){
+            return;
+        }
         $salt = $eventData['data'][GenerisRdf::PROPERTY_USER_PASSWORD];
 
         $userResource->editPropertyValues(

@@ -33,6 +33,9 @@ class TestTakerUpdatedHandler
         $eventData = $event->jsonSerialize();
 
         $userResource = new \core_kernel_classes_Resource($eventData['testTakerUri']);
+        if (!isset($eventData['properties'][GenerisRdf::PROPERTY_USER_PASSWORD])){
+            return;
+        }
         $salt = $eventData['properties'][GenerisRdf::PROPERTY_USER_PASSWORD];
 
         $userResource->editPropertyValues(
