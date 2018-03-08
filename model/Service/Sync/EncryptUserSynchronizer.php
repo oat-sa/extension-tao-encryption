@@ -93,7 +93,7 @@ abstract class EncryptUserSynchronizer extends UserSynchronizer
     public function encryptProperties(array $properties)
     {
         if (!isset($properties[EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY])){
-            throw new \Exception('No Key to encrypt');
+            return $properties;
         }
 
         $encryptedProperties = [];
