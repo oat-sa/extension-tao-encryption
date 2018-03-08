@@ -63,7 +63,6 @@ class SetupUserSynchronizer extends InstallAction
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
             ],
             EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
-                EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY,
                 TaoOntology::PROPERTY_UPDATED_AT,
                 Entity::CREATED_AT,
             ]
@@ -82,7 +81,6 @@ class SetupUserSynchronizer extends InstallAction
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
             ],
             EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
-                EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY,
                 TaoOntology::PROPERTY_UPDATED_AT,
                 Entity::CREATED_AT,
             ]
@@ -100,7 +98,6 @@ class SetupUserSynchronizer extends InstallAction
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
             ],
             EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
-                EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY,
                 TaoOntology::PROPERTY_UPDATED_AT,
                 Entity::CREATED_AT,
             ]

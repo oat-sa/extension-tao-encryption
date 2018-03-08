@@ -50,6 +50,9 @@ abstract class EncryptUserSynchronizer extends UserSynchronizer
         $keyEncryption = $properties[EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY];
 
         foreach ($properties as $key => $value){
+            if ($key === EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY){
+                continue;
+            }
             if (in_array($key, $propertiesToEncrypt)){
                 $valuesDecrypted = [];
                 if (is_array($value)){
@@ -89,11 +92,18 @@ abstract class EncryptUserSynchronizer extends UserSynchronizer
      */
     public function encryptProperties(array $properties)
     {
+        if (!isset($properties[EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY])){
+            throw new \Exception('No Key to encrypt');
+        }
+
         $encryptedProperties = [];
         $propertiesToEncrypt = $this->getEncryptedProperties();
         $keyEncryption = $properties[EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY];
 
         foreach ($properties as $key => $value){
+            if ($key === EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY){
+                continue;
+            }
             if (in_array($key, $propertiesToEncrypt)){
                 $valuesEncrypted = [];
                 if (is_array($value)){
