@@ -73,6 +73,10 @@ Along with this you have to setup the ProctorCommand with storage execution, ava
  $ sudo -u www-data php index.php 'oat\taoProctoring\scripts\tools\SetupProctorCommandWithStorageExecution'
 ```
 
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedMonitoringService'
+```
+
 This service it's using the symmetric algorithm in order to encrypt information.
 
 ### 3. User Encryption
@@ -81,10 +85,6 @@ This service it's using the symmetric algorithm in order to encrypt information.
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedUser'
-```
-
-```bash
- $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedMonitoringService'
 ```
 
 - #### Setup scripts for Tao Server instance
