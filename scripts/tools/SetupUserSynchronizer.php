@@ -22,6 +22,7 @@ namespace oat\taoEncryption\scripts\tools;
 use oat\generis\model\OntologyRdfs;
 use oat\oatbox\extension\InstallAction;
 use oat\tao\model\TaoOntology;
+use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Sync\EncryptAdministratorSynchronizer;
@@ -62,6 +63,7 @@ class SetupUserSynchronizer extends InstallAction
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
             ],
             EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
+                EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY,
                 TaoOntology::PROPERTY_UPDATED_AT,
                 Entity::CREATED_AT,
             ]
@@ -80,6 +82,7 @@ class SetupUserSynchronizer extends InstallAction
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
             ],
             EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
+                EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY,
                 TaoOntology::PROPERTY_UPDATED_AT,
                 Entity::CREATED_AT,
             ]
@@ -97,6 +100,7 @@ class SetupUserSynchronizer extends InstallAction
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
             ],
             EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
+                EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY,
                 TaoOntology::PROPERTY_UPDATED_AT,
                 Entity::CREATED_AT,
             ]
