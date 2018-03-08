@@ -92,6 +92,7 @@ This service it's using the symmetric algorithm in order to encrypt information.
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserEventSubscription'
 ```
+- #### Both Instances
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserSynchronizer'
