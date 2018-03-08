@@ -24,7 +24,6 @@ use oat\oatbox\extension\InstallAction;
 use oat\tao\model\event\UserCreatedEvent;
 use oat\tao\model\event\UserUpdatedEvent;
 use oat\taoEncryption\Event\TestTakerUpdatedHandler;
-use oat\taoEncryption\Event\UserCreatedHandler;
 use oat\taoEncryption\Event\UserUpdatedHandler;
 use oat\taoTestTaker\models\events\TestTakerUpdatedEvent;
 use common_report_Report as Report;
@@ -54,11 +53,6 @@ class SetupUserEventSubscription extends InstallAction
 
         $eventManager->attach(UserUpdatedEvent::class, [
             UserUpdatedHandler::class,
-            'handle'
-        ]);
-
-        $eventManager->attach(UserCreatedEvent::class, [
-            UserCreatedHandler::class,
             'handle'
         ]);
 
