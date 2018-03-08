@@ -22,7 +22,7 @@ namespace oat\taoEncryption\scripts\tools;
 
 use oat\oatbox\extension\InstallAction;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
-use oat\taoSync\model\SynchronisationStart;
+use oat\taoSync\model\event\SynchronisationStart;
 use common_report_Report as Report;
 
 class SyncPublicKey extends InstallAction

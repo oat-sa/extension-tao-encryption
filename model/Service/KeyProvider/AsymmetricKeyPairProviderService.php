@@ -26,7 +26,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Model\Asymmetric\AsymmetricRSAKeyPairProvider;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
-use oat\taoSync\model\SynchronisationStart;
+use oat\taoSync\model\event\SynchronisationStart;
 
 class AsymmetricKeyPairProviderService extends ConfigurableService
 {
@@ -81,6 +81,8 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
 
     static public function onSynchronisationStarted(SynchronisationStart $event)
     {
+        \common_Logger::i(print_r(__METHOD__, true));
+
         /** @var AsymmetricKeyPairProviderService $keyPairService */
         $keyPairService = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
         $keyPairService->getKeyPairModel()->getPublicKey();
