@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017-2018 (original work) Open Assessment Technologies SA;
  *
  *
  */
@@ -30,13 +30,13 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.2.0',
+    'version' => '0.3.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=16.0.0',
-        'taoResultServer' => '>=6.2.0'
+        'taoResultServer' => '>=6.2.0',
+        'taoOauth' => '>=0.1.0',
     ),
-
     'install' => array(
         'php' => [
             RegisterKeyPairProviderService::class,
@@ -49,4 +49,7 @@ return array(
     'uninstall' => array(
     ),
     'update' => \oat\taoEncryption\scripts\update\Updater::class,
+    'routes' => array(
+        '/taoEncryption' => 'oat\\taoEncryption\\controller'
+    ),
 );

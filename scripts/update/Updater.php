@@ -21,11 +21,22 @@
 namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 
 class Updater extends common_ext_ExtensionUpdater
 {
+    /**
+     * @param $initialVersion
+     * @return string|void
+     * @throws \Exception
+     */
     public function update($initialVersion)
     {
         $this->skip('0.1.0', '0.2.0');
+
+        if ($this->isVersion('0.2.0')) {
+            $this->getServiceManager()->register(KeyProviderClient::SERVICE_ID, new KeyProviderClient());
+            $this->setVersion('0.3.0');
+        }
     }
 }

@@ -22,9 +22,11 @@ namespace oat\taoEncryption\Service\KeyProvider;
 
 use oat\oatbox\filesystem\FileSystemService;
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Model\Asymmetric\AsymmetricRSAKeyPairProvider;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
+use oat\taoSync\model\SynchronisationStart;
 
 class AsymmetricKeyPairProviderService extends ConfigurableService
 {
@@ -65,5 +67,35 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
         }
 
         return $this->asymmetricKeyPair;
+    }
+
+    /**
+     * Get hash of public key
+     *
+     * @return string
+     */
+    public function getPublicKeyChecksum()
+    {
+        return hash('crc32', $this->getPublicKey());
+    }
+
+    static public function onSynchronisationStarted(SynchronisationStart $event)
+    {
+        /** @var AsymmetricKeyPairProviderService $keyPairService */
+        $keyPairService = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+        $keyPairService->getKeyPairModel()->getPublicKey();
+
+        /** @var KeyProviderClient $keyProviderClient */
+        $keyProviderClient = ServiceManager::getServiceManager()->get(KeyProviderClient::SERVICE_ID);
+        $remotePublicKeyHash = $keyProviderClient->getRemotePublicKeyChecksum();
+
+        \common_Logger::i(print_r($remotePublicKeyHash, true));
+//        $alreadySynchronized = ;
+//        $request = new Request();
+//        $response = $publishingService->callEnvironment(SynchronisationStart::class, $request);
+//        $response = $client->send('taoEncryption/EncryptionApi/getPublicKeyChecksum');
+//        if ($response->getBody()->getContents()['checksum'] != $keyPairService->getChecksum()) {
+//            $client->send('taoEncryption/EncryptionApi/savePublicKey');
+//        }
     }
 }
