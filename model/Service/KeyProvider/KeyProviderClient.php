@@ -25,7 +25,7 @@ use function GuzzleHttp\Psr7\stream_for;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoEncryption\controller\EncryptionApi;
 use oat\taoPublishing\model\publishing\PublishingService;
-use oat\taoSync\model\SynchronisationStart;
+use oat\taoSync\scripts\tool\synchronisation\SynchronizeData;
 
 class KeyProviderClient extends ConfigurableService
 {
@@ -94,7 +94,7 @@ class KeyProviderClient extends ConfigurableService
         $request = $request->withHeader('Content-type', 'application/json');
 
         try {
-            return $this->getServiceLocator()->get(PublishingService::SERVICE_ID)->callEnvironment(SynchronisationStart::class, $request);
+            return $this->getServiceLocator()->get(PublishingService::SERVICE_ID)->callEnvironment(SynchronizeData::class, $request);
         } catch (\Exception $e) {
             throw new \common_Exception($e->getMessage(), 0, $e);
         }
