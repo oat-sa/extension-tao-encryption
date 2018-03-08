@@ -14,8 +14,9 @@ You can add the Tao Encryption as a standard TAO extension to your current TAO i
 
 ### 1. Results Encryption
 
-- ### Setup Keys on the server tao instance
+- #### Setup scripts for Tao Server instance
 
+###### Encrypt
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupAsymmetricKeys' generate
 ```
@@ -27,20 +28,8 @@ _Note_:
 
 _Note_: 
 > On Server Tao instance. You need both keys
-    
-- ### Setup encryption on tao client instance
 
-In order to use the encrypted results service you have to run the following command on the client tao instance.
-
-```bash
- $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedResultStorage'
-```
-
-_Note_: 
->  You should use this on tao client instance
-
-
-- ### Setup decryption on tao server instance.
+###### Decrypt
 
 In order to decrypt your results use the following script by passing a delivery id.
 
@@ -53,31 +42,57 @@ Or by passing the -all argument
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' -all
 ```
-
 _Note_: 
 > This command will decrypt results and store in the delivery result storage setup.
+  
+- #### Setup scripts for Tao Client instance
 
-_Note_: 
->  You should use this on tao server instance
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedResultStorage'
+```
 
-#### 3. Setup Sync Encrypted Result
+- #### Sync Encrypted Result (Run on Server and client)
 In order to sync encrypted results the script needs to be run on the server tao instance and client as well.
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedSyncResult'
  ```
-_Note_: 
->  You should ran this command on server and client.
 
 ### 2. Test State data encryption
 
-In order to use the encrypted state test service you have to run the following command:
+- #### Setup scripts for Tao Client instance
+
+In order to use the encrypted state test service you have to run the following command on tao client instance:
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedStateStorage'
 ```
 
-This service it's using the symmetric algorithm in order to encrypt.
+Along with this you have to setup the ProctorCommand with storage execution, available in taoProctoring version 8.6.0
+```bash
+ $ sudo -u www-data php index.php 'oat\taoProctoring\scripts\tools\SetupProctorCommandWithStorageExecution'
+```
 
-_Note_: 
->  You should ran this command on client tao instance
+This service it's using the symmetric algorithm in order to encrypt information.
+
+### 3. User Encryption
+
+- #### Setup scripts for Tao Client instance
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedUser'
+```
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedMonitoringService'
+```
+
+- #### Setup scripts for Tao Server instance
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserEventSubscription'
+```
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserSynchronizer'
+```
