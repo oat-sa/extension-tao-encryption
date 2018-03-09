@@ -45,6 +45,8 @@ use oat\taoEncryption\Service\FileSystem\EncryptionFlyWrapper;
  *     The ID of the EncryptionService to be used for data encryption/decryption
  *
  * Optional Arguments:
+ *   -k keyProviderServiceId, --keyProviderServiceId keyProviderServiceId
+ *     The ID of the KeyProviderService to be used for key provisioning
  *   -h help, --help help
  *     Prints a help statement
  *
@@ -85,6 +87,12 @@ class SetupEncryptedFileSystem extends ScriptAction
                 'longPrefix' => 'encryptionServiceId',
                 'required' => true,
                 'description' => 'The ID of the EncryptionService to be used for data encryption/decryption'
+            ],
+            'keyProviderServiceId' => [
+                'prefix' => 'k',
+                'longPrefix' => 'keyProviderServiceId',
+                'required' => false,
+                'description' => 'The ID of the KeyProviderService to be used for key provisioning'
             ]
         ];
     }
@@ -133,6 +141,20 @@ class SetupEncryptedFileSystem extends ScriptAction
             );
         }
 
+        $serviceOptions = [EncryptionFlyWrapper::OPTION_ENCRYPTIONSERVICEID => $encryptionServiceId];
+
+        if ($this->hasOption('keyProviderServiceId')) {
+
+            if (!$this->getServiceLocator()->has($this->getOption('keyProviderServiceId'))) {
+                return new Report(
+                    Report::TYPE_ERROR,
+                    "No KeyProviderService with ID '" . $this->getOption('keyProviderServiceId') . "' available on the system."
+                );
+            }
+
+            $serviceOptions[EncryptionFlyWrapper::OPTION_ENCRYPTIONKEYPROVIDERSERVICE] = $this->getOption('keyProviderServiceId');
+        }
+
         /** @var FileSystemService $fileSystemService */
         $fileSystemService = $this->getServiceLocator()->get(FileSystemService::SERVICE_ID);
         $fileSystemServiceOptions = $fileSystemService->getOption(FileSystemService::OPTION_ADAPTERS);
@@ -140,7 +162,7 @@ class SetupEncryptedFileSystem extends ScriptAction
         if (isset($fileSystemServiceOptions[$fileSystemId])) {
             if ($fileSystemServiceOptions[$fileSystemId]['class'] === 'Local') {
                 $fileSystemServiceOptions[$fileSystemId]['class'] = EncryptionFlyWrapper::class;
-                $fileSystemServiceOptions[$fileSystemId]['options'] = [array_merge($fileSystemServiceOptions[$fileSystemId]['options'], ['encryptionServiceId' => $encryptionServiceId])];
+                $fileSystemServiceOptions[$fileSystemId]['options'] = [array_merge($fileSystemServiceOptions[$fileSystemId]['options'], $serviceOptions)];
                 $fileSystemService->setOption(FileSystemService::OPTION_ADAPTERS, $fileSystemServiceOptions);
 
                 $this->getServiceManager()->register(FileSystemService::SERVICE_ID, $fileSystemService);
