@@ -39,6 +39,8 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
 
     /**
      * @return PublicKey
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
      */
     public function getPublicKey()
     {
@@ -47,6 +49,8 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
 
     /**
      * @return PrivateKey
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
      */
     public function getPrivateKey()
     {
@@ -55,6 +59,8 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
 
     /**
      * @return AsymmetricRSAKeyPairProvider
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
      */
     public function getKeyPairModel()
     {
@@ -70,13 +76,31 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
     }
 
     /**
+     * @param $publicKeyChecksum
+     * @return bool
+     */
+    public function comparePublicKeyChecksum($checksum, $publicKey)
+    {
+        return $checksum === $this->hash($publicKey);
+    }
+
+    /**
      * Get hash of public key
      *
      * @return string
      */
-    public function getPublicKeyChecksum()
+    protected function getPublicKeyChecksum()
     {
-        return hash('crc32', $this->getPublicKey());
+        try {
+            return $this->hash($this->getPublicKey()->getKey());
+        } catch (\common_Exception $e) {
+            return null;
+        }
+    }
+
+    protected function hash($value)
+    {
+        return hash('crc32', $value);
     }
 
     static public function onSynchronisationStarted(SynchronisationStart $event)
@@ -85,13 +109,13 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
 
         /** @var AsymmetricKeyPairProviderService $keyPairService */
         $keyPairService = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
-        $keyPairService->getKeyPairModel()->getPublicKey();
+        $checksum = $keyPairService->getPublicKeyChecksum();
 
         /** @var KeyProviderClient $keyProviderClient */
         $keyProviderClient = ServiceManager::getServiceManager()->get(KeyProviderClient::SERVICE_ID);
-        $remotePublicKeyHash = $keyProviderClient->getRemotePublicKeyChecksum();
+        $response = $keyProviderClient->updatePublicKey($checksum);
 
-        \common_Logger::i(print_r($remotePublicKeyHash, true));
+        \common_Logger::i(print_r($response, true));
 //        $alreadySynchronized = ;
 //        $request = new Request();
 //        $response = $publishingService->callEnvironment(SynchronisationStart::class, $request);
