@@ -32,11 +32,12 @@ class Updater extends common_ext_ExtensionUpdater
      */
     public function update($initialVersion)
     {
-        $this->skip('0.1.0', '0.2.0');
+        $this->skip('0.1.0', '0.3.0');
 
-        if ($this->isVersion('0.2.0')) {
+        if ($this->isVersion('0.3.0')) {
             $this->getServiceManager()->register(KeyProviderClient::SERVICE_ID, new KeyProviderClient());
-            $this->setVersion('0.3.0');
+            $this->setVersion('0.4.0');
         }
+
     }
 }
