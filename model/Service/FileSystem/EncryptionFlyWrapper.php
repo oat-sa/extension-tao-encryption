@@ -18,7 +18,7 @@
  *
  */
 
-namespace oat\taoEncryption\Model\FileSystem;
+namespace oat\taoEncryption\Service\FileSystem;
 
 use League\Flysystem\AdapterInterface;
 use oat\oatbox\filesystem\utils\FlyWrapperTrait;
@@ -29,7 +29,7 @@ use oat\oatbox\service\ConfigurableService;
  *
  * A Configurable Wrapper for the EncryptionAdapter FlySystem adapter.
  *
- * @package oat\taoEncryption\Model\FileSystem
+ * @package oat\taoEncryption\Service\FileSystem
  * @see EncryptionAdapter
  */
 class EncryptionFlyWrapper extends ConfigurableService implements AdapterInterface

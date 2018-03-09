@@ -23,7 +23,7 @@ namespace oat\taoEncryption\scripts\tools;
 use oat\oatbox\extension\script\ScriptAction;
 use common_report_Report as Report;
 use oat\oatbox\filesystem\FileSystemService;
-use oat\taoEncryption\Model\FileSystem\EncryptionFlyWrapper;
+use oat\taoEncryption\Service\FileSystem\EncryptionFlyWrapper;
 
 /**
  * Encrypted File System Setup
