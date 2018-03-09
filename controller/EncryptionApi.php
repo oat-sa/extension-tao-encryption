@@ -11,7 +11,7 @@ namespace oat\taoEncryption\controller;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 use oat\taoOauth\model\OauthController;
 
-class EncryptionApi extends \tao_actions_RestController implements OauthController
+class EncryptionApi extends \tao_actions_CommonModule
 {
     const PARAM_PUBLIC_KEY = 'public-key';
 

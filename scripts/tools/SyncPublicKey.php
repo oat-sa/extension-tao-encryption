@@ -21,6 +21,7 @@
 namespace oat\taoEncryption\scripts\tools;
 
 use oat\oatbox\extension\InstallAction;
+use oat\taoEncryption\controller\EncryptionApi;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 use oat\taoSync\model\event\SynchronisationStart;
 use common_report_Report as Report;
@@ -29,6 +30,8 @@ class SyncPublicKey extends InstallAction
 {
     public function __invoke($params)
     {
+        new EncryptionApi();
+        die();
         /** @var \common_ext_ExtensionsManager $extensionManager */
         $extensionManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
         if ($extensionManager->isInstalled('taoSync')) {

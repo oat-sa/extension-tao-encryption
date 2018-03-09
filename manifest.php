@@ -37,6 +37,10 @@ return array(
         'taoResultServer' => '>=6.2.0',
         'taoOauth' => '>=0.1.0',
     ),
+    'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
+    'acl' => array(
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', array('ext'=>'taoEncryption')),
+    ),
     'install' => array(
         'php' => [
             RegisterKeyPairProviderService::class,
