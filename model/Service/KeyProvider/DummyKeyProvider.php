@@ -23,7 +23,7 @@ namespace oat\taoEncryption\Service\KeyProvider;
 
 use oat\taoEncryption\Model\Key;
 
-class DummyKeyProvider implements SymmetricKeyProvider
+class DummyKeyProvider extends SymmetricKeyProviderService
 {
     /**
      * @return Key
