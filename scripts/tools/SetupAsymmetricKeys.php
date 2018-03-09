@@ -22,9 +22,7 @@ namespace oat\taoEncryption\scripts\tools;
 use common_report_Report as Report;
 use oat\oatbox\action\Action;
 use oat\oatbox\action\ResolutionException;
-use oat\oatbox\event\EventManager;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
-use oat\taoSync\model\event\SynchronisationStart;
 use oat\taoSync\model\SyncService;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
@@ -99,37 +97,28 @@ class SetupAsymmetricKeys implements Action, ServiceLocatorAwareInterface
         $pairModel->savePrivateKey($pair->getPrivateKey());
         $pairModel->savePublicKey($pair->getPublicKey());
 
-        $this->setupKeysSyncrhonization();
+        $this->prepareSynchronisation();
 
         $this->report = Report::createSuccess('Keys saved with success');
     }
 
     /**
-     * If taoSync is installed, prepare synchronization to be aware of taoEncryption
+     * During keys generation, check if taoSync is installed.
      *
-     * During synchronization process, public key will be synchronized againt remote host
-     *
-     * @return Report
+     * If yes then add encryption role to sync role to allow sync user to access encryption API.
+     * After that, synchronisation will be able to synchronise encryption key.
      */
-    protected function setupKeysSynchronization()
+    protected function prepareSynchronisation()
     {
         /** @var \common_ext_ExtensionsManager $extensionManager */
         $extensionManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
         if ($extensionManager->isInstalled('taoSync')) {
-            $this->getServiceLocator()->get(EventManager::SERVICE_ID)->attach(
-                SynchronisationStart::class,
-                [AsymmetricKeyPairProviderService::class, 'onSynchronisationStarted']
-            );
-
             $userService = \core_kernel_users_Service::singleton();
             $userService->includeRole(
                 new \core_kernel_classes_Resource(SyncService::TAO_SYNC_ROLE),
                 new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole')
             );
-
-            return Report::createSuccess('Synchronisation event successfully configured to synchronize encryption key.');
         }
-        return Report::createSuccess('taoSync extension is not installed. No need to configure event to synchronize encryption key.');
     }
 
     /**
