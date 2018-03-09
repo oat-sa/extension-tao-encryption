@@ -84,3 +84,17 @@ The key provider is a configurable option which can be changed in the config fil
 
 _Note_: 
 >  You should ran this command on client tao instance
+
+
+## Encrypted File Systems
+
+You can make TAO file systems encrypted. The following command line enables encryption
+for the `private` file system, using the service registered with ID 
+`taoEncryption/symmetricEncryptionService` for data encryption/decryption.
+
+```bash
+sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f private -e taoEncryption/symmetricEncryptionService
+```
+
+This script will NOT encrypt the data already stored in the file system. In other words, it is suitable
+for new installations only. In addition, it only works, for the time being, with local file systems.
