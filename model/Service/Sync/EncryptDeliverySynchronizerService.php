@@ -18,10 +18,11 @@
  *
  */
 
-namespace oat\taoEncryption\Rdf;
+namespace oat\taoEncryption\Service\Sync;
 
-interface EncryptedUserRdf
+use oat\taoSync\model\synchronizer\delivery\DeliverySynchronizerService;
+
+class EncryptDeliverySynchronizerService extends DeliverySynchronizerService
 {
-    const PROPERTY_ENCRYPTION_KEY = 'http://www.tao.lu/Ontologies/generis.rdf#encryptionKey';
-    const PROPERTY_ENCRYPTION_PUBLIC_KEY = 'http://www.tao.lu/Ontologies/generis.rdf#encryptionPublicKey';
+
 }

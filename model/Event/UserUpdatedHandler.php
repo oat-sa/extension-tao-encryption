@@ -22,12 +22,19 @@ namespace oat\taoEncryption\Event;
 
 
 use oat\generis\model\GenerisRdf;
+use oat\oatbox\service\ServiceManager;
 use oat\tao\model\event\UserUpdatedEvent;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
+use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\GenerateKey;
 
 class UserUpdatedHandler
 {
+    /**
+     * @param UserUpdatedEvent $event
+     * @throws \Exception
+     */
     public static function handle(UserUpdatedEvent $event)
     {
         $eventData = $event->jsonSerialize();
@@ -36,10 +43,23 @@ class UserUpdatedHandler
             return;
         }
         $salt = $eventData['data'][GenerisRdf::PROPERTY_USER_PASSWORD];
+        $clientId = 'taoffline';
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
             GenerateKey::generate($eventData['data']['plainPassword'], $salt)
+        );
+
+        /** @var EncryptionSymmetricService $encryptService */
+        $encryptService = ServiceManager::getServiceManager()->get(EncryptionSymmetricService::SERVICE_ID);
+        /** @var SimpleKeyProviderService $simpleKeyProvider */
+        $simpleKeyProvider = ServiceManager::getServiceManager()->get(SimpleKeyProviderService::SERVICE_ID);
+        $simpleKeyProvider->setKey($eventData['data']['plainPassword']);
+        $encryptService->setKeyProvider($simpleKeyProvider);
+
+        $userResource->editPropertyValues(
+            new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY),
+            base64_encode($encryptService->encrypt($clientId))
         );
     }
 }

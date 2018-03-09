@@ -24,6 +24,7 @@ use League\Flysystem\AdapterInterface;
 use oat\oatbox\filesystem\utils\FlyWrapperTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoEncryption\Model\FileSystem\EncryptionAdapter;
+use oat\taoEncryption\Service\EncryptionSymmetricService;
 
 /**
  * Class EncryptionFlyWrapper
@@ -38,7 +39,7 @@ class EncryptionFlyWrapper extends ConfigurableService implements AdapterInterfa
     use FlyWrapperTrait;
 
     const OPTION_ENCRYPTIONSERVICEID = 'encryptionServiceId';
-    const OPTION_ENCRYPTIONKEYPROVIDERSERVICE = 'keyProviderService';
+    const OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE = 'keyProviderService';
     const OPTION_ROOT = 'root';
 
     /**
@@ -50,9 +51,10 @@ class EncryptionFlyWrapper extends ConfigurableService implements AdapterInterfa
      */
     public function getAdapter()
     {
+        /** @var EncryptionSymmetricService $encryptionService */
         $encryptionService = $this->getServiceLocator()->get($this->getOption(self::OPTION_ENCRYPTIONSERVICEID));
 
-        if ($this->hasOption(self::OPTION_ENCRYPTIONKEYPROVIDERSERVICE)) {
+        if ($this->hasOption(self::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE)) {
             /** @var \oat\taoEncryption\Service\KeyProvider\SymmetricKeyProviderService $keyProvider */
             $keyProvider = $this->getServiceLocator()->get($this->getOption(self::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE));
             $encryptionService->setKeyProvider($keyProvider);
