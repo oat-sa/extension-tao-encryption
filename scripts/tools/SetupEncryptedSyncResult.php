@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,11 +17,15 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
  *
  */
+
 namespace oat\taoEncryption\scripts\tools;
+
 use common_ext_ExtensionsManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoEncryption\Service\EncryptionAsymmetricService;
+use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
+use oat\taoSync\model\event\SynchronisationStart;
 use oat\taoSync\model\ResultService;
 use common_report_Report as Report;
 
@@ -34,6 +37,14 @@ use common_report_Report as Report;
  */
 class SetupEncryptedSyncResult extends InstallAction
 {
+    /**
+     * Register taoEncryption services for synchronisation if taoSync is installed.
+     *
+     * @param $params
+     * @return Report
+     * @throws \common_Exception
+     * @throws \common_exception_Error
+     */
     public function __invoke($params)
     {
         /** @var common_ext_ExtensionsManager $extManger */
@@ -42,6 +53,8 @@ class SetupEncryptedSyncResult extends InstallAction
         if (!$extManger->isInstalled('taoSync')) {
             return Report::createFailure('taoSync extension not installed.');
         }
+
+        $report = Report::createInfo('Configuring SyncEncryptedResult service...');
 
         /** @var ResultService $stateStorage */
         $stateStorage = $this->getServiceLocator()->get(ResultService::SERVICE_ID);
@@ -55,6 +68,27 @@ class SetupEncryptedSyncResult extends InstallAction
 
         $this->registerService(SyncEncryptedResultService::SERVICE_ID, $encrypted);
 
-        return Report::createSuccess('SyncEncryptedResultService configured');
+        $report->add(Report::createSuccess('SyncEncryptedResultService successfully registered.'));
+        $report->add(Report::createSuccess($this->setupSynchronizationListener()));
+
+        return $report;
+
+    }
+
+    /**
+     * If taoSync is installed, prepare synchronization to be aware of taoEncryption
+     *
+     * During synchronization process, public key will be synchronized againt remote host
+     *
+     * @return Report
+     */
+    protected function setupSynchronizationListener()
+    {
+        $this->registerEvent(
+            SynchronisationStart::class,
+            [AsymmetricKeyPairProviderService::class, 'onSynchronisationStarted']
+        );
+
+        return Report::createSuccess('Synchronisation event successfully configured to synchronize encryption key.');
     }
 }
