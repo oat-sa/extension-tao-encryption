@@ -23,6 +23,7 @@ namespace oat\taoEncryption\Service\KeyProvider;
 use oat\oatbox\filesystem\FileSystemService;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;
+use oat\taoEncryption\controller\EncryptionApi;
 use oat\taoEncryption\Model\Asymmetric\AsymmetricRSAKeyPairProvider;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
@@ -76,12 +77,28 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
     }
 
     /**
-     * @param $publicKeyChecksum
+     * Compare a checksum against a value
+     *
+     * @param $checksum
+     * @param $value
      * @return bool
      */
-    public function comparePublicKeyChecksum($checksum, $publicKey)
+    public function comparePublicKeyChecksum($checksum, $value)
     {
-        return $checksum === $this->hash($publicKey);
+        return $checksum === $this->hash($value);
+    }
+
+    /**
+     * Event listener for synchronisation start event
+     *
+     * @param SynchronisationStart $event
+     * @throws \common_Exception
+     */
+    static public function onSynchronisationStarted(SynchronisationStart $event)
+    {
+        /** @var AsymmetricKeyPairProviderService $keyPairService */
+        $keyPairService = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+        return $keyPairService->synchronizePublicKey();
     }
 
     /**
@@ -93,35 +110,53 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
     {
         try {
             return $this->hash($this->getPublicKey()->getKey());
-        } catch (\common_Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
 
+    /**
+     * Hash a value with crc32 algorithm
+     *
+     * @param $value
+     * @return string
+     */
     protected function hash($value)
     {
         return hash('crc32', $value);
     }
 
-    static public function onSynchronisationStarted(SynchronisationStart $event)
+    /**
+     * Synchronize a local public against a remote host
+     *
+     * Send the local public key checksum to remote
+     * Parse the response to know if an update is required
+     * If yes then save the remote public from response
+     *
+     * @throws \common_Exception
+     */
+    protected function synchronizePublicKey()
     {
-        \common_Logger::i(print_r(__METHOD__, true));
-
-        /** @var AsymmetricKeyPairProviderService $keyPairService */
-        $keyPairService = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
-        $checksum = $keyPairService->getPublicKeyChecksum();
+        $checksum = $this->getPublicKeyChecksum();
 
         /** @var KeyProviderClient $keyProviderClient */
-        $keyProviderClient = ServiceManager::getServiceManager()->get(KeyProviderClient::SERVICE_ID);
-        $response = $keyProviderClient->updatePublicKey($checksum);
+        $keyProviderClient = $this->getServiceLocator()->get(KeyProviderClient::SERVICE_ID);
+        $response = $keyProviderClient->updatePublicKey($checksum)->getContents();
 
-        \common_Logger::i(print_r($response, true));
-//        $alreadySynchronized = ;
-//        $request = new Request();
-//        $response = $publishingService->callEnvironment(SynchronisationStart::class, $request);
-//        $response = $client->send('taoEncryption/EncryptionApi/getPublicKeyChecksum');
-//        if ($response->getBody()->getContents()['checksum'] != $keyPairService->getChecksum()) {
-//            $client->send('taoEncryption/EncryptionApi/savePublicKey');
-//        }
+        if (
+            is_array($response = json_decode($response, true))
+            && json_last_error() === JSON_ERROR_NONE
+            && array_key_exists(EncryptionApi::PARAM_REQUIRE_UPDATE, $response)
+            && array_key_exists(EncryptionApi::PARAM_PUBLIC_KEY, $response)
+        ) {
+            if ($response[EncryptionApi::PARAM_REQUIRE_UPDATE] === true) {
+                $this->logNotice('Remote and local encryption keys does not match. Updating local public key...');
+                $this->getKeyPairModel()->savePublicKey(new PublicKey($response[EncryptionApi::PARAM_PUBLIC_KEY]));
+            } else {
+                $this->logInfo('Remote and local encryption keys are already synchronized.');
+            }
+        } else {
+            throw new \LogicException('The response is not correctly formatted. Process aborted.');
+        }
     }
 }

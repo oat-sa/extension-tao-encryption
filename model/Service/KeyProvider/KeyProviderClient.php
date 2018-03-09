@@ -41,36 +41,18 @@ class KeyProviderClient extends ConfigurableService
     {
         $url = '/taoEncryption/EncryptionApi/updatePublicKey';
         $method = 'POST';
-        $body = ['checksum' => $publicKeyChecksum];
+        $body = [EncryptionApi::PARAM_CHECKSUM => $publicKeyChecksum];
 
-        $response = $this->call($url, $method, $body);
+        $response = $this->call($url, $method, json_encode($body));
+
         $httpCode  =  (string) $response->getStatusCode();
         if (!preg_match('/2\d\d/', (string) $httpCode)) {
-            $this->logError('Error has occurred during ' . __FUNCTION__ . ' call: response code => ' . $httpCode . ' | response body ' .  $response->getBody()->getContents());
+            $this->logError('Error has occurred during ' . __FUNCTION__ . ' call: Response code : ' . $httpCode . ' | Response body : ' .  $response->getBody()->getContents());
             throw new \common_Exception('An error has occurred during calling remote server with http code "' . $httpCode . '"');
         }
 
         return $response->getBody();
     }
-
-    /**
-     * Send the encrypted public key
-     *
-     * @param $publicKey
-     * @return \Psr\Http\Message\StreamInterface
-     * @throws \common_Exception
-     */
-//    public function sendPublicKey($publicKey)
-//    {
-//        $url = '/taoEncryption/EncryptionApi/savePublicKey?' . http_build_query([EncryptionApi::PARAM_PUBLIC_KEY => $publicKey]);
-//        $method = 'POST';
-//
-//        $response = $this->call($url, $method);
-//        if ($response->getStatusCode() != 200) {
-//            throw new \common_Exception('An error has occurred during calling remote server with message : ' . $response->getBody()->getContents());
-//        }
-//        return $response->getBody();
-//    }
 
     /**
      * Process an http call to a remote environment
