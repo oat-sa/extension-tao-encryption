@@ -44,6 +44,6 @@ class SetupUserApplicationKey extends InstallAction
 
         $fileKeyProvider->generateAndSaveKey();
 
-        Report::createSuccess('User Application key generated success.');
+        return Report::createSuccess('User Application key generated success.');
     }
 }

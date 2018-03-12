@@ -102,8 +102,27 @@ _Note_:
 >  You should ran this command on client tao instance
 
 
-## Encrypted File Systems
+### 4. Setup Encrypted File Systems
 
+- #### Setup scripts for Tao Client instance
+
+```bash
+ $ sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f private -e taoEncryption/symmetricEncryptionService -k taoEncryption/symmetricFileKeyProvider
+```
+
+```bash
+ $ sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f public -e taoEncryption/symmetricEncryptionService -k taoEncryption/symmetricFileKeyProvider
+```
+
+- #### Setup scripts for Tao Server instance
+
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserApplicationKey'
+ ```
+
+_Note_: 
+> Extra
 You can make TAO file systems encrypted. The following command line enables encryption
 for the `private` file system, using the service registered with ID 
 `taoEncryption/symmetricEncryptionService` for data encryption/decryption.
@@ -112,5 +131,5 @@ for the `private` file system, using the service registered with ID
 sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f private -e taoEncryption/symmetricEncryptionService
 ```
 
-This script will NOT encrypt the data already stored in the file system. In other words, it is suitable
+> This script will NOT encrypt the data already stored in the file system. In other words, it is suitable
 for new installations only. In addition, it only works, for the time being, with local file systems.
