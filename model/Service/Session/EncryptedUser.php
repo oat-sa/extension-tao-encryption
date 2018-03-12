@@ -28,6 +28,8 @@ use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyRdf;
 use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
+use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Sync\EncryptTestTakerSynchronizer;
 
 class EncryptedUser extends core_kernel_users_GenerisUser
@@ -35,10 +37,14 @@ class EncryptedUser extends core_kernel_users_GenerisUser
     /** @var string */
     private $key;
 
+    /** @var string */
+    protected $applicationKey;
+
     /**
      * EncryptedUser constructor.
      * @param core_kernel_classes_Resource $user
      * @param null $passwordPlain
+     * @throws \Exception
      */
     public function __construct(core_kernel_classes_Resource $user, $passwordPlain = null)
     {
@@ -47,6 +53,18 @@ class EncryptedUser extends core_kernel_users_GenerisUser
         $password = $this->getPropertyValues(GenerisRdf::PROPERTY_USER_PASSWORD);
         $salt     = $password[0];
         $this->key = GenerateKey::generate($passwordPlain, $salt);
+
+        /** @var EncryptionSymmetricService $encryptService */
+        $encryptService = ServiceManager::getServiceManager()->get(EncryptionSymmetricService::SERVICE_ID);
+        /** @var SimpleKeyProviderService $simpleKeyProvider */
+        $simpleKeyProvider = ServiceManager::getServiceManager()->get(SimpleKeyProviderService::SERVICE_ID);
+        $simpleKeyProvider->setKey($passwordPlain);
+        $encryptService->setKeyProvider($simpleKeyProvider);
+
+        $appKey = $this->getPropertyValues(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY);
+        $appKey = $appKey[0];
+
+        $this->applicationKey = $encryptService->decrypt(base64_decode($appKey));
     }
 
     /**
@@ -102,6 +120,7 @@ class EncryptedUser extends core_kernel_users_GenerisUser
 
         return array(
             'key',
+            'applicationKey',
             'userResource',
             'cache',
             'cachedProperties'
@@ -134,5 +153,13 @@ class EncryptedUser extends core_kernel_users_GenerisUser
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApplicationKey()
+    {
+        return $this->applicationKey;
     }
 }
