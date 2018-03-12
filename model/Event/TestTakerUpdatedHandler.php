@@ -24,6 +24,7 @@ use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\GenerateKey;
 use oat\taoTestTaker\models\events\TestTakerUpdatedEvent;
@@ -43,7 +44,6 @@ class TestTakerUpdatedHandler
             return;
         }
         $salt = $eventData['properties'][GenerisRdf::PROPERTY_USER_PASSWORD];
-        $clientId = 'taoffline';
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
@@ -57,9 +57,12 @@ class TestTakerUpdatedHandler
         $simpleKeyProvider->setKey($eventData['properties']['plainPassword']);
         $encryptService->setKeyProvider($simpleKeyProvider);
 
+        /** @var FileKeyProviderService $fileKeyProvider */
+        $fileKeyProvider = ServiceManager::getServiceManager()->get(FileKeyProviderService::SERVICE_ID);
+
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY),
-            base64_encode($encryptService->encrypt($clientId))
+            base64_encode($encryptService->encrypt($fileKeyProvider->getKeyFromFileSystem()))
         );
     }
 }

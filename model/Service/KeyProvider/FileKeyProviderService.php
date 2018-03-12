@@ -48,7 +48,7 @@ class FileKeyProviderService extends SimpleKeyProviderService
             return parent::getKey();
         }
 
-        $this->setKey($this->getKeyFromFileSystem());
+        $this->setKey('');
 
         return parent::getKey();
     }
@@ -64,7 +64,7 @@ class FileKeyProviderService extends SimpleKeyProviderService
         $fs = $fileSystem->getFileSystem($this->getOption(static::OPTION_FILESYSTEM_ID));
         $symKey = Random::string(150);
 
-        return $fs->put('user_application.key', $symKey);
+        return $fs->put('user_application.key', base64_encode($symKey));
     }
 
     /**
@@ -78,6 +78,6 @@ class FileKeyProviderService extends SimpleKeyProviderService
         $fileSystem = $this->getServiceLocator()->get(FileSystemService::SERVICE_ID);
         $fs = $fileSystem->getFileSystem($this->getOption(static::OPTION_FILESYSTEM_ID));
 
-        return (string)$fs->read('user_application.key');
+        return (string) $fs->read('user_application.key');
     }
 }

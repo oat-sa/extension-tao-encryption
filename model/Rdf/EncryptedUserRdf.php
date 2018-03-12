@@ -23,5 +23,5 @@ namespace oat\taoEncryption\Rdf;
 interface EncryptedUserRdf
 {
     const PROPERTY_ENCRYPTION_KEY = 'http://www.tao.lu/Ontologies/generis.rdf#encryptionKey';
-    const PROPERTY_ENCRYPTION_PUBLIC_KEY = 'http://www.tao.lu/Ontologies/generis.rdf#encryptionPublicKey';
+    const PROPERTY_ENCRYPTION_PUBLIC_KEY = EncryptedDeliveryRdf::PROPERTY_APPLICATION_KEY;
 }

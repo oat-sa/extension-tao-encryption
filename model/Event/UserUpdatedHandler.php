@@ -26,6 +26,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\tao\model\event\UserUpdatedEvent;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\GenerateKey;
 
@@ -43,7 +44,6 @@ class UserUpdatedHandler
             return;
         }
         $salt = $eventData['data'][GenerisRdf::PROPERTY_USER_PASSWORD];
-        $clientId = 'taoffline';
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
@@ -57,9 +57,12 @@ class UserUpdatedHandler
         $simpleKeyProvider->setKey($eventData['data']['plainPassword']);
         $encryptService->setKeyProvider($simpleKeyProvider);
 
+        /** @var FileKeyProviderService $fileKeyProvider */
+        $fileKeyProvider = ServiceManager::getServiceManager()->get(FileKeyProviderService::SERVICE_ID);
+
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY),
-            base64_encode($encryptService->encrypt($clientId))
+            base64_encode($encryptService->encrypt($fileKeyProvider->getKeyFromFileSystem()))
         );
     }
 }
