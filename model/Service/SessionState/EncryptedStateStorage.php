@@ -77,6 +77,6 @@ class EncryptedStateStorage extends tao_models_classes_service_StateStorage
             throw new \Exception('EncryptedStateStorage should work only with EncryptedUser');
         }
 
-        return $user->getKey();
+        return $user->getApplicationKey();
     }
 }
