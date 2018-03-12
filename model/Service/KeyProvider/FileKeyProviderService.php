@@ -33,7 +33,6 @@ class FileKeyProviderService extends SimpleKeyProviderService
     /**
      * @return Key
      * @throws \common_exception_Error
-     * @throws \common_exception_NotFound
      */
     public function getKey()
     {

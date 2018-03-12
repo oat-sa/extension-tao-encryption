@@ -28,6 +28,9 @@ class EncryptRdfDeliverySynchronizer extends RdfDeliverySynchronizer
 {
     const SERVICE_ID = 'taoEncryption/encryptRdfDeliverySynchronizer';
 
+    /** @var array */
+    private $properties;
+
     /**
      * @param array $triples
      * @return array
@@ -36,12 +39,26 @@ class EncryptRdfDeliverySynchronizer extends RdfDeliverySynchronizer
      */
     public function filterProperties(array $triples)
     {
-        /** @var FileKeyProviderService $keyProvider */
-        $keyProvider = $this->getServiceLocator()->get('taoEncryption/symmetricFileKeyProvider');
-
         $properties = parent::filterProperties($triples);
+        $this->properties = $properties;
+
+        /** @var FileKeyProviderService $keyProvider */
+        $keyProvider = $this->getServiceLocator()->get(FileKeyProviderService::SERVICE_ID);
         $properties[EncryptedDeliveryRdf::PROPERTY_APPLICATION_KEY] = $keyProvider->getKeyFromFileSystem();
 
         return $properties;
+    }
+
+    /**
+     * @param array $properties
+     * @return string
+     */
+    protected function serializeProperties($properties)
+    {
+        if (is_null($this->properties)){
+            return parent::serializeProperties($properties);
+        }
+
+        return parent::serializeProperties($this->properties);
     }
 }

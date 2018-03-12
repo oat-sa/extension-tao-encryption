@@ -41,7 +41,7 @@ use oat\taoSync\model\SyncService;
  *
  * sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupDeliveryEncrypted'
  */
-class SetupDeliveryEncrypted extends InstallAction
+class SetupRdfDeliveryEncrypted extends InstallAction
 {
     /**
      * @param $params
@@ -56,6 +56,39 @@ class SetupDeliveryEncrypted extends InstallAction
         if (!$extensionManager->isInstalled('taoSync')) {
             return Report::createSuccess('Cannot setup sync, to taoSync extension installed');
         }
+
+        $rdfDeliverySync = new EncryptRdfDeliverySynchronizer([
+            AbstractResourceSynchronizer::OPTIONS_FIELDS => array(
+                OntologyRdf::RDF_TYPE,
+                OntologyRdfs::RDFS_LABEL,
+                OntologyService::PROPERTY_RESULT_SERVER,
+                DeliveryContainerService::PROPERTY_MAX_EXEC,
+                DeliveryAssemblyService::PROPERTY_DELIVERY_DISPLAY_ORDER_PROP,
+                DeliveryContainerService::PROPERTY_ACCESS_SETTINGS,
+                DeliveryAssemblyService::PROPERTY_END,
+                DeliveryFieldsService::PROPERTY_CUSTOM_LABEL,
+                ProctorService::ACCESSIBLE_PROCTOR,
+                DeliveryAssemblyService::PROPERTY_START,
+                EncryptedDeliveryRdf::PROPERTY_APPLICATION_KEY,
+            )
+        ]);
+
+        $this->registerService(EncryptRdfDeliverySynchronizer::SERVICE_ID, $rdfDeliverySync);
+
+        /** @var SyncService $syncService */
+        $syncService = $this->getServiceLocator()->get(SyncService::SERVICE_ID);
+        $synchronizers = $syncService->getOption(SyncService::OPTION_SYNCHRONIZERS);
+
+        $syncService->setOptions(array_merge(
+            $syncService->getOptions(),
+            [
+                SyncService::OPTION_SYNCHRONIZERS => array_merge($synchronizers,[
+                    'delivery' => EncryptRdfDeliverySynchronizer::SERVICE_ID,
+                ])
+            ]
+        ));
+
+        $this->registerService(SyncService::SERVICE_ID, $syncService);
 
         $encryptDeliverySinchronize = new EncryptDeliverySynchronizerService();
 

@@ -114,12 +114,20 @@ _Note_:
  $ sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f public -e taoEncryption/symmetricEncryptionService -k taoEncryption/symmetricFileKeyProvider
 ```
 
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupDeliveryEncrypted'
+```
+
 - #### Setup scripts for Tao Server instance
 
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserApplicationKey'
  ```
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupRdfDeliveryEncrypted'
+```
 
 _Note_: 
 > Extra
