@@ -68,11 +68,6 @@ In order to use the encrypted state test service you have to run the following c
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedStateStorage'
 ```
 
-Along with this you have to setup the ProctorCommand with storage execution, available in taoProctoring version 8.6.0
-```bash
- $ sudo -u www-data php index.php 'oat\taoProctoring\scripts\tools\SetupProctorCommandWithStorageExecution'
-```
-
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedMonitoringService'
 ```
