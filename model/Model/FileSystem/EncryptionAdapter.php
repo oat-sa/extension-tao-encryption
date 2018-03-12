@@ -92,7 +92,7 @@ class EncryptionAdapter extends Local
         $fp = fopen('php://temp','r+');
         fwrite($fp, $contents);
         rewind($fp);
-        return parent::update($path, $contents, $config);
+        return parent::updateStream($path, $fp, $config);
     }
 
     public function read($path)
