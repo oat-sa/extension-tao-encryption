@@ -39,7 +39,7 @@ return array(
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
     'acl' => array(
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', array('ext'=>'taoEncryption')),
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', array('ext'=>'taoEncryption', 'mod' => 'EncryptionApi')),
     ),
     'install' => array(
         'php' => [

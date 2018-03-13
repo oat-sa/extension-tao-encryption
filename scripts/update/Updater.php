@@ -21,6 +21,8 @@
 namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use oat\tao\model\accessControl\func\AccessRule;
+use oat\tao\model\accessControl\func\AclProxy;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 
 class Updater extends common_ext_ExtensionUpdater
@@ -36,6 +38,13 @@ class Updater extends common_ext_ExtensionUpdater
         
         if ($this->isVersion('0.4.0')) {
             $this->getServiceManager()->register(KeyProviderClient::SERVICE_ID, new KeyProviderClient());
+            AclProxy::applyRule(
+                new AccessRule(
+                    AccessRule::GRANT,
+                    'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
+                    array('ext'=>'taoEncryption', 'mod' => 'EncryptionApi')
+                )
+            );
             $this->setVersion('0.5.0');
         }
     }
