@@ -27,6 +27,7 @@ use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
 use oat\taoResultServer\models\Entity\VariableStorable;
+use oat\taoSync\model\result\DetectTestAndItemIdentifiers;
 use taoResultServer_models_classes_Variable;
 
 class EncryptResultService extends ConfigurableService implements EncryptResult
@@ -118,11 +119,13 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     )
     {
         $keyStore = $this->buildStoreKey($deliveryResultIdentifier, $callIdItem, $itemVariable->getIdentifier());
+        $detect = new DetectTestAndItemIdentifiers();
+        list($testIdentifier,$itemIdentifier) = $detect->detect($deliveryResultIdentifier, $test, $item);
         $variable = $this->buildItemVariable(
             $deliveryResultIdentifier,
-            $test,
+            $testIdentifier,
             $itemVariable,
-            $item,
+            $itemIdentifier,
             $callIdItem
         );
 
@@ -180,9 +183,12 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     )
     {
         $keyStore = $this->buildStoreKey($deliveryResultIdentifier, $callIdTest, $testVariable->getIdentifier());
+        $detect = new DetectTestAndItemIdentifiers();
+        list($testIdentifier,$itemIdentifier) = $detect->detect($deliveryResultIdentifier, $test);
+
         $variable = $this->buildTestVariable(
             $deliveryResultIdentifier,
-            $test,
+            $testIdentifier,
             $testVariable,
             $callIdTest
         );

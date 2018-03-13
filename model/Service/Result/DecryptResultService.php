@@ -29,7 +29,6 @@ use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoResultServer\models\classes\implementation\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
-use oat\taoSync\model\result\DetectTestAndItemIdentifiers;
 
 class DecryptResultService extends ConfigurableService implements DecryptResult
 {
@@ -81,16 +80,12 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
             foreach ($itemsTestsRefs as $ref) {
                 $resultRow = $this->getResultRow($ref);
-                $detect  = new DetectTestAndItemIdentifiers();
-                list($testIdentifier,$itemIdentifier) = $detect->detect(
-                    $relatedDelivery['deliveryIdentifier'], $resultRow->getVariable()
-                );
 
                 if ($resultRow instanceof ItemVariableStorable) {
                     $resultStorage->storeItemVariable(
                         $deliveryResultIdentifier,
-                        $testIdentifier,
-                        $itemIdentifier,
+                        $resultRow->getTestIdentifier(),
+                        $resultRow->getItemIdentifier(),
                         $resultRow->getVariable(),
                         $deliveryResultIdentifier .'.'.$resultRow->getCallItemId()
                     );
@@ -98,7 +93,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 } else if ($resultRow instanceof TestVariableStorable) {
                     $resultStorage->storeTestVariable(
                         $deliveryResultIdentifier,
-                        $testIdentifier,
+                        $resultRow->getTestIdentifier(),
                         $resultRow->getVariable(),
                         $deliveryResultIdentifier .'.'.$resultRow->getCallTestId()
                     );
