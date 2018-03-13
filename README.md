@@ -105,9 +105,6 @@ _Note_:
  $ sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f private -e taoEncryption/symmetricEncryptionService -k taoEncryption/symmetricFileKeyProvider
 ```
 
-```bash
- $ sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f public -e taoEncryption/symmetricEncryptionService -k taoEncryption/symmetricFileKeyProvider
-```
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupDeliveryEncrypted'
