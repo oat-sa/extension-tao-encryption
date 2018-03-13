@@ -21,6 +21,7 @@
 namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 
 class Updater extends common_ext_ExtensionUpdater
@@ -38,6 +39,10 @@ class Updater extends common_ext_ExtensionUpdater
             $simpleKeyProvider = new SimpleKeyProviderService([]);
 
             $this->getServiceManager()->register(SimpleKeyProviderService::SERVICE_ID, $simpleKeyProvider);
+
+            $fileKeyProvider = new FileKeyProviderService([]);
+
+            $this->getServiceManager()->register(FileKeyProviderService::SERVICE_ID, $fileKeyProvider);
 
             $this->setVersion('0.5.0');
         }
