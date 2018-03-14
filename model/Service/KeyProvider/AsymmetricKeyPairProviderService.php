@@ -22,9 +22,12 @@ namespace oat\taoEncryption\Service\KeyProvider;
 
 use oat\oatbox\filesystem\FileSystemService;
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\ServiceManager;
+use oat\taoEncryption\controller\EncryptionApi;
 use oat\taoEncryption\Model\Asymmetric\AsymmetricRSAKeyPairProvider;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
+use oat\taoSync\model\event\SynchronisationStart;
 
 class AsymmetricKeyPairProviderService extends ConfigurableService
 {
@@ -37,6 +40,8 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
 
     /**
      * @return PublicKey
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
      */
     public function getPublicKey()
     {
@@ -45,6 +50,8 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
 
     /**
      * @return PrivateKey
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
      */
     public function getPrivateKey()
     {
@@ -53,6 +60,8 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
 
     /**
      * @return AsymmetricRSAKeyPairProvider
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
      */
     public function getKeyPairModel()
     {
@@ -65,5 +74,89 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
         }
 
         return $this->asymmetricKeyPair;
+    }
+
+    /**
+     * Compare a checksum against a value
+     *
+     * @param $checksum
+     * @param $value
+     * @return bool
+     */
+    public function comparePublicKeyChecksum($checksum, $value)
+    {
+        return $checksum === $this->hash($value);
+    }
+
+    /**
+     * Event listener for synchronisation start event
+     *
+     * @param SynchronisationStart $event
+     * @throws \common_Exception
+     */
+    static public function onSynchronisationStarted(SynchronisationStart $event)
+    {
+        /** @var AsymmetricKeyPairProviderService $keyPairService */
+        $keyPairService = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+        return $keyPairService->synchronizePublicKey();
+    }
+
+    /**
+     * Get hash of public key
+     *
+     * @return string
+     */
+    protected function getPublicKeyChecksum()
+    {
+        try {
+            return $this->hash($this->getPublicKey()->getKey());
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Hash a value with crc32 algorithm
+     *
+     * @param $value
+     * @return string
+     */
+    protected function hash($value)
+    {
+        return hash('crc32', $value);
+    }
+
+    /**
+     * Synchronize a local public against a remote host
+     *
+     * Send the local public key checksum to remote
+     * Parse the response to know if an update is required
+     * If yes then save the remote public from response
+     *
+     * @throws \common_Exception
+     */
+    protected function synchronizePublicKey()
+    {
+        $checksum = $this->getPublicKeyChecksum();
+
+        /** @var KeyProviderClient $keyProviderClient */
+        $keyProviderClient = $this->getServiceLocator()->get(KeyProviderClient::SERVICE_ID);
+        $response = $keyProviderClient->updatePublicKey($checksum)->getContents();
+
+        if (
+            is_array($response = json_decode($response, true))
+            && json_last_error() === JSON_ERROR_NONE
+            && array_key_exists(EncryptionApi::PARAM_REQUIRE_UPDATE, $response)
+            && array_key_exists(EncryptionApi::PARAM_PUBLIC_KEY, $response)
+        ) {
+            if ($response[EncryptionApi::PARAM_REQUIRE_UPDATE] === true) {
+                $this->logNotice('Remote and local encryption keys does not match. Updating local public key...');
+                $this->getKeyPairModel()->savePublicKey(new PublicKey($response[EncryptionApi::PARAM_PUBLIC_KEY]));
+            } else {
+                $this->logInfo('Remote and local encryption keys are already synchronized.');
+            }
+        } else {
+            throw new \LogicException('The response is not correctly formatted. Process aborted.');
+        }
     }
 }
