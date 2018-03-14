@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017-2018 (original work) Open Assessment Technologies SA;
  *
  *
  */
@@ -25,6 +25,7 @@ use oat\taoEncryption\scripts\install\RegisterEncryptionSymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptResultStorage;
 use oat\taoEncryption\scripts\install\RegisterFileKeyProviderService;
 use oat\taoEncryption\scripts\install\RegisterKeyPairProviderService;
+use oat\taoEncryption\controller\EncryptionApi;
 use oat\taoEncryption\scripts\install\RegisterSimpleKeyProviderService;
 
 return array(
@@ -32,15 +33,22 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.5.0',
+    'version' => '0.6.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
         'generis' => '>=6.12.0',
-        'taoResultServer' => '>=6.2.0'
+        'taoResultServer' => '>=6.2.0',
+        'taoOauth' => '>=0.1.0',
     ),
-
+    'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
+    'acl' => array(
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', EncryptionApi::class),
+    ),
     'install' => array(
+        'rdf' => [
+            __DIR__ . '/model/ontology/encryptionRole.rdf',
+        ],
         'php' => [
             RegisterKeyPairProviderService::class,
             RegisterEncryptionAsymmetricService::class,
@@ -54,4 +62,7 @@ return array(
     'uninstall' => array(
     ),
     'update' => \oat\taoEncryption\scripts\update\Updater::class,
+    'routes' => array(
+        '/taoEncryption' => 'oat\\taoEncryption\\controller'
+    ),
 );
