@@ -23,6 +23,7 @@ namespace oat\taoEncryption\scripts\update;
 use common_ext_ExtensionUpdater;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
+use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 
 class Updater extends common_ext_ExtensionUpdater
@@ -37,6 +38,7 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('0.1.0', '0.4.0');
         
         if ($this->isVersion('0.4.0')) {
+            OntologyUpdater::syncModels();
             $this->getServiceManager()->register(KeyProviderClient::SERVICE_ID, new KeyProviderClient());
             AclProxy::applyRule(
                 new AccessRule(

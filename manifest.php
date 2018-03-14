@@ -24,6 +24,7 @@ use oat\taoEncryption\scripts\install\RegisterEncryptionAsymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptionSymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptResultStorage;
 use oat\taoEncryption\scripts\install\RegisterKeyPairProviderService;
+use oat\taoEncryption\controller\EncryptionApi;
 
 return array(
     'name' => 'taoEncryption',
@@ -39,9 +40,12 @@ return array(
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
     'acl' => array(
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', array('ext'=>'taoEncryption', 'mod' => 'EncryptionApi')),
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', EncryptionApi::class),
     ),
     'install' => array(
+        'rdf' => [
+            __DIR__ . '/model/ontology/encryptionRole.rdf',
+        ],
         'php' => [
             RegisterKeyPairProviderService::class,
             RegisterEncryptionAsymmetricService::class,
