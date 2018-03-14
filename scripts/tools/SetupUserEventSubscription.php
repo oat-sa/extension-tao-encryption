@@ -76,9 +76,12 @@ class SetupUserEventSubscription extends InstallAction
             $callbacks[GenerisRdf::PROPERTY_USER_PASSWORD] = array_merge([
                 'oat\\taoTestTaker\\models\\TestTakerSavePasswordInMemory::saveUserPassword'
             ], $callbacks[GenerisRdf::PROPERTY_USER_PASSWORD]);
-
-            $taoTestTaker->setConfig('csvImporterCallbacks', array_merge($config, ['callbacks' => $callbacks]));
         }
+
+        $taoTestTaker->setConfig('csvImporterCallbacks', array_merge($config, [
+            'callbacks' => $callbacks,
+            'use_properties_for_event' => true
+        ]));
 
         return Report::createSuccess('Events TestTakerUpdatedEvent UserUpdatedEvent subscription attached.');
     }
