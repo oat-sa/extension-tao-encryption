@@ -21,14 +21,13 @@ namespace oat\taoEncryption\scripts\tools;
 
 use oat\generis\model\OntologyRdfs;
 use oat\oatbox\extension\InstallAction;
-use oat\tao\model\TaoOntology;
-use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
-use oat\taoEncryption\Service\Sync\EncryptAdministratorSynchronizer;
-use oat\taoEncryption\Service\Sync\EncryptProctorSynchronizer;
-use oat\taoEncryption\Service\Sync\EncryptTestTakerSynchronizer;
-use oat\taoSync\model\Entity;
+use oat\taoEncryption\Service\Sync\EncryptUserSyncFormatter;
+use oat\taoSync\model\synchronizer\user\administrator\RdfAdministratorSynchronizer;
+use oat\taoSync\model\synchronizer\user\proctor\RdfProctorSynchronizer;
+use oat\taoSync\model\synchronizer\user\testtaker\RdfTestTakerSynchronizer;
+use oat\taoSync\model\synchronizer\user\UserSynchronizer;
 use oat\taoSync\model\SyncService;
 use common_report_Report as Report;
 
@@ -53,69 +52,41 @@ class SetupUserSynchronizer extends InstallAction
         if (!$extensionManager->isInstalled('taoSync')) {
             return Report::createSuccess('Cannot setup sync, to taoSync extension installed');
         }
-        $testTakerService = new EncryptTestTakerSynchronizer([
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID,
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTED_PROPERTIES => [
+
+        $encryptUserSyncFormatter = new EncryptUserSyncFormatter([
+            EncryptUserSyncFormatter::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
+            EncryptUserSyncFormatter::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID,
+            EncryptUserSyncFormatter::OPTION_ENCRYPTED_PROPERTIES => [
                 OntologyRdfs::RDFS_LABEL,
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_FIRSTNAME,
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_LASTNAME,
                 \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
             ],
-            EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
-                TaoOntology::PROPERTY_UPDATED_AT,
-                Entity::CREATED_AT,
-            ]
         ]);
 
-        $this->registerService(EncryptTestTakerSynchronizer::SERVICE_ID, $testTakerService);
-
-
-        $administratorService = new EncryptAdministratorSynchronizer([
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID,
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTED_PROPERTIES => [
-                OntologyRdfs::RDFS_LABEL,
-                \oat\generis\model\GenerisRdf::PROPERTY_USER_FIRSTNAME,
-                \oat\generis\model\GenerisRdf::PROPERTY_USER_LASTNAME,
-                \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
-            ],
-            EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
-                TaoOntology::PROPERTY_UPDATED_AT,
-                Entity::CREATED_AT,
-            ]
-        ]);
-
-        $this->registerService(EncryptAdministratorSynchronizer::SERVICE_ID, $administratorService);
-
-        $proctorService = new EncryptProctorSynchronizer([
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID,
-            EncryptTestTakerSynchronizer::OPTION_ENCRYPTED_PROPERTIES => [
-                OntologyRdfs::RDFS_LABEL,
-                \oat\generis\model\GenerisRdf::PROPERTY_USER_FIRSTNAME,
-                \oat\generis\model\GenerisRdf::PROPERTY_USER_LASTNAME,
-                \oat\generis\model\GenerisRdf::PROPERTY_USER_MAIL
-            ],
-            EncryptTestTakerSynchronizer::OPTIONS_EXCLUDED_FIELDS => [
-                TaoOntology::PROPERTY_UPDATED_AT,
-                Entity::CREATED_AT,
-            ]
-        ]);
-
-        $this->registerService(EncryptProctorSynchronizer::SERVICE_ID, $proctorService);
+        $this->registerService(EncryptUserSyncFormatter::SERVICE_ID, $encryptUserSyncFormatter);
 
         /** @var SyncService $syncService */
         $syncService = $this->getServiceLocator()->get(SyncService::SERVICE_ID);
         $synchronizers = $syncService->getOption(SyncService::OPTION_SYNCHRONIZERS);
+        $syncOptions = $syncService->getOptions();
 
         $syncService->setOptions(array_merge(
-           $syncService->getOptions(),
+            $syncOptions,
            [
                SyncService::OPTION_SYNCHRONIZERS => array_merge($synchronizers,[
-                   'administrator' => EncryptAdministratorSynchronizer::SERVICE_ID,
-                   'proctor' => EncryptProctorSynchronizer::SERVICE_ID,
-                   'test-taker' => EncryptTestTakerSynchronizer::SERVICE_ID,
+                   'administrator' => new RdfAdministratorSynchronizer(array_merge(
+                       $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['administrator']->getOptions(),
+                       [UserSynchronizer::OPTIONS_FORMATTER_CLASS => EncryptUserSyncFormatter::SERVICE_ID]
+                   )),
+                   'proctor' => new RdfProctorSynchronizer(array_merge(
+                       $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['proctor']->getOptions(),
+                       [UserSynchronizer::OPTIONS_FORMATTER_CLASS => EncryptUserSyncFormatter::SERVICE_ID]
+                   )),
+                   'test-taker' => new RdfTestTakerSynchronizer(array_merge(
+                       $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['test-taker']->getOptions(),
+                       [UserSynchronizer::OPTIONS_FORMATTER_CLASS => EncryptUserSyncFormatter::SERVICE_ID]
+                   )),
                ])
            ]
         ));

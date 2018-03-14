@@ -22,24 +22,26 @@ namespace oat\taoEncryption\Service\Sync;
 
 use oat\taoEncryption\Rdf\EncryptedDeliveryRdf;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
-use oat\taoSync\model\synchronizer\delivery\RdfDeliverySynchronizer;
+use oat\taoSync\model\formatter\FormatterService;
 
-class EncryptRdfDeliverySynchronizer extends RdfDeliverySynchronizer
+class EncryptRdfDeliverySyncFormatter extends FormatterService
 {
-    const SERVICE_ID = 'taoEncryption/encryptRdfDeliverySynchronizer';
+    const SERVICE_ID = 'taoEncryption/encryptRdfDeliverySyncFormatter';
 
     /** @var array */
     private $properties;
 
     /**
      * @param array $triples
+     * @param array $options
      * @return array
      * @throws \common_exception_Error
      * @throws \common_exception_NotFound
      */
-    public function filterProperties(array $triples)
+    public function filterProperties(array $triples, array $options = [])
     {
-        $properties = parent::filterProperties($triples);
+        $properties = parent::filterProperties($triples, $options);
+
         $this->properties = $properties;
 
         /** @var FileKeyProviderService $keyProvider */
@@ -53,12 +55,12 @@ class EncryptRdfDeliverySynchronizer extends RdfDeliverySynchronizer
      * @param array $properties
      * @return string
      */
-    protected function serializeProperties($properties)
+    protected function hashProperties(array $properties)
     {
         if (is_null($this->properties)){
-            return parent::serializeProperties($properties);
+            return parent::hashProperties($properties);
         }
 
-        return parent::serializeProperties($this->properties);
+        return parent::hashProperties($this->properties);
     }
 }

@@ -30,7 +30,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
-use oat\taoEncryption\Service\Sync\EncryptTestTakerSynchronizer;
+use oat\taoEncryption\Service\Sync\EncryptUserSyncFormatter;
 
 class EncryptedUser extends core_kernel_users_GenerisUser
 {
@@ -62,9 +62,11 @@ class EncryptedUser extends core_kernel_users_GenerisUser
         $encryptService->setKeyProvider($simpleKeyProvider);
 
         $appKey = $this->getPropertyValues(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY);
-        $appKey = $appKey[0];
+        if (isset($appKey[0])){
+            $appKey = $appKey[0];
 
-        $this->applicationKey = $encryptService->decrypt(base64_decode($appKey));
+            $this->applicationKey = $encryptService->decrypt(base64_decode($appKey));
+        }
     }
 
     /**
@@ -139,12 +141,12 @@ class EncryptedUser extends core_kernel_users_GenerisUser
 
     /**
      * @param string $key
-     * @return \oat\oatbox\service\ConfigurableService|EncryptTestTakerSynchronizer
+     * @return \oat\oatbox\service\ConfigurableService|EncryptUserSyncFormatter
      * @throws \Exception
      */
     public function getDecryptionService()
     {
-        return ServiceManager::getServiceManager()->get(EncryptTestTakerSynchronizer::SERVICE_ID);
+        return ServiceManager::getServiceManager()->get(EncryptUserSyncFormatter::SERVICE_ID);
     }
 
     /**

@@ -22,17 +22,9 @@ namespace oat\taoEncryption\scripts\tools;
 
 use common_report_Report as Report;
 use oat\oatbox\extension\InstallAction;
-use oat\taoEncryption\Rdf\EncryptedDeliveryRdf;
 use oat\taoEncryption\Service\Sync\EncryptDeliverySynchronizerService;
-use oat\taoEncryption\Service\Sync\EncryptRdfDeliverySynchronizer;
-use oat\taoSync\model\synchronizer\AbstractResourceSynchronizer;
-use oat\generis\model\OntologyRdf;
-use oat\generis\model\OntologyRdfs;
-use oat\taoDelivery\model\fields\DeliveryFieldsService;
-use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
-use oat\taoDeliveryRdf\model\DeliveryContainerService;
-use oat\taoProctoring\model\ProctorService;
-use oat\taoResultServer\models\classes\implementation\OntologyService;
+use oat\taoEncryption\Service\Sync\EncryptRdfDeliverySyncFormatter;
+use oat\taoSync\model\synchronizer\delivery\RdfDeliverySynchronizer;
 use oat\taoSync\model\SyncService;
 
 /**
@@ -57,33 +49,22 @@ class SetupRdfDeliveryEncrypted extends InstallAction
             return Report::createSuccess('Cannot setup sync, to taoSync extension installed');
         }
 
-        $rdfDeliverySync = new EncryptRdfDeliverySynchronizer([
-            AbstractResourceSynchronizer::OPTIONS_FIELDS => array(
-                OntologyRdf::RDF_TYPE,
-                OntologyRdfs::RDFS_LABEL,
-                OntologyService::PROPERTY_RESULT_SERVER,
-                DeliveryContainerService::PROPERTY_MAX_EXEC,
-                DeliveryAssemblyService::PROPERTY_DELIVERY_DISPLAY_ORDER_PROP,
-                DeliveryContainerService::PROPERTY_ACCESS_SETTINGS,
-                DeliveryAssemblyService::PROPERTY_END,
-                DeliveryFieldsService::PROPERTY_CUSTOM_LABEL,
-                ProctorService::ACCESSIBLE_PROCTOR,
-                DeliveryAssemblyService::PROPERTY_START,
-                EncryptedDeliveryRdf::PROPERTY_APPLICATION_KEY,
-            )
-        ]);
-
-        $this->registerService(EncryptRdfDeliverySynchronizer::SERVICE_ID, $rdfDeliverySync);
+        $rdfDeliverySync = new EncryptRdfDeliverySyncFormatter([]);
+        $this->registerService(EncryptRdfDeliverySyncFormatter::SERVICE_ID, $rdfDeliverySync);
 
         /** @var SyncService $syncService */
         $syncService = $this->getServiceLocator()->get(SyncService::SERVICE_ID);
         $synchronizers = $syncService->getOption(SyncService::OPTION_SYNCHRONIZERS);
+        $syncOptions = $syncService->getOptions();
 
         $syncService->setOptions(array_merge(
-            $syncService->getOptions(),
+            $syncOptions,
             [
                 SyncService::OPTION_SYNCHRONIZERS => array_merge($synchronizers,[
-                    'delivery' => EncryptRdfDeliverySynchronizer::SERVICE_ID,
+                    'delivery' => new RdfDeliverySynchronizer(array_merge(
+                        $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['proctor']->getOptions(),
+                        [RdfDeliverySynchronizer::OPTIONS_FORMATTER_CLASS => EncryptRdfDeliverySyncFormatter::SERVICE_ID]
+                    )),
                 ])
             ]
         ));

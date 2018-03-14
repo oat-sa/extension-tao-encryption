@@ -35,11 +35,6 @@ class Updater extends common_ext_ExtensionUpdater
      * @return string|void
      * @throws \Exception
      */
-    /**
-     * @param $initialVersion
-     * @return string|void
-     * @throws \common_Exception
-     */
     public function update($initialVersion)
     {
         $this->skip('0.1.0', '0.4.0');
