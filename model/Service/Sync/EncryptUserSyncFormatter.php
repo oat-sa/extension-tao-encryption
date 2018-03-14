@@ -17,20 +17,21 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoEncryption\Service\Sync;
 
-use core_kernel_classes_Literal;
 use oat\oatbox\log\LoggerAwareTrait;
-use oat\taoEncryption\Rdf\EncryptedUserRdf;
-use oat\taoEncryption\Service\EncryptionSymmetricService;
-use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\EncryptionSymmetricServiceHelper;
-use oat\taoSync\model\synchronizer\user\UserSynchronizer;
+use core_kernel_classes_Literal;
+use oat\taoEncryption\Rdf\EncryptedUserRdf;
+use oat\taoSync\model\formatter\FormatterService;
 
-abstract class EncryptUserSynchronizer extends UserSynchronizer
+class EncryptUserSyncFormatter extends FormatterService
 {
     use LoggerAwareTrait;
     use EncryptionSymmetricServiceHelper;
+
+    const SERVICE_ID = 'taoEncryption/encryptUserSyncFormatter';
 
     const OPTION_ENCRYPTION_SERVICE = 'symmetricEncryptionService';
 
@@ -123,25 +124,16 @@ abstract class EncryptUserSynchronizer extends UserSynchronizer
     }
 
     /**
-     * Format a resource to an array
-     *
-     * Add a checksum to identify the resource content
-     * Add resource triples as properties if $withProperties param is true
-     *
-     * @param \core_kernel_classes_Resource $resource
-     * @param $withProperty
+     * @param array $triples
+     * @param array $options
      * @return array
      * @throws \Exception
      */
-    public function format(\core_kernel_classes_Resource $resource, $withProperty = false)
+    public function filterProperties(array $triples, array $options = [])
     {
-        $properties = $this->filterProperties($resource->getRdfTriples()->toArray());
+        $properties = parent::filterProperties($triples, $options);
         $properties = $this->encryptProperties($properties);
 
-        return [
-            'id' => $resource->getUri(),
-            'checksum' => md5(serialize($properties)),
-            'properties' => ($withProperty === true) ? $properties : [],
-        ];
+        return $properties;
     }
 }

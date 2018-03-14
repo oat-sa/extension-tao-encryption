@@ -22,18 +22,7 @@ namespace oat\taoEncryption\scripts\tools;
 
 use common_report_Report as Report;
 use oat\oatbox\extension\InstallAction;
-use oat\taoEncryption\Rdf\EncryptedDeliveryRdf;
 use oat\taoEncryption\Service\Sync\EncryptDeliverySynchronizerService;
-use oat\taoEncryption\Service\Sync\EncryptRdfDeliverySynchronizer;
-use oat\taoSync\model\synchronizer\AbstractResourceSynchronizer;
-use oat\generis\model\OntologyRdf;
-use oat\generis\model\OntologyRdfs;
-use oat\taoDelivery\model\fields\DeliveryFieldsService;
-use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
-use oat\taoDeliveryRdf\model\DeliveryContainerService;
-use oat\taoProctoring\model\ProctorService;
-use oat\taoResultServer\models\classes\implementation\OntologyService;
-use oat\taoSync\model\SyncService;
 
 /**
  * Class SetupAsymmetricKeys
