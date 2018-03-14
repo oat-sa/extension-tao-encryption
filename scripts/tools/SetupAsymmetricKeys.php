@@ -23,6 +23,7 @@ use common_report_Report as Report;
 use oat\oatbox\action\Action;
 use oat\oatbox\action\ResolutionException;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
+use oat\taoSync\model\SyncService;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
@@ -96,7 +97,28 @@ class SetupAsymmetricKeys implements Action, ServiceLocatorAwareInterface
         $pairModel->savePrivateKey($pair->getPrivateKey());
         $pairModel->savePublicKey($pair->getPublicKey());
 
+        $this->prepareSynchronisation();
+
         $this->report = Report::createSuccess('Keys saved with success');
+    }
+
+    /**
+     * During keys generation, check if taoSync is installed.
+     *
+     * If yes then add encryption role to sync role to allow sync user to access encryption API.
+     * After that, synchronisation will be able to synchronise encryption key.
+     */
+    protected function prepareSynchronisation()
+    {
+        /** @var \common_ext_ExtensionsManager $extensionManager */
+        $extensionManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
+        if ($extensionManager->isInstalled('taoSync')) {
+            $userService = \core_kernel_users_Service::singleton();
+            $userService->includeRole(
+                new \core_kernel_classes_Resource(SyncService::TAO_SYNC_ROLE),
+                new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole')
+            );
+        }
     }
 
     /**

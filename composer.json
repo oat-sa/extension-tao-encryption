@@ -36,6 +36,7 @@
     "autoload" : {
         "psr-4" : {
             "oat\\taoEncryption\\" : "model",
+            "oat\\taoEncryption\\controller\\" : "controller",
             "oat\\taoEncryption\\scripts\\" : "scripts",
             "oat\\taoEncryption\\Test\\" : "test"
         }
