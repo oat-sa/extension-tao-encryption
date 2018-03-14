@@ -23,46 +23,41 @@ namespace oat\taoEncryption\Event;
 use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
-use oat\taoEncryption\Service\EncryptionSymmetricService;
-use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
-use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
-use oat\taoEncryption\Service\Session\GenerateKey;
-use oat\taoTestTaker\models\events\TestTakerUpdatedEvent;
+use oat\taoEncryption\Service\User\UserHandlerKeys;
+use oat\taoTestTaker\models\events\AbstractTestTakerEvent;
 
 class TestTakerUpdatedHandler
 {
     /**
-     * @param TestTakerUpdatedEvent $event
+     * @param AbstractTestTakerEvent $event
      * @throws \Exception
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
      */
-    public static function handle(TestTakerUpdatedEvent $event)
+    public static function handle(AbstractTestTakerEvent $event)
     {
         $eventData = $event->jsonSerialize();
+        $testTakerUri = $eventData['testTakerUri'];
+        $properties = $event->getProperties();
 
-        $userResource = new \core_kernel_classes_Resource($eventData['testTakerUri']);
-        if (!isset($eventData['properties'][GenerisRdf::PROPERTY_USER_PASSWORD])){
+        $userResource = new \core_kernel_classes_Resource($testTakerUri);
+        if (!isset($properties[GenerisRdf::PROPERTY_USER_PASSWORD])){
             return;
         }
-        $salt = $eventData['properties'][GenerisRdf::PROPERTY_USER_PASSWORD];
+        $userAddKeys = new UserHandlerKeys([]);
+        ServiceManager::getServiceManager()->propagate($userAddKeys);
+
+        $plainPassword = $properties['plainPassword'];
+        $salt = $properties[GenerisRdf::PROPERTY_USER_PASSWORD];
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
-            GenerateKey::generate($eventData['properties']['plainPassword'], $salt)
+            $userAddKeys->generateUserKey($plainPassword, $salt)
         );
-
-        /** @var EncryptionSymmetricService $encryptService */
-        $encryptService = ServiceManager::getServiceManager()->get(EncryptionSymmetricService::SERVICE_ID);
-        /** @var SimpleKeyProviderService $simpleKeyProvider */
-        $simpleKeyProvider = ServiceManager::getServiceManager()->get(SimpleKeyProviderService::SERVICE_ID);
-        $simpleKeyProvider->setKey($eventData['properties']['plainPassword']);
-        $encryptService->setKeyProvider($simpleKeyProvider);
-
-        /** @var FileKeyProviderService $fileKeyProvider */
-        $fileKeyProvider = ServiceManager::getServiceManager()->get(FileKeyProviderService::SERVICE_ID);
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY),
-            base64_encode($encryptService->encrypt($fileKeyProvider->getKeyFromFileSystem()))
+            $userAddKeys->encryptApplicationKey($plainPassword)
         );
     }
 }

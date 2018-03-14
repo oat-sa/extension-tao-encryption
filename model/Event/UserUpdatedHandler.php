@@ -25,10 +25,7 @@ use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ServiceManager;
 use oat\tao\model\event\UserUpdatedEvent;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
-use oat\taoEncryption\Service\EncryptionSymmetricService;
-use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
-use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
-use oat\taoEncryption\Service\Session\GenerateKey;
+use oat\taoEncryption\Service\User\UserHandlerKeys;
 
 class UserUpdatedHandler
 {
@@ -43,26 +40,19 @@ class UserUpdatedHandler
         if (!isset($eventData['data'][GenerisRdf::PROPERTY_USER_PASSWORD])){
             return;
         }
+        $userAddKeys = new UserHandlerKeys();
+        ServiceManager::getServiceManager()->propagate($userAddKeys);
+        $plainPassword = $eventData['data']['plainPassword'];
         $salt = $eventData['data'][GenerisRdf::PROPERTY_USER_PASSWORD];
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
-            GenerateKey::generate($eventData['data']['plainPassword'], $salt)
+            $userAddKeys->generateUserKey($plainPassword, $salt)
         );
-
-        /** @var EncryptionSymmetricService $encryptService */
-        $encryptService = ServiceManager::getServiceManager()->get(EncryptionSymmetricService::SERVICE_ID);
-        /** @var SimpleKeyProviderService $simpleKeyProvider */
-        $simpleKeyProvider = ServiceManager::getServiceManager()->get(SimpleKeyProviderService::SERVICE_ID);
-        $simpleKeyProvider->setKey($eventData['data']['plainPassword']);
-        $encryptService->setKeyProvider($simpleKeyProvider);
-
-        /** @var FileKeyProviderService $fileKeyProvider */
-        $fileKeyProvider = ServiceManager::getServiceManager()->get(FileKeyProviderService::SERVICE_ID);
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY),
-            base64_encode($encryptService->encrypt($fileKeyProvider->getKeyFromFileSystem()))
+            $userAddKeys->encryptApplicationKey($plainPassword)
         );
     }
 }

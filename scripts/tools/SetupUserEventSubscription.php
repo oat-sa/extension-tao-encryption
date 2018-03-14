@@ -19,12 +19,13 @@
  */
 namespace oat\taoEncryption\scripts\tools;
 
+use oat\generis\model\GenerisRdf;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\InstallAction;
-use oat\tao\model\event\UserCreatedEvent;
 use oat\tao\model\event\UserUpdatedEvent;
 use oat\taoEncryption\Event\TestTakerUpdatedHandler;
 use oat\taoEncryption\Event\UserUpdatedHandler;
+use oat\taoTestTaker\models\events\TestTakerImportedEvent;
 use oat\taoTestTaker\models\events\TestTakerUpdatedEvent;
 use common_report_Report as Report;
 
@@ -56,7 +57,28 @@ class SetupUserEventSubscription extends InstallAction
             'handle'
         ]);
 
+        $eventManager->attach(TestTakerImportedEvent::class, [
+            TestTakerUpdatedHandler::class,
+            'handle'
+        ]);
+
         $this->registerService(EventManager::SERVICE_ID, $eventManager);
+
+        /** @var \common_ext_ExtensionsManager $extManager */
+        $extManager = $this->getServiceManager()->get(\common_ext_ExtensionsManager::SERVICE_ID);
+        $taoTestTaker = $extManager->getExtensionById('taoTestTaker');
+        $config = $taoTestTaker->getConfig('csvImporterCallbacks');
+        $callbacks = $config['callbacks'];
+
+        $passwordCallbacks = $callbacks[GenerisRdf::PROPERTY_USER_PASSWORD];
+
+        if (false === array_search('oat\\taoTestTaker\\models\\TestTakerSavePasswordInMemory::saveUserPassword', $passwordCallbacks)){
+            $callbacks[GenerisRdf::PROPERTY_USER_PASSWORD] = array_merge([
+                'oat\\taoTestTaker\\models\\TestTakerSavePasswordInMemory::saveUserPassword'
+            ], $callbacks[GenerisRdf::PROPERTY_USER_PASSWORD]);
+
+            $taoTestTaker->setConfig('csvImporterCallbacks', array_merge($config, ['callbacks' => $callbacks]));
+        }
 
         return Report::createSuccess('Events TestTakerUpdatedEvent UserUpdatedEvent subscription attached.');
     }
