@@ -95,7 +95,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                         $deliveryResultIdentifier,
                         $resultRow->getTestIdentifier(),
                         $resultRow->getVariable(),
-                        $deliveryResultIdentifier .'.'.$resultRow->getCallTestId()
+                        $deliveryResultIdentifier
                     );
                 }
             }
