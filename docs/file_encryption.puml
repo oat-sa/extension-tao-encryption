@@ -1,0 +1,7 @@
+@startuml
+TAOServer -> TAOServer: Generate Application Key (AK)
+TAOServer -> TAOServer: Attach to User the AK (encrypted with user password)
+TAOClient -> TAOServer: Sync User
+TAOClient -> TAOClient: User Login (decrypt AK)
+TAOClient -> TAOClient: Use AK to encrypt private folder files content
+@enduml

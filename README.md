@@ -57,6 +57,8 @@ In order to sync encrypted results the script needs to be run on the server tao 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedSyncResult'
  ```
+ 
+![alt text](docs/result_encryption.png)
 
 ### 2. Test State data encryption
 
@@ -73,6 +75,8 @@ In order to use the encrypted state test service you have to run the following c
 ```
 
 This service it's using the symmetric algorithm in order to encrypt information.
+
+![alt text](docs/state_encryption.png)
 
 ### 3. User Encryption
 
@@ -96,6 +100,7 @@ This service it's using the symmetric algorithm in order to encrypt information.
 _Note_: 
 >  You should ran this command on client tao instance
 
+![alt text](docs/user_encryption.png)
 
 ### 4. Setup Encrypted File Systems
 
@@ -120,7 +125,6 @@ _Note_:
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupRdfDeliveryEncrypted'
 ```
-
 _Note_: 
 > Extra
 You can make TAO file systems encrypted. The following command line enables encryption
@@ -131,5 +135,4 @@ for the `private` file system, using the service registered with ID
 sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f private -e taoEncryption/symmetricEncryptionService
 ```
 
-> This script will NOT encrypt the data already stored in the file system. In other words, it is suitable
-for new installations only. In addition, it only works, for the time being, with local file systems.
+![alt text](docs/file_encryption.png)

@@ -1,0 +1,8 @@
+@startuml
+TAOServer -> TAOServer: Genrate Key Pair
+TAOClient -> TAOServer: Sync public key (PubK)
+TAOClient -> TAOClient: Encrypt Results with (PubK)
+TAOClient -> TAOServer: Sync Results
+TAOServer -> TAOServer: Save Results separate store
+TAOServer -> TAOServer: Decrypt Results and save
+@enduml
