@@ -31,7 +31,7 @@ use oat\taoSync\model\SyncService;
  * Class SetupAsymmetricKeys
  * @package oat\taoEncryption\tools
  *
- * sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupDeliveryEncrypted'
+ * sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupRdfDeliveryEncrypted'
  */
 class SetupRdfDeliveryEncrypted extends InstallAction
 {
@@ -62,7 +62,7 @@ class SetupRdfDeliveryEncrypted extends InstallAction
             [
                 SyncService::OPTION_SYNCHRONIZERS => array_merge($synchronizers,[
                     'delivery' => new RdfDeliverySynchronizer(array_merge(
-                        $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['proctor']->getOptions(),
+                        $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['delivery']->getOptions(),
                         [RdfDeliverySynchronizer::OPTIONS_FORMATTER_CLASS => EncryptRdfDeliverySyncFormatter::SERVICE_ID]
                     )),
                 ])
