@@ -57,7 +57,9 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->getServiceManager()->register(SimpleKeyProviderService::SERVICE_ID, $simpleKeyProvider);
 
-            $fileKeyProvider = new FileKeyProviderService([]);
+            $fileKeyProvider = new FileKeyProviderService([
+                FileKeyProviderService::OPTION_FILESYSTEM_ID => 'keysEncryption'
+            ]);
 
             $this->getServiceManager()->register(FileKeyProviderService::SERVICE_ID, $fileKeyProvider);
 

@@ -136,4 +136,20 @@ class EncryptUserSyncFormatter extends FormatterService
 
         return $properties;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getOptionEncryptionService()
+    {
+        return $this->getOption(static::OPTION_ENCRYPTION_SERVICE);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getOptionEncryptionKeyProvider()
+    {
+        return $this->getOption(static::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE);
+    }
 }

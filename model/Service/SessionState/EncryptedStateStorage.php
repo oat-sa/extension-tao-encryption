@@ -37,6 +37,22 @@ class EncryptedStateStorage extends tao_models_classes_service_StateStorage
     const OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE = 'keyProviderService';
 
     /**
+     * @inheritdoc
+     */
+    protected function getOptionEncryptionService()
+    {
+        return $this->getOption(static::OPTION_ENCRYPTION_SERVICE);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getOptionEncryptionKeyProvider()
+    {
+        return $this->getOption(static::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE);
+    }
+
+    /**
      * @param string $userId
      * @param string $callId
      * @param string $data

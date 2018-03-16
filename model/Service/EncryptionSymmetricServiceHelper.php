@@ -21,11 +21,21 @@
 namespace oat\taoEncryption\Service;
 
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 trait EncryptionSymmetricServiceHelper
 {
     /** @var SimpleKeyProviderService */
     private $encryptionService;
+
+    /** @return ServiceLocatorInterface */
+    public abstract function getServiceLocator();
+
+    /** @return string */
+    protected abstract function getOptionEncryptionService();
+
+    /** @return string */
+    protected abstract function getOptionEncryptionKeyProvider();
 
     /**
      * @param string $key
@@ -36,7 +46,7 @@ trait EncryptionSymmetricServiceHelper
     {
         if (is_null($this->encryptionService)) {
             /** @var EncryptionSymmetricService $service */
-            $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_SERVICE));
+            $service = $this->getServiceLocator()->get($this->getOptionEncryptionService());
             if (!$service instanceof EncryptionSymmetricService) {
                 throw new  \Exception('Incorrect algorithm service provided');
             }
@@ -45,7 +55,7 @@ trait EncryptionSymmetricServiceHelper
         }
 
         /** @var SimpleKeyProviderService $keyProvider */
-        $keyProvider = $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE));
+        $keyProvider = $this->getServiceLocator()->get($this->getOptionEncryptionKeyProvider());
         $keyProvider->setKey($key);
         $this->encryptionService->setKeyProvider($keyProvider);
 
