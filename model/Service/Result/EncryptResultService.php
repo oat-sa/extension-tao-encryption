@@ -25,11 +25,11 @@ use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDeliveryRdf\helper\DetectTestAndItemIdentifiersHelper;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
 use oat\taoResultServer\models\Entity\VariableStorable;
-use oat\taoSync\model\result\DetectTestAndItemIdentifiers;
 use taoResultServer_models_classes_Variable;
 
 class EncryptResultService extends ConfigurableService implements EncryptResult
@@ -124,7 +124,7 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     )
     {
         $keyStore = $this->buildStoreKey($deliveryResultIdentifier, $callIdItem, $itemVariable->getIdentifier());
-        $detect = new DetectTestAndItemIdentifiers();
+        $detect = new DetectTestAndItemIdentifiersHelper();
 
         if (is_null($this->deliveryExecution)){
             /** @var DeliveryExecutionInterface $deliveryExecution */
@@ -194,7 +194,7 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     )
     {
         $keyStore = $this->buildStoreKey($deliveryResultIdentifier, $callIdTest, $testVariable->getIdentifier());
-        $detect = new DetectTestAndItemIdentifiers();
+        $detect = new DetectTestAndItemIdentifiersHelper();
 
         if (is_null($this->deliveryExecution)){
             /** @var DeliveryExecutionInterface $deliveryExecution */
