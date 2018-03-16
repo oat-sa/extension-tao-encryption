@@ -71,22 +71,25 @@ class SetupUserSynchronizer extends InstallAction
         $synchronizers = $syncService->getOption(SyncService::OPTION_SYNCHRONIZERS);
         $syncOptions = $syncService->getOptions();
 
+        /** @var UserSynchronizer $administrator */
+        $administrator = $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['administrator'];
+        $administrator->setOption(UserSynchronizer::OPTIONS_FORMATTER_CLASS , EncryptUserSyncFormatter::SERVICE_ID);
+
+        /** @var UserSynchronizer $proctor */
+        $proctor = $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['proctor'];
+        $proctor->setOption(UserSynchronizer::OPTIONS_FORMATTER_CLASS, EncryptUserSyncFormatter::SERVICE_ID);
+
+        /** @var UserSynchronizer $testTaker */
+        $testTaker = $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['test-taker'];
+        $testTaker->setOption(UserSynchronizer::OPTIONS_FORMATTER_CLASS, EncryptUserSyncFormatter::SERVICE_ID);
+
         $syncService->setOptions(array_merge(
             $syncOptions,
            [
                SyncService::OPTION_SYNCHRONIZERS => array_merge($synchronizers,[
-                   'administrator' => new RdfAdministratorSynchronizer(array_merge(
-                       $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['administrator']->getOptions(),
-                       [UserSynchronizer::OPTIONS_FORMATTER_CLASS => EncryptUserSyncFormatter::SERVICE_ID]
-                   )),
-                   'proctor' => new RdfProctorSynchronizer(array_merge(
-                       $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['proctor']->getOptions(),
-                       [UserSynchronizer::OPTIONS_FORMATTER_CLASS => EncryptUserSyncFormatter::SERVICE_ID]
-                   )),
-                   'test-taker' => new RdfTestTakerSynchronizer(array_merge(
-                       $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['test-taker']->getOptions(),
-                       [UserSynchronizer::OPTIONS_FORMATTER_CLASS => EncryptUserSyncFormatter::SERVICE_ID]
-                   )),
+                   'administrator' => $administrator,
+                   'proctor' => $proctor,
+                   'test-taker' => $testTaker,
                ])
            ]
         ));

@@ -57,14 +57,15 @@ class SetupRdfDeliveryEncrypted extends InstallAction
         $synchronizers = $syncService->getOption(SyncService::OPTION_SYNCHRONIZERS);
         $syncOptions = $syncService->getOptions();
 
+        /** @var RdfDeliverySynchronizer $delivery */
+        $delivery = $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['delivery'];
+        $delivery->setOption(RdfDeliverySynchronizer::OPTIONS_FORMATTER_CLASS, EncryptRdfDeliverySyncFormatter::SERVICE_ID);
+
         $syncService->setOptions(array_merge(
             $syncOptions,
             [
                 SyncService::OPTION_SYNCHRONIZERS => array_merge($synchronizers,[
-                    'delivery' => new RdfDeliverySynchronizer(array_merge(
-                        $syncOptions[SyncService::OPTION_SYNCHRONIZERS]['delivery']->getOptions(),
-                        [RdfDeliverySynchronizer::OPTIONS_FORMATTER_CLASS => EncryptRdfDeliverySyncFormatter::SERVICE_ID]
-                    )),
+                    'delivery' => $delivery
                 ])
             ]
         ));
