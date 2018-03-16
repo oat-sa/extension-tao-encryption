@@ -21,8 +21,8 @@
 namespace oat\taoEncryption\scripts\tools;
 use oat\generis\model\user\UserFactoryService;
 use oat\oatbox\extension\InstallAction;
-use oat\taoEncryption\Service\Session\EncryptedUser;
 use common_report_Report as Report;
+use oat\taoEncryption\Service\User\EncryptedUserFactoryService;
 
 /**
  * Class SetupAsymmetricKeys
@@ -34,16 +34,15 @@ class SetupEncryptedUser extends InstallAction
 {
     /**
      * @param $params
+     * @return Report
      * @throws \common_Exception
      */
     public function __invoke($params)
     {
         /** @var UserFactoryService $service */
-        $service = $this->getServiceLocator()->get(UserFactoryService::SERVICE_ID);
+        $factory = new EncryptedUserFactoryService();
 
-        $service->setOption(UserFactoryService::OPTION_CLASS_USER, EncryptedUser::class);
-
-        $this->registerService(UserFactoryService::SERVICE_ID, $service);
+        $this->registerService(EncryptedUserFactoryService::SERVICE_ID, $factory);
 
         return Report::createSuccess('EncryptedUser setup.');
 
