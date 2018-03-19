@@ -20,13 +20,13 @@
 namespace oat\taoEncryption\Test\Service\KeyProvider;
 
 use oat\taoEncryption\Model\Key;
-use oat\taoEncryption\Service\KeyProvider\DeliveryExecutionStateKeyProviderService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 
-class DeliveryExecutionStateKeyProviderServiceTest extends \PHPUnit_Framework_TestCase
+class SimpleKeyProviderServiceTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetKey()
     {
-        $service = new DeliveryExecutionStateKeyProviderService();
+        $service = new SimpleKeyProviderService();
 
         $this->assertInstanceOf(Key::class, $service->getKey());
     }

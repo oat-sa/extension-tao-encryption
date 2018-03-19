@@ -17,47 +17,31 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Model\Symmetric;
 
-use oat\taoEncryption\Model\Encrypt;
+namespace oat\taoEncryption\Service\KeyProvider;
+
 use oat\taoEncryption\Model\Key;
-use phpseclib\Crypt\Base;
-use phpseclib\Crypt\RC4;
 
-class Symmetric implements Encrypt
+class SimpleKeyProviderService extends SymmetricKeyProviderService
 {
-    /** @var RC4 */
-    private $crypter;
+    const SERVICE_ID = 'taoEncryption/symmetricSimpleKeyProvider';
+
+    /** @var Key */
+    protected $key;
 
     /**
-     * Symmetric constructor.
-     * @param Base $cripter
+     * @param string $key
      */
-    public function __construct(Base $cripter)
+    public function setKey($key)
     {
-        $this->crypter = $cripter;
+        $this->key = new Key(base64_encode($key));
     }
 
     /**
-     * @param Key $key
-     * @param string $data
-     * @return mixed|string
+     * @return Key
      */
-    public function encrypt(Key $key, $data)
+    public function getKey()
     {
-        $this->crypter->setKey($key->getKey());
-
-        return $this->crypter->encrypt($data);
-    }
-
-    /**
-     * @param $data
-     * @return string
-     */
-    public function decrypt(Key $key, $data)
-    {
-        $this->crypter->setKey($key->getKey());
-
-        return $this->crypter->decrypt($data);
+        return $this->key;
     }
 }

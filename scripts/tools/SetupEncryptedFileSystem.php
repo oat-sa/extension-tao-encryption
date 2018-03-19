@@ -162,7 +162,7 @@ class SetupEncryptedFileSystem extends ScriptAction
                 );
             }
 
-            $serviceOptions[EncryptionFlyWrapper::OPTION_ENCRYPTIONKEYPROVIDERSERVICE] = $this->getOption('keyProviderServiceId');
+            $serviceOptions[EncryptionFlyWrapper::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE] = $this->getOption('keyProviderServiceId');
         }
 
         /** @var FileSystemService $fileSystemService */

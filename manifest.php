@@ -23,18 +23,21 @@ use oat\taoEncryption\scripts\install\RegisterDecryptResultStorage;
 use oat\taoEncryption\scripts\install\RegisterEncryptionAsymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptionSymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptResultStorage;
+use oat\taoEncryption\scripts\install\RegisterFileKeyProviderService;
 use oat\taoEncryption\scripts\install\RegisterKeyPairProviderService;
 use oat\taoEncryption\controller\EncryptionApi;
+use oat\taoEncryption\scripts\install\RegisterSimpleKeyProviderService;
 
 return array(
     'name' => 'taoEncryption',
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.5.0',
+    'version' => '0.6.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
+        'generis' => '>=6.17.0',
         'taoResultServer' => '>=6.2.0',
         'taoOauth' => '>=0.1.0',
     ),
@@ -52,6 +55,8 @@ return array(
             RegisterEncryptionSymmetricService::class,
             RegisterEncryptResultStorage::class,
             RegisterDecryptResultStorage::class,
+            RegisterSimpleKeyProviderService::class,
+            RegisterFileKeyProviderService::class,
         ]
     ),
     'uninstall' => array(

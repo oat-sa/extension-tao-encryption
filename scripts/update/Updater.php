@@ -25,6 +25,8 @@ use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
+use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 
 class Updater extends common_ext_ExtensionUpdater
 {
@@ -36,7 +38,7 @@ class Updater extends common_ext_ExtensionUpdater
     public function update($initialVersion)
     {
         $this->skip('0.1.0', '0.4.0');
-        
+
         if ($this->isVersion('0.4.0')) {
             OntologyUpdater::syncModels();
             $this->getServiceManager()->register(KeyProviderClient::SERVICE_ID, new KeyProviderClient());
@@ -48,6 +50,20 @@ class Updater extends common_ext_ExtensionUpdater
                 )
             );
             $this->setVersion('0.5.0');
+        }
+
+        if ($this->isVersion('0.5.0')){
+            $simpleKeyProvider = new SimpleKeyProviderService([]);
+
+            $this->getServiceManager()->register(SimpleKeyProviderService::SERVICE_ID, $simpleKeyProvider);
+
+            $fileKeyProvider = new FileKeyProviderService([
+                FileKeyProviderService::OPTION_FILESYSTEM_ID => 'keysEncryption'
+            ]);
+
+            $this->getServiceManager()->register(FileKeyProviderService::SERVICE_ID, $fileKeyProvider);
+
+            $this->setVersion('0.6.0');
         }
     }
 }

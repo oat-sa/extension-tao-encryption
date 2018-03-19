@@ -14,8 +14,9 @@ You can add the Tao Encryption as a standard TAO extension to your current TAO i
 
 ### 1. Results Encryption
 
-- ### Setup Keys on the server tao instance
+- #### Setup scripts for Tao Server instance
 
+###### Encrypt
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupAsymmetricKeys' generate
 ```
@@ -27,20 +28,8 @@ _Note_:
 
 _Note_: 
 > On Server Tao instance. You need both keys
-    
-- ### Setup encryption on tao client instance
 
-In order to use the encrypted results service you have to run the following command on the client tao instance.
-
-```bash
- $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedResultStorage'
-```
-
-_Note_: 
->  You should use this on tao client instance
-
-
-- ### Setup decryption on tao server instance.
+###### Decrypt
 
 In order to decrypt your results use the following script by passing a delivery id.
 
@@ -53,41 +42,91 @@ Or by passing the -all argument
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\DecryptResults' -all
 ```
-
 _Note_: 
 > This command will decrypt results and store in the delivery result storage setup.
+  
+- #### Setup scripts for Tao Client instance
 
-_Note_: 
->  You should use this on tao server instance
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedResultStorage'
+```
 
-#### 3. Setup Sync Encrypted Result
+- #### Sync Encrypted Result (Run on Server and client)
 In order to sync encrypted results the script needs to be run on the server tao instance and client as well.
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedSyncResult'
  ```
-_Note_: 
->  You should ran this command on server and client.
+ 
+![alt text](docs/result_encryption.png)
 
 ### 2. Test State data encryption
 
-In order to use the encrypted state test service you have to run the following command:
+- #### Setup scripts for Tao Client instance
+
+In order to use the encrypted state test service you have to run the following command on tao client instance:
 
 ```bash
  $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedStateStorage'
 ```
 
-This service it's using the symmetric algorithm in order to encrypt.
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedMonitoringService'
+```
 
-The key provider is a configurable option which can be changed in the config file:
-`taoEncryption/symmetricDeliveryExecutionProvider`
+This service it's using the symmetric algorithm in order to encrypt information.
+
+![alt text](docs/state_encryption.png)
+
+### 3. User Encryption
+
+- #### Setup scripts for Tao Client instance
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedUser'
+```
+
+- #### Setup scripts for Tao Server instance
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserEventSubscription'
+```
+- #### Both Instances
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserSynchronizer'
+```
 
 _Note_: 
 >  You should ran this command on client tao instance
 
+![alt text](docs/user_encryption.png)
 
-## Encrypted File Systems
+### 4. Setup Encrypted File Systems
 
+- #### Setup scripts for Tao Client instance
+
+```bash
+ $ sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f private -e taoEncryption/symmetricEncryptionService -k taoEncryption/symmetricFileKeyProvider
+```
+
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupDeliveryEncrypted'
+```
+
+- #### Setup scripts for Tao Server instance
+
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupUserApplicationKey'
+ ```
+
+```bash
+ $ sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupRdfDeliveryEncrypted'
+```
+_Note_: 
+> Extra
 You can make TAO file systems encrypted. The following command line enables encryption
 for the `private` file system, using the service registered with ID 
 `taoEncryption/symmetricEncryptionService` for data encryption/decryption.
@@ -96,5 +135,4 @@ for the `private` file system, using the service registered with ID
 sudo -u www-data php index.php "oat\taoEncryption\scripts\tools\SetupEncryptedFileSystem" -f private -e taoEncryption/symmetricEncryptionService
 ```
 
-This script will NOT encrypt the data already stored in the file system. In other words, it is suitable
-for new installations only. In addition, it only works, for the time being, with local file systems.
+![alt text](docs/file_encryption.png)

@@ -18,19 +18,26 @@
  *
  */
 
-namespace oat\taoEncryption\Service\KeyProvider;
+namespace oat\taoEncryption\Service\DeliveryMonitoring;
 
-use oat\taoEncryption\Model\Key;
+use oat\generis\model\GenerisRdf;
+use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
 
-class DeliveryExecutionStateKeyProviderService extends SymmetricKeyProviderService
+class EncryptedMonitoringService extends MonitorCacheService
 {
-    const SERVICE_ID = 'taoEncryption/symmetricDeliveryExecutionProvider';
-
+    const TEST_TAKER_LOGIN = 'test_taker_login';
     /**
-     * @return Key
+     * @param \oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData $data
+     * @param \oat\oatbox\user\User $user
+     * @return \oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData
      */
-    public function getKey()
+    protected function updateTestTakerInformation($data, $user)
     {
-        return new Key(base64_encode('')) ;
+        $login = $user->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN);
+        if (!empty($login)) {
+            $data->update(static::TEST_TAKER_LOGIN, reset($login));
+        }
+
+        return $data;
     }
 }
