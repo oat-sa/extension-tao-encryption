@@ -23,12 +23,12 @@ namespace oat\taoEncryption\Service\Session;
 class GenerateKey
 {
     /**
-     * @param $passwordPlain
+     * @param $hashForKey
      * @param $salt
      * @return mixed
      */
-    public static function generate($passwordPlain, $salt)
+    public static function generate($hashForKey, $salt)
     {
-        return hash_pbkdf2("sha256", $passwordPlain, $salt, 1000, 32);
+        return hash_pbkdf2("sha256", $hashForKey, $salt, 1000, 32);
     }
 }

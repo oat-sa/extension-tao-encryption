@@ -28,13 +28,13 @@ class EncryptedUserFactoryService extends ConfigurableService implements UserFac
 {
     /**
      * @param core_kernel_classes_Resource $userResource
-     * @param string $password
+     * @param string $hashForEncryption
      * @return \common_user_User
      * @throws \Exception
      */
-    public function createUser(core_kernel_classes_Resource $userResource, $password = null)
+    public function createUser(core_kernel_classes_Resource $userResource, $hashForEncryption = null)
     {
-        $user = new EncryptedUser($userResource, $password);
+        $user = new EncryptedUser($userResource, $hashForEncryption);
 
         if (!$user instanceof \common_user_User) {
             throw new \Exception('Incorrect user class provided to the factory.');

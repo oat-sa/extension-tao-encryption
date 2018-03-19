@@ -46,18 +46,17 @@ class TestTakerUpdatedHandler
         }
         $userAddKeys = new UserHandlerKeys([]);
         ServiceManager::getServiceManager()->propagate($userAddKeys);
-
-        $plainPassword = $properties['plainPassword'];
+        $hashForKey = $properties['hashForKey'];
         $salt = $properties[GenerisRdf::PROPERTY_USER_PASSWORD];
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY),
-            $userAddKeys->generateUserKey($plainPassword, $salt)
+            $userAddKeys->generateUserKey($hashForKey, $salt)
         );
 
         $userResource->editPropertyValues(
             new \core_kernel_classes_Property(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY),
-            $userAddKeys->encryptApplicationKey($plainPassword)
+            $userAddKeys->encryptApplicationKey($hashForKey)
         );
     }
 }

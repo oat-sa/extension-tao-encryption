@@ -29,30 +29,30 @@ use oat\taoEncryption\Service\Session\GenerateKey;
 class UserHandlerKeys extends ConfigurableService
 {
     /**
-     * @param $password
+     * @param $hashForKey
      * @param $salt
      * @return mixed
      */
-    public function generateUserKey($password, $salt)
+    public function generateUserKey($hashForKey, $salt)
     {
-        return GenerateKey::generate($password, $salt);
+        return GenerateKey::generate($hashForKey, $salt);
     }
 
     /**
-     * @param $plainPassword
+     * @param $hashForKey
      * @return string
      * @throws \Exception
      * @throws \common_exception_Error
      * @throws \common_exception_NotFound
      */
-    public function encryptApplicationKey($plainPassword)
+    public function encryptApplicationKey($hashForKey)
     {
         /** @var EncryptionSymmetricService $encryptService */
         $encryptService = $this->getServiceLocator()->get(EncryptionSymmetricService::SERVICE_ID);
         /** @var SimpleKeyProviderService $simpleKeyProvider */
         $simpleKeyProvider = $this->getServiceLocator()->get(SimpleKeyProviderService::SERVICE_ID);
 
-        $simpleKeyProvider->setKey($plainPassword);
+        $simpleKeyProvider->setKey($hashForKey);
         $encryptService->setKeyProvider($simpleKeyProvider);
 
         /** @var FileKeyProviderService $fileKeyProvider */
