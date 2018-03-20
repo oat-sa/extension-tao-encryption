@@ -21,12 +21,14 @@
 namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use core_kernel_users_GenerisUser;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
+use oat\taoEncryption\Service\User\EncryptedUserFactoryService;
 
 class Updater extends common_ext_ExtensionUpdater
 {
@@ -64,6 +66,14 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(FileKeyProviderService::SERVICE_ID, $fileKeyProvider);
 
             $this->setVersion('0.6.0');
+        }
+
+        if ($this->isVersion('0.6.0')){
+            $userFactory = $this->getServiceManager()->get(EncryptedUserFactoryService::SERVICE_ID);
+            $userFactory->setOption(EncryptedUserFactoryService::OPTION_USER_CLASS_WRAPPED, core_kernel_users_GenerisUser::class);
+
+            $this->getServiceManager()->register(EncryptedUserFactoryService::SERVICE_ID, $userFactory);
+            $this->setVersion('0.6.1');
         }
     }
 }
