@@ -40,7 +40,9 @@ class SetupEncryptedUser extends InstallAction
     public function __invoke($params)
     {
         /** @var UserFactoryService $service */
-        $factory = new EncryptedUserFactoryService();
+        $factory = new EncryptedUserFactoryService([
+            EncryptedUserFactoryService::OPTION_USER_CLASS_WRAPPED => \core_kernel_users_GenerisUser::class
+        ]);
 
         $this->registerService(EncryptedUserFactoryService::SERVICE_ID, $factory);
 
