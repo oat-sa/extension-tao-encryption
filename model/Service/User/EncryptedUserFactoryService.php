@@ -26,6 +26,8 @@ use oat\taoEncryption\Service\Session\EncryptedUser;
 
 class EncryptedUserFactoryService extends ConfigurableService implements UserFactoryServiceInterface
 {
+    const OPTION_USER_CLASS_WRAPPED = 'userClassToBeWrapped';
+
     /**
      * @param core_kernel_classes_Resource $userResource
      * @param string $hashForEncryption
@@ -34,11 +36,13 @@ class EncryptedUserFactoryService extends ConfigurableService implements UserFac
      */
     public function createUser(core_kernel_classes_Resource $userResource, $hashForEncryption = null)
     {
-        $user = new EncryptedUser($userResource, $hashForEncryption);
-
-        if (!$user instanceof \common_user_User) {
-            throw new \Exception('Incorrect user class provided to the factory.');
+        $class = $this->getOption(static::OPTION_USER_CLASS_WRAPPED);
+        $userWrapped = new $class($userResource);
+        if (!$userWrapped instanceof \common_user_User){
+            throw  new \Exception('Incorrect user class provided.');
         }
+
+        $user = new EncryptedUser($userWrapped, $hashForEncryption);
 
         $this->propagate($user);
 

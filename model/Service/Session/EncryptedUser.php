@@ -20,19 +20,15 @@
 
 namespace oat\taoEncryption\Service\Session;
 
-use core_kernel_classes_Literal;
-use core_kernel_classes_Property;
-use core_kernel_classes_Resource;
-use core_kernel_users_GenerisUser;
+use common_user_User;
 use oat\generis\model\GenerisRdf;
-use oat\generis\model\OntologyRdf;
 use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Sync\EncryptUserSyncFormatter;
 
-class EncryptedUser extends core_kernel_users_GenerisUser
+class EncryptedUser extends common_user_User
 {
     /** @var string */
     private $key;
@@ -40,17 +36,20 @@ class EncryptedUser extends core_kernel_users_GenerisUser
     /** @var string */
     protected $applicationKey;
 
+    /** @var \common_user_User */
+    protected $realUser;
+
     /**
      * EncryptedUser constructor.
-     * @param core_kernel_classes_Resource $user
+     * @param common_user_User $user
      * @param null $hashForEncryption
      * @throws \Exception
      */
-    public function __construct(core_kernel_classes_Resource $user, $hashForEncryption = null)
+    public function __construct(common_user_User $user, $hashForEncryption = null)
     {
-        parent::__construct($user);
+        $this->realUser = $user;
 
-        $password = $this->getPropertyValues(GenerisRdf::PROPERTY_USER_PASSWORD);
+        $password = $this->realUser->getPropertyValues(GenerisRdf::PROPERTY_USER_PASSWORD);
         $salt     = $password[0];
         $this->key = GenerateKey::generate($hashForEncryption, $salt);
 
@@ -70,44 +69,32 @@ class EncryptedUser extends core_kernel_users_GenerisUser
     }
 
     /**
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->realUser->getIdentifier();
+    }
+
+    /**
      * @param $property
      * @return array
-     * @throws \common_Exception
-     * @throws \core_kernel_classes_EmptyProperty
-     * @throws \core_kernel_persistence_Exception
      * @throws \Exception
      */
-    protected function getUncached($property)
+    public function getPropertyValues($property)
     {
-        switch ($property) {
-            case GenerisRdf::PROPERTY_USER_DEFLG:
-            case GenerisRdf::PROPERTY_USER_UILG:
-                $resource = $this->getUserResource()->getOnePropertyValue(new core_kernel_classes_Property($property));
-                if (!is_null($resource)) {
-                    if ($resource instanceof core_kernel_classes_Resource) {
-                        $val = $resource->getUniquePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_VALUE));
-                        $decryptVal = $this->getDecryptionService()->decryptProperties([
-                            EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY => $this->key,
-                            $property => $val->literal
-                        ]);
-                        return array(
-                            new core_kernel_classes_Literal($decryptVal[$property])
-                        );
-                    } else {
-                        return array(DEFAULT_LANG);
-                    }
-                } else {
-                    return array(DEFAULT_LANG);
-                }
-                break;
-            default:
-                $val = $this->getUserResource()->getPropertyValues(new core_kernel_classes_Property($property));
-                $decryptVal = $this->getDecryptionService()->decryptProperties([
-                    EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY => $this->key,
-                    $property => $val
-                ]);
-                return $decryptVal[$property];
-        }
+        $values = $this->realUser->getPropertyValues($property);
+        $decryptVal = $this->getDecryptionService()->decryptProperties([
+            EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY => $this->key,
+            $property => $values
+        ]);
+
+        return $decryptVal[$property];
+    }
+
+    public function refresh()
+    {
+        $this->realUser->refresh();
     }
 
     /**
@@ -116,27 +103,11 @@ class EncryptedUser extends core_kernel_users_GenerisUser
      */
     public function __sleep()
     {
-        $this->cache = $this->getDecryptionService()->encryptProperties(array_merge(
-            $this->cache, [EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY => $this->key]
-        ));
-
         return array(
             'key',
             'applicationKey',
-            'userResource',
-            'cache',
-            'cachedProperties'
+            'realUser',
         );
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function __wakeup()
-    {
-        $this->cache = $this->getDecryptionService()->decryptProperties(array_merge(
-            $this->cache, [EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY => $this->key]
-        ));
     }
 
     /**
