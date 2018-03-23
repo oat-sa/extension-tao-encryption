@@ -22,7 +22,9 @@ namespace oat\taoEncryption\scripts\tools;
 
 use oat\oatbox\extension\script\ScriptAction;
 use common_report_Report as Report;
+use oat\oatbox\filesystem\FileSystem;
 use oat\oatbox\filesystem\FileSystemService;
+use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\FileSystem\EncryptionFlyWrapper;
 
 /**
@@ -39,16 +41,18 @@ use oat\taoEncryption\Service\FileSystem\EncryptionFlyWrapper;
  * Available arguments:
  *
  * Required Arguments:
- *   -f fileSystemId, --fileSystemId fileSystemId
- *     The File System ID as it appears in the TAO File System configuration
- *   -e encryptionServiceId, --encryptionServiceId encryptionServiceId
- *     The ID of the EncryptionService to be used for data encryption/decryption
+ *  -f fileSystemId, --fileSystemId fileSystemId
+ *    The File System ID as it appears in the TAO File System configuration
+ *  -e encryptionServiceId, --encryptionServiceId encryptionServiceId
+ *    The ID of the EncryptionService to be used for data encryption/decryption
  *
  * Optional Arguments:
- *   -k keyProviderServiceId, --keyProviderServiceId keyProviderServiceId
- *     The ID of the KeyProviderService to be used for key provisioning
- *   -h help, --help help
- *     Prints a help statement
+ *  -k keyProviderServiceId, --keyProviderServiceId keyProviderServiceId
+ *    The ID of the KeyProviderService to be used for key provisioning
+ *  -d, --encryptData
+ *    Encrypt existing data in the target File System (works only with not already encrypted File Systems)
+ *  -h help, --help help
+ *    Prints a help statement
  *
  * @package oat\taoEncryption\scripts\tools
  */
@@ -93,6 +97,12 @@ class SetupEncryptedFileSystem extends ScriptAction
                 'longPrefix' => 'keyProviderServiceId',
                 'required' => false,
                 'description' => 'The ID of the KeyProviderService to be used for key provisioning'
+            ],
+            'encryptData' => [
+                'prefix' => 'd',
+                'longPrefix' => 'encryptData',
+                'flag' => true,
+                'description' => 'Encrypt existing data in the target File System (works only with not already encrypted File Systems)'
             ]
         ];
     }
@@ -152,12 +162,13 @@ class SetupEncryptedFileSystem extends ScriptAction
                 );
             }
 
-            $serviceOptions[EncryptionFlyWrapper::OPTION_ENCRYPTIONKEYPROVIDERSERVICE] = $this->getOption('keyProviderServiceId');
+            $serviceOptions[EncryptionFlyWrapper::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE] = $this->getOption('keyProviderServiceId');
         }
 
         /** @var FileSystemService $fileSystemService */
         $fileSystemService = $this->getServiceLocator()->get(FileSystemService::SERVICE_ID);
         $fileSystemServiceOptions = $fileSystemService->getOption(FileSystemService::OPTION_ADAPTERS);
+        $alreadyEncrypted = false;
 
         if (isset($fileSystemServiceOptions[$fileSystemId])) {
             if ($fileSystemServiceOptions[$fileSystemId]['class'] === 'Local') {
@@ -171,6 +182,8 @@ class SetupEncryptedFileSystem extends ScriptAction
                     new Report(Report::TYPE_SUCCESS, "Contents of File System '${fileSystemId}' will now be encrypted with EncryptionService '${encryptionServiceId}'.")
                 );
             } elseif ($fileSystemServiceOptions[$fileSystemId]['class'] === EncryptionFlyWrapper::class) {
+                $alreadyEncrypted = true;
+
                 $fileSystemServiceOptions[$fileSystemId]['options']['encryptionServiceId'] = $encryptionServiceId;
                 $this->getServiceManager()->register(FileSystemService::SERVICE_ID, $fileSystemService);
 
@@ -180,6 +193,35 @@ class SetupEncryptedFileSystem extends ScriptAction
             } else {
                 return new Report(Report::TYPE_ERROR, "Only Local File Systems can be encrypted for the moment. File System '${fileSystemId}' is not.");
             }
+
+            // Let's check whether we have to encrypt existing data.
+            if ($this->hasOption('encryptData') && $alreadyEncrypted === false) {
+                /** @var FileSystem $fileSystem */
+                $fileSystem = $fileSystemService->getFileSystem($fileSystemId);
+                $contents = $fileSystem->listContents('', true);
+
+                /** @var EncryptionServiceInterface $encryptionService */
+                $encryptionService = $this->getServiceLocator()->get($encryptionServiceId);
+
+                foreach ($contents as $content) {
+                    if ($content['type'] === 'file') {
+                        $path = $content['path'];
+                        $data = $fileSystem->read($path);
+
+                        if ($content === false) {
+                            $report->add(new Report(Report::TYPE_WARNING, "File at '${fileSystemId}/${path}' could not be read for encryption."));
+                        } else {
+                            $update = $fileSystem->update($path, $encryptionService->encrypt($data));
+                            if ($update === true) {
+                                $report->add(new Report(Report::TYPE_INFO, "File at '${fileSystemId}/${path}' encrypted."));
+                            } else {
+                                $report->add(new Report(Report::TYPE_INFO, "File at '${fileSystemId}/${path}' could not be encrypted."));
+                            }
+                        }
+                    }
+                }
+            }
+
         } else {
             return new Report(
                 Report::TYPE_ERROR,

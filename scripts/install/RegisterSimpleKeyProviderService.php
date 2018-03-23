@@ -14,31 +14,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
  *
  */
-namespace oat\taoEncryption\Model;
 
-class Key
+namespace oat\taoEncryption\scripts\install;
+
+
+use oat\oatbox\extension\InstallAction;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
+
+class RegisterSimpleKeyProviderService extends InstallAction
 {
-    /** @var string */
-    protected $key;
-
     /**
-     * Key constructor.
-     * @param $key
+     * @param $params
+     * @return \common_report_Report
+     * @throws \common_Exception
      */
-    public function __construct($key)
+    public function __invoke($params)
     {
-        $this->key = $key;
-    }
+        $simpleKeyProvider = new SimpleKeyProviderService([]);
 
-    /**
-     * @return mixed
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
+        $this->registerService(SimpleKeyProviderService::SERVICE_ID, $simpleKeyProvider);
 
+        return \common_report_Report::createSuccess('SimpleKeyProviderService successfully registered.');
+    }
 }

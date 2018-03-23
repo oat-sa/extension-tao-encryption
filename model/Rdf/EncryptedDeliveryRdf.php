@@ -17,28 +17,9 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Model;
+namespace oat\taoEncryption\Rdf;
 
-class Key
+interface EncryptedDeliveryRdf
 {
-    /** @var string */
-    protected $key;
-
-    /**
-     * Key constructor.
-     * @param $key
-     */
-    public function __construct($key)
-    {
-        $this->key = $key;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
-
+    const PROPERTY_APPLICATION_KEY = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#applicationKey';
 }

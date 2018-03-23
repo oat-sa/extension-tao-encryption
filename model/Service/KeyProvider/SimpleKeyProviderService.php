@@ -17,28 +17,31 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Model;
 
-class Key
+namespace oat\taoEncryption\Service\KeyProvider;
+
+use oat\taoEncryption\Model\Key;
+
+class SimpleKeyProviderService extends SymmetricKeyProviderService
 {
-    /** @var string */
+    const SERVICE_ID = 'taoEncryption/symmetricSimpleKeyProvider';
+
+    /** @var Key */
     protected $key;
 
     /**
-     * Key constructor.
-     * @param $key
+     * @param string $key
      */
-    public function __construct($key)
+    public function setKey($key)
     {
-        $this->key = $key;
+        $this->key = new Key(base64_encode($key));
     }
 
     /**
-     * @return mixed
+     * @return Key
      */
     public function getKey()
     {
         return $this->key;
     }
-
 }

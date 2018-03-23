@@ -21,11 +21,59 @@
 namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use core_kernel_users_GenerisUser;
+use oat\tao\model\accessControl\func\AccessRule;
+use oat\tao\model\accessControl\func\AclProxy;
+use oat\tao\scripts\update\OntologyUpdater;
+use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
+use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
+use oat\taoEncryption\Service\User\EncryptedUserFactoryService;
 
 class Updater extends common_ext_ExtensionUpdater
 {
+    /**
+     * @param $initialVersion
+     * @return string|void
+     * @throws \Exception
+     */
     public function update($initialVersion)
     {
-        $this->skip('0.1.0', '0.3.0');
+        $this->skip('0.1.0', '0.4.0');
+
+        if ($this->isVersion('0.4.0')) {
+            OntologyUpdater::syncModels();
+            $this->getServiceManager()->register(KeyProviderClient::SERVICE_ID, new KeyProviderClient());
+            AclProxy::applyRule(
+                new AccessRule(
+                    AccessRule::GRANT,
+                    'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
+                    array('ext'=>'taoEncryption', 'mod' => 'EncryptionApi')
+                )
+            );
+            $this->setVersion('0.5.0');
+        }
+
+        if ($this->isVersion('0.5.0')){
+            $simpleKeyProvider = new SimpleKeyProviderService([]);
+
+            $this->getServiceManager()->register(SimpleKeyProviderService::SERVICE_ID, $simpleKeyProvider);
+
+            $fileKeyProvider = new FileKeyProviderService([
+                FileKeyProviderService::OPTION_FILESYSTEM_ID => 'keysEncryption'
+            ]);
+
+            $this->getServiceManager()->register(FileKeyProviderService::SERVICE_ID, $fileKeyProvider);
+
+            $this->setVersion('0.6.0');
+        }
+
+        if ($this->isVersion('0.6.0')){
+            $userFactory = $this->getServiceManager()->get(EncryptedUserFactoryService::SERVICE_ID);
+            $userFactory->setOption(EncryptedUserFactoryService::OPTION_USER_CLASS_WRAPPED, core_kernel_users_GenerisUser::class);
+
+            $this->getServiceManager()->register(EncryptedUserFactoryService::SERVICE_ID, $userFactory);
+            $this->setVersion('0.6.1');
+        }
     }
 }

@@ -17,28 +17,18 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Model;
 
-class Key
+namespace oat\taoEncryption\Service\Session;
+
+class GenerateKey
 {
-    /** @var string */
-    protected $key;
-
     /**
-     * Key constructor.
-     * @param $key
-     */
-    public function __construct($key)
-    {
-        $this->key = $key;
-    }
-
-    /**
+     * @param $hashForKey
+     * @param $salt
      * @return mixed
      */
-    public function getKey()
+    public static function generate($hashForKey, $salt)
     {
-        return $this->key;
+        return hash_pbkdf2("sha256", $hashForKey, $salt, 1000, 32);
     }
-
 }

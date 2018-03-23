@@ -23,7 +23,7 @@ use oat\oatbox\extension\InstallAction;
 use common_report_Report as Report;
 use oat\tao\model\state\StateStorage;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
-use oat\taoEncryption\Service\KeyProvider\DeliveryExecutionStateKeyProviderService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\SessionState\EncryptedStateStorage;
 
 /**
@@ -42,17 +42,17 @@ class SetupEncryptedStateStorage extends InstallAction
      */
     public function __invoke($params)
     {
-        $keyProvider = new DeliveryExecutionStateKeyProviderService();
-        $this->registerService(DeliveryExecutionStateKeyProviderService::SERVICE_ID, $keyProvider);
+        $keyProvider = new SimpleKeyProviderService();
+        $this->registerService(SimpleKeyProviderService::SERVICE_ID, $keyProvider);
 
         /** @var StateStorage $stateStorage */
         $stateStorage = $this->getServiceLocator()->get(StateStorage::SERVICE_ID);
         $options = $stateStorage->getOptions();
 
-        $encryptedStateStorage = new EncryptedStateStorage(array_merge([
+        $encryptedStateStorage = new EncryptedStateStorage(array_merge($options, [
                 EncryptedStateStorage::OPTION_ENCRYPTION_SERVICE => EncryptionSymmetricService::SERVICE_ID,
-                EncryptedStateStorage::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => DeliveryExecutionStateKeyProviderService::SERVICE_ID
-            ], $options)
+                EncryptedStateStorage::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE => SimpleKeyProviderService::SERVICE_ID
+            ])
         );
 
         $this->registerService(EncryptedStateStorage::SERVICE_ID, $encryptedStateStorage);

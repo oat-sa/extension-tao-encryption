@@ -1,0 +1,8 @@
+@startuml
+TAOServer -> TAOServer: Generate to User Key (UK) (based on password)
+TAOClient -> TAOServer: Ask to Sync User
+TAOServer -> TAOServer: Encrypt user properties with UK
+TAOServer -> TAOClient: Sent user encrypted without UK
+TAOClient -> TAOClient: User Login
+TAOClient -> TAOClient: Regenerate the UK and decrypt information
+@enduml

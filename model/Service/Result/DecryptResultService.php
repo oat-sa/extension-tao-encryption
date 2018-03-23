@@ -80,6 +80,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
             foreach ($itemsTestsRefs as $ref) {
                 $resultRow = $this->getResultRow($ref);
+
                 if ($resultRow instanceof ItemVariableStorable) {
                     $resultStorage->storeItemVariable(
                         $deliveryResultIdentifier,
@@ -94,7 +95,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                         $deliveryResultIdentifier,
                         $resultRow->getTestIdentifier(),
                         $resultRow->getVariable(),
-                        $deliveryResultIdentifier .'.'.$resultRow->getCallTestId()
+                        $deliveryResultIdentifier
                     );
                 }
             }

@@ -23,6 +23,9 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDeliveryRdf\helper\DetectTestAndItemIdentifiersHelper;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
@@ -52,6 +55,9 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
 
     /** @var DeliveryResultVarsRefsModel */
     public $deliveryResultVarsRefs;
+
+    /** @var DeliveryExecutionInterface */
+    private $deliveryExecution;
 
     /**
      * @inheritdoc
@@ -118,11 +124,19 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     )
     {
         $keyStore = $this->buildStoreKey($deliveryResultIdentifier, $callIdItem, $itemVariable->getIdentifier());
+        $detect = new DetectTestAndItemIdentifiersHelper();
+
+        if (is_null($this->deliveryExecution)){
+            /** @var DeliveryExecutionInterface $deliveryExecution */
+            $this->deliveryExecution = $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID)->getDeliveryExecution($deliveryResultIdentifier);
+        }
+        list($testIdentifier,$itemIdentifier) = $detect->detect($this->deliveryExecution->getDelivery()->getUri(), $test, $item);
+
         $variable = $this->buildItemVariable(
             $deliveryResultIdentifier,
-            $test,
+            $testIdentifier,
             $itemVariable,
-            $item,
+            $itemIdentifier,
             $callIdItem
         );
 
@@ -180,9 +194,17 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     )
     {
         $keyStore = $this->buildStoreKey($deliveryResultIdentifier, $callIdTest, $testVariable->getIdentifier());
+        $detect = new DetectTestAndItemIdentifiersHelper();
+
+        if (is_null($this->deliveryExecution)){
+            /** @var DeliveryExecutionInterface $deliveryExecution */
+            $this->deliveryExecution = $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID)->getDeliveryExecution($deliveryResultIdentifier);
+        }
+        list($testIdentifier,$itemIdentifier) = $detect->detect($this->deliveryExecution->getDelivery()->getUri(), $test);
+
         $variable = $this->buildTestVariable(
             $deliveryResultIdentifier,
-            $test,
+            $testIdentifier,
             $testVariable,
             $callIdTest
         );

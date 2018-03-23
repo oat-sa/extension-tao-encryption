@@ -39,6 +39,7 @@ class Symmetric implements Encrypt
     }
 
     /**
+     * @param Key $key
      * @param string $data
      * @return mixed|string
      */
