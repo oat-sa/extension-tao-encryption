@@ -124,7 +124,7 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     )
     {
         $keyStore = $this->buildStoreKey($deliveryResultIdentifier, $callIdItem, $itemVariable->getIdentifier());
-        $detect = new DetectTestAndItemIdentifiersHelper();
+        $detect = $this->getDetector();
 
         if (is_null($this->deliveryExecution)){
             /** @var DeliveryExecutionInterface $deliveryExecution */
@@ -194,7 +194,7 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     )
     {
         $keyStore = $this->buildStoreKey($deliveryResultIdentifier, $callIdTest, $testVariable->getIdentifier());
-        $detect = new DetectTestAndItemIdentifiersHelper();
+        $detect = $this->getDetector();
 
         if (is_null($this->deliveryExecution)){
             /** @var DeliveryExecutionInterface $deliveryExecution */
@@ -396,5 +396,13 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
             $mapping[] = $keyStore;
             $this->getDeliveryResultVarsRefsModel()->setResultsVariablesRefs($resultIdentifier, $mapping);
         }
+    }
+
+    /**
+     * @return DetectTestAndItemIdentifiersHelper
+     */
+    protected function getDetector()
+    {
+        return new DetectTestAndItemIdentifiersHelper();
     }
 }

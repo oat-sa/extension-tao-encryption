@@ -21,6 +21,10 @@ namespace oat\taoEncryption\Test\Service\Result;
 
 use common_persistence_KeyValuePersistence;
 use common_persistence_Manager;
+use core_kernel_classes_Resource;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDeliveryRdf\helper\DetectTestAndItemIdentifiersHelper;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Result\EncryptResultService;
 use PHPUnit\Framework\TestCase;
@@ -108,18 +112,35 @@ class EncryptResultServiceTest extends TestCase
             ->method('encrypt')
             ->willReturn('decrypted');
 
+        $resource = $this->getMockBuilder(core_kernel_classes_Resource::class)->setMethods(['getUri'])->disableOriginalConstructor()->getMock();
+        $deliveryExec = $this->getMockForAbstractClass(DeliveryExecutionInterface::class);
+        $deliveryExec
+            ->method('getDelivery')
+            ->willReturn($resource);
+
+        $serviceProxy = $this->getMockBuilder(ServiceProxy::class)->disableOriginalConstructor()->getMock();
+        $serviceProxy
+            ->method('getDeliveryExecution')
+            ->willReturn($deliveryExec);
+
         $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
         $serviceLocator->method('get')
-            ->willReturnOnConsecutiveCalls(
-                $persistence,
-                $encryption
-            );
+            ->willReturnOnConsecutiveCalls($serviceProxy, $persistence, $encryption);
 
+        /** @var EncryptResultService $service */
+        $service = $this->getMockBuilder(EncryptResultService::class)
+            ->setConstructorArgs([
+                array(
+                    EncryptResultService::OPTION_PERSISTENCE => 'encryptedResults',
+                    EncryptResultService::OPTION_ENCRYPTION_SERVICE => 'taoEncryption/asymmetricEncryptionService',
+                )
+            ])
+            ->setMethods(['getDetector'])
+            ->getMockForAbstractClass();
 
-        $service = new EncryptResultService(array(
-            EncryptResultService::OPTION_PERSISTENCE => 'encryptedResults',
-            EncryptResultService::OPTION_ENCRYPTION_SERVICE => 'taoEncryption/asymmetricEncryptionService',
-        ));
+        $service->method('getDetector')
+            ->willReturn($this->getMockBuilder(DetectTestAndItemIdentifiersHelper::class)->disableOriginalConstructor()->getMock());
+
         $service->setServiceLocator($serviceLocator);
 
         return $service;
