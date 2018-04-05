@@ -36,20 +36,20 @@ class FileKeyProviderService extends SimpleKeyProviderService
      */
     public function getKey()
     {
-        $key = parent::getKey();
+        $key = $this->callParentGetKey();
         if (!is_null($key)){
             return $key;
         }
 
-        $user = \common_session_SessionManager::getSession()->getUser();
+        $user = $this->getSessionUser();
         if($user instanceof EncryptedUser){
             $this->setKey($user->getApplicationKey());
-            return parent::getKey();
+            return $this->callParentGetKey();
         }
 
         $this->setKey('');
 
-        return parent::getKey();
+        return $this->callParentGetKey();
     }
 
     /**
@@ -78,5 +78,22 @@ class FileKeyProviderService extends SimpleKeyProviderService
         $fs = $fileSystem->getFileSystem($this->getOption(static::OPTION_FILESYSTEM_ID));
 
         return (string) $fs->read('user_application.key');
+    }
+
+    /**
+     * @return Key
+     */
+    protected function callParentGetKey()
+    {
+        return parent::getKey();
+    }
+
+    /**
+     * @return \oat\oatbox\user\User
+     * @throws \common_exception_Error
+     */
+    protected function getSessionUser()
+    {
+        return \common_session_SessionManager::getSession()->getUser();
     }
 }
