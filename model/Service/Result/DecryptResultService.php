@@ -68,7 +68,6 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
             if (!isset($relatedDelivery['deliveryResultIdentifier'])
                 || !isset($relatedDelivery['deliveryIdentifier'])
-                || !isset($relatedTestTaker['deliveryIdentifier'])
                 || !isset($relatedTestTaker['testTakerIdentifier']))
             {
                 continue;
