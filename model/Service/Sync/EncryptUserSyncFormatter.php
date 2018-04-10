@@ -47,7 +47,11 @@ class EncryptUserSyncFormatter extends FormatterService
     public function decryptProperties($properties)
     {
         $propertiesToEncrypt = $this->getEncryptedProperties();
-        $encryptedProperties = [];
+        $decryptedProperties = [];
+        if (!isset($properties[EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY])){
+            return $properties;
+        }
+
         $keyEncryption = $properties[EncryptedUserRdf::PROPERTY_ENCRYPTION_KEY];
 
         foreach ($properties as $key => $value){
@@ -68,13 +72,13 @@ class EncryptUserSyncFormatter extends FormatterService
                         $this->getEncryptionService($keyEncryption)->decrypt(base64_decode($value))
                     );
                 }
-                $encryptedProperties[$key] = $valuesDecrypted;
+                $decryptedProperties[$key] = $valuesDecrypted;
             } else {
-                $encryptedProperties[$key] = $value;
+                $decryptedProperties[$key] = $value;
             }
         }
 
-        return $encryptedProperties;
+        return $decryptedProperties;
     }
 
 
@@ -131,10 +135,20 @@ class EncryptUserSyncFormatter extends FormatterService
      */
     public function filterProperties(array $triples, array $options = [])
     {
-        $properties = parent::filterProperties($triples, $options);
+        $properties = $this->callParentFilterProperties($triples, $options);
         $properties = $this->encryptProperties($properties);
 
         return $properties;
+    }
+
+    /**
+     * @param array $triples
+     * @param array $options
+     * @return array
+     */
+    protected function callParentFilterProperties(array $triples, array $options = [])
+    {
+        return parent::filterProperties($triples, $options);
     }
 
     /**
