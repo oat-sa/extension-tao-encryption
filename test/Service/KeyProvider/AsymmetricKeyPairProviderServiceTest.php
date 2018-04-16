@@ -21,6 +21,7 @@ namespace oat\taoEncryption\Test\Service\KeyProvider;
 
 use League\Flysystem\FilesystemInterface;
 use oat\oatbox\filesystem\FileSystemService;
+use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
@@ -54,5 +55,14 @@ class AsymmetricKeyPairProviderServiceTest extends TestCase
 
         $this->assertInstanceOf(PublicKey::class, $service->getPublicKey());
         $this->assertInstanceOf(PrivateKey::class, $service->getPrivateKey());
+    }
+
+    public function testComparePublicKeyChecksum()
+    {
+        $service = new AsymmetricKeyPairProviderService([
+            AsymmetricKeyPairProviderService::OPTION_FILE_SYSTEM_ID => 'someFolder'
+        ]);
+
+        $this->assertFalse($service->comparePublicKeyChecksum('bla', 'bla'));
     }
 }

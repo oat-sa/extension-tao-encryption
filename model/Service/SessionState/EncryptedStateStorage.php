@@ -85,14 +85,23 @@ class EncryptedStateStorage extends tao_models_classes_service_StateStorage
      * @throws \Exception
      * @throws \common_exception_Error
      */
-    private function getUserKey()
+    protected function getUserKey()
     {
-        $user = common_session_SessionManager::getSession()->getUser();
+        $user = $this->getUser();
 
         if (!$user instanceof EncryptedUser){
             throw new \Exception('EncryptedStateStorage should work only with EncryptedUser');
         }
 
         return $user->getApplicationKey();
+    }
+
+    /**
+     * @return \oat\oatbox\user\User
+     * @throws \common_exception_Error
+     */
+    protected function getUser()
+    {
+        return common_session_SessionManager::getSession()->getUser();
     }
 }

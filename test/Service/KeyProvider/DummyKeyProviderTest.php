@@ -17,18 +17,18 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+namespace oat\taoEncryption\Test\Service\KeyProvider;
 
-namespace oat\taoEncryption\Service\Result;
-use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 
-interface DecryptResult
+use oat\taoEncryption\Model\Key;
+use oat\taoEncryption\Service\KeyProvider\DummyKeyProvider;
+
+class DummyKeyProviderTest extends \PHPUnit_Framework_TestCase
 {
-    const SERVICE_ID = 'taoEncryption/DecryptResult';
+    public function testGetKey()
+    {
+        $dummy = new DummyKeyProvider();
 
-    /**
-     * @param string $deliveryIdentifier
-     * @throws DecryptionFailedException
-     * @return bool
-     */
-    public function decrypt($deliveryIdentifier);
+        $this->assertInstanceOf(Key::class, $dummy->getKey());
+    }
 }

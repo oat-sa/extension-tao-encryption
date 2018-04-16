@@ -28,16 +28,15 @@ class EncryptionSymmetricServiceTest extends \PHPUnit_Framework_TestCase
 {
     public function testFlow()
     {
-        $algorithm = $this->getMockBuilder(AlgorithmSymmetricService::class)->disableOriginalConstructor()->getMock();
+        $algorithm = $this->getMockBuilder(AlgorithmSymmetricService::class)
+            ->setMethods(['encrypt','decrypt'])->disableOriginalConstructor()->getMock();
         $algorithm
             ->method('encrypt')
             ->willReturn('encryptString');
         $algorithm
             ->method('decrypt')
             ->willReturn('decryptString');
-        $algorithm
-            ->method('setKeyPairProvider')
-            ->willReturn('encryptString');
+
 
         $keyProvider = $this->getMockBuilder(SymmetricKeyProviderService::class)->disableOriginalConstructor()->getMock();
         $keyProvider
