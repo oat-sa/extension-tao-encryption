@@ -75,5 +75,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(EncryptedUserFactoryService::SERVICE_ID, $userFactory);
             $this->setVersion('0.6.1');
         }
+
+        $this->skip('0.6.1', '0.6.2');
     }
 }
