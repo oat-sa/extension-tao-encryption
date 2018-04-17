@@ -39,7 +39,6 @@ return array(
         'tao' => '>=17.7.0',
         'generis' => '>=6.17.0',
         'taoResultServer' => '>=6.2.0',
-        'taoOauth' => '>=0.1.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
     'acl' => array(
