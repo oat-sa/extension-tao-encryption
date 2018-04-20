@@ -50,8 +50,10 @@ class EncryptedUser extends common_user_User
         $this->realUser = $user;
 
         $password = $this->realUser->getPropertyValues(GenerisRdf::PROPERTY_USER_PASSWORD);
-        $salt     = $password[0];
-        $this->key = GenerateKey::generate($hashForEncryption, $salt);
+        if (isset($password[0])){
+            $salt     = $password[0];
+            $this->key = GenerateKey::generate($hashForEncryption, $salt);
+        }
 
         /** @var EncryptionSymmetricService $encryptService */
         $encryptService = ServiceManager::getServiceManager()->get(EncryptionSymmetricService::SERVICE_ID);

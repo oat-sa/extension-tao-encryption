@@ -27,7 +27,7 @@ class SimpleKeyProviderServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetKey()
     {
         $service = new SimpleKeyProviderService();
-
+        $service->setKey('abc');
         $this->assertInstanceOf(Key::class, $service->getKey());
     }
 }

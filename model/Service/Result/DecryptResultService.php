@@ -66,6 +66,13 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             $relatedDelivery  = $this->getRelatedDelivery($resultId);
             $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
 
+            if (!isset($relatedDelivery['deliveryResultIdentifier'])
+                || !isset($relatedDelivery['deliveryIdentifier'])
+                || !isset($relatedTestTaker['testTakerIdentifier']))
+            {
+                continue;
+            }
+
             $deliveryResultIdentifier = $relatedDelivery['deliveryResultIdentifier'];
 
             $resultStorage->storeRelatedDelivery(
@@ -105,6 +112,8 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             $this->deleteItemsTestsRefs($resultId);
             $this->deleteResult($deliveryIdentifier, $resultId);
         }
+
+        return true;
     }
 
     /**
@@ -260,7 +269,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function deleteResult($deliveryIdentifier, $resultId)
     {
-        $results = $this->getDeliveryResultsModel()->getResults($deliveryIdentifier);
+        $results = $this->getResults($deliveryIdentifier);
 
         if (($key = array_search($resultId, $results)) !== false) {
             unset($results[$key]);

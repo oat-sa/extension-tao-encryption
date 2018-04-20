@@ -40,7 +40,7 @@ class EncryptRdfDeliverySyncFormatter extends FormatterService
      */
     public function filterProperties(array $triples, array $options = [])
     {
-        $properties = parent::filterProperties($triples, $options);
+        $properties = $this->callParentFilterProperties($triples, $options);
 
         $this->properties = $properties;
 
@@ -49,6 +49,16 @@ class EncryptRdfDeliverySyncFormatter extends FormatterService
         $properties[EncryptedDeliveryRdf::PROPERTY_APPLICATION_KEY] = $keyProvider->getKeyFromFileSystem();
 
         return $properties;
+    }
+
+    /**
+     * @param array $triples
+     * @param array $options
+     * @return array
+     */
+    protected function callParentFilterProperties(array $triples, array $options = [])
+    {
+        return parent::filterProperties($triples, $options);
     }
 
     /**

@@ -37,6 +37,9 @@ class EncryptedUserFactoryService extends ConfigurableService implements UserFac
     public function createUser(core_kernel_classes_Resource $userResource, $hashForEncryption = null)
     {
         $class = $this->getOption(static::OPTION_USER_CLASS_WRAPPED);
+        if (!class_exists($class)){
+            throw  new \Exception('Incorrect user class provided.');
+        }
         $userWrapped = new $class($userResource);
         if (!$userWrapped instanceof \common_user_User){
             throw  new \Exception('Incorrect user class provided.');

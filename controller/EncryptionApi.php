@@ -25,7 +25,7 @@ use oat\oatbox\log\TaoLoggerAwareInterface;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 use oat\taoOauth\model\OauthController;
 
-class EncryptionApi extends \tao_actions_RestController implements OauthController, TaoLoggerAwareInterface
+class EncryptionApi extends \tao_actions_RestController implements TaoLoggerAwareInterface
 {
     use LoggerAwareTrait;
 
