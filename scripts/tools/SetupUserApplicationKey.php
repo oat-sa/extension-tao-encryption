@@ -42,8 +42,12 @@ class SetupUserApplicationKey extends InstallAction
         /** @var FileKeyProviderService $fileKeyProvider */
         $fileKeyProvider = $this->getServiceLocator()->get(FileKeyProviderService::SERVICE_ID);
 
-        $fileKeyProvider->generateAndSaveKey();
+        if ($fileKeyProvider->getKeyFromFileSystem() === ''){
+            $fileKeyProvider->generateAndSaveKey();
+            return Report::createSuccess('User Application key generated success.');
+        }
 
-        return Report::createSuccess('User Application key generated success.');
+        return Report::createInfo('User Application key already generated.');
+
     }
 }
