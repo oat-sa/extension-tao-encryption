@@ -33,7 +33,7 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.6.2',
+    'version' => '0.7.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
