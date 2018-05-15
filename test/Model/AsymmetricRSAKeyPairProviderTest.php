@@ -19,7 +19,7 @@
  */
 namespace oat\taoEncryption\Test\Model;
 
-use League\Flysystem\FilesystemInterface;
+use oat\oatbox\filesystem\FileSystem;
 use oat\taoEncryption\Model\Asymmetric\AsymmetricRSAKeyPairProvider;
 use oat\taoEncryption\Model\KeyPairEncryption;
 use oat\taoEncryption\Model\PrivateKey;
@@ -30,7 +30,7 @@ class AsymmetricRSAKeyPairProviderTest extends TestCase
 {
     public function testGenerateKeyPair()
     {
-        $fileSystem = $this->getMockBuilder(FilesystemInterface::class)->getMock();
+        $fileSystem = $this->getMockBuilder(FileSystem::class)->disableOriginalConstructor()->getMock();
         $provider = new AsymmetricRSAKeyPairProvider($fileSystem);
 
         $this->assertInstanceOf(KeyPairEncryption::class, $provider->generate());
@@ -38,7 +38,7 @@ class AsymmetricRSAKeyPairProviderTest extends TestCase
 
     public function testSavePublicKey()
     {
-        $fileSystem = $this->getMockBuilder(FilesystemInterface::class)->getMock();
+        $fileSystem = $this->getMockBuilder(FileSystem::class)->disableOriginalConstructor()->getMock();
         $fileSystem
             ->method('put')
             ->willReturn(true);
@@ -51,7 +51,7 @@ class AsymmetricRSAKeyPairProviderTest extends TestCase
 
     public function testGetPublicKey()
     {
-        $fileSystem = $this->getMockBuilder(FilesystemInterface::class)->getMock();
+        $fileSystem = $this->getMockBuilder(FileSystem::class)->disableOriginalConstructor()->getMock();
         $fileSystem
             ->method('read')
             ->willReturn('public key');
@@ -64,7 +64,7 @@ class AsymmetricRSAKeyPairProviderTest extends TestCase
 
     public function testSavePrivateKey()
     {
-        $fileSystem = $this->getMockBuilder(FilesystemInterface::class)->getMock();
+        $fileSystem = $this->getMockBuilder(FileSystem::class)->disableOriginalConstructor()->getMock();
         $fileSystem
             ->method('put')
             ->willReturn(true);
@@ -77,7 +77,7 @@ class AsymmetricRSAKeyPairProviderTest extends TestCase
 
     public function testGetPrivateKey()
     {
-        $fileSystem = $this->getMockBuilder(FilesystemInterface::class)->getMock();
+        $fileSystem = $this->getMockBuilder(FileSystem::class)->disableOriginalConstructor()->getMock();
         $fileSystem
             ->method('read')
             ->willReturn('private key');

@@ -19,9 +19,8 @@
  */
 namespace oat\taoEncryption\Test\Service\KeyProvider;
 
-use League\Flysystem\FilesystemInterface;
+use oat\oatbox\filesystem\FileSystem;
 use oat\oatbox\filesystem\FileSystemService;
-use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
@@ -32,7 +31,7 @@ class AsymmetricKeyPairProviderServiceTest extends TestCase
 {
     public function testGetKeys()
     {
-        $fileSystem = $this->getMockBuilder(FilesystemInterface::class)->getMock();
+        $fileSystem = $this->getMockBuilder(FileSystem::class)->disableOriginalConstructor()->getMock();
         $fileSystem
             ->method('read')
             ->willReturn('key');
