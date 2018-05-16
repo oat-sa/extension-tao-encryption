@@ -19,7 +19,6 @@
  */
 namespace oat\taoEncryption\Service\KeyProvider;
 
-use League\Flysystem\FileNotFoundException;
 use oat\oatbox\filesystem\FileSystemService;
 use oat\taoEncryption\Model\Key;
 use oat\taoEncryption\Service\Session\EncryptedUser;
