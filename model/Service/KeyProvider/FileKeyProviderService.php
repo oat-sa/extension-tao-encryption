@@ -68,16 +68,19 @@ class FileKeyProviderService extends SimpleKeyProviderService
 
     /**
      * @return string
-     * @throws \common_exception_Error
-     * @throws \common_exception_NotFound
      */
     public function getKeyFromFileSystem()
     {
         /** @var FileSystemService $fileSystem */
         $fileSystem = $this->getServiceLocator()->get(FileSystemService::SERVICE_ID);
-        $fs = $fileSystem->getFileSystem($this->getOption(static::OPTION_FILESYSTEM_ID));
+        $fs = $fileSystem->getDirectory($this->getOption(static::OPTION_FILESYSTEM_ID));
+        $file = $fs->getFile('user_application.key');
 
-        return (string) $fs->read('user_application.key');
+        if (!$file->exists()) {
+            return '';
+        }
+
+        return (string) $file->read();
     }
 
     /**
