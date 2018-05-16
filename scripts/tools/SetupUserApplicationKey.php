@@ -34,6 +34,7 @@ class SetupUserApplicationKey extends InstallAction
 
     /**
      * @param $params
+     * @return Report
      * @throws \common_exception_Error
      * @throws \common_exception_NotFound
      */
@@ -44,7 +45,7 @@ class SetupUserApplicationKey extends InstallAction
 
         if ($fileKeyProvider->getKeyFromFileSystem() === ''){
             $fileKeyProvider->generateAndSaveKey();
-            return Report::createSuccess('User Application key generated success.');
+            return Report::createSuccess('User Application key generated successfully.');
         }
 
         return Report::createInfo('User Application key already generated.');
