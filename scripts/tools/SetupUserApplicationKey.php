@@ -34,6 +34,7 @@ class SetupUserApplicationKey extends InstallAction
 
     /**
      * @param $params
+     * @return Report
      * @throws \common_exception_Error
      * @throws \common_exception_NotFound
      */
@@ -42,8 +43,12 @@ class SetupUserApplicationKey extends InstallAction
         /** @var FileKeyProviderService $fileKeyProvider */
         $fileKeyProvider = $this->getServiceLocator()->get(FileKeyProviderService::SERVICE_ID);
 
-        $fileKeyProvider->generateAndSaveKey();
+        if ($fileKeyProvider->getKeyFromFileSystem() === ''){
+            $fileKeyProvider->generateAndSaveKey();
+            return Report::createSuccess('User Application key generated successfully.');
+        }
 
-        return Report::createSuccess('User Application key generated success.');
+        return Report::createInfo('User Application key already generated.');
+
     }
 }

@@ -19,7 +19,7 @@
  */
 namespace oat\taoEncryption\Model\Asymmetric;
 
-use League\Flysystem\FilesystemInterface;
+use oat\oatbox\filesystem\FileSystem;
 use oat\taoEncryption\Model\KeyPairEncryption;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
@@ -33,9 +33,9 @@ class AsymmetricRSAKeyPairProvider implements AsymmetricKeyPairProvider
     private $rsaEncryption;
 
     /**
-     * @param FilesystemInterface $filesystem
+     * @param FileSystem $filesystem
      */
-    public function __construct(FilesystemInterface $filesystem)
+    public function __construct(FileSystem $filesystem)
     {
         $this->rsaEncryption = new RSA();
         $this->fileSystem = $filesystem;
