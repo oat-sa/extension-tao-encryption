@@ -22,13 +22,14 @@ namespace oat\taoEncryption\Service\Session;
 
 use common_user_User;
 use oat\generis\model\GenerisRdf;
+use oat\generis\model\kernel\users\UserInternalInterface;
 use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Sync\EncryptUserSyncFormatter;
 
-class EncryptedUser extends common_user_User
+class EncryptedUser extends common_user_User implements UserInternalInterface
 {
     /** @var string */
     private $key;
