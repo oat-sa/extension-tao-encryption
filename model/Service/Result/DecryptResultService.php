@@ -42,10 +42,10 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
     const PREFIX_TEST_TAKER = EncryptResultService::PREFIX_TEST_TAKER;
 
-    /** @var  common_persistence_KvDriver */
+    /** @var common_persistence_KvDriver */
     private $persistence;
 
-    /** @var  EncryptionServiceInterface*/
+    /** @var EncryptionServiceInterface*/
     private $encryptionService;
 
     /** @var DeliveryResultsModel */
@@ -53,64 +53,79 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
     /** @var DeliveryResultVarsRefsModel */
     public $deliveryResultVarsRefs;
+
     /**
      * @inheritdoc
      */
     public function decrypt($deliveryIdentifier)
     {
-        $resultStorage = $this->getResultStorage($deliveryIdentifier);
-        $results = $this->getResults($deliveryIdentifier);
+        $resultStorage    = $this->getResultStorage($deliveryIdentifier);
+        $results          = $this->getResults($deliveryIdentifier);
+        $resultsDecrypted = [];
 
         foreach ($results as $resultId){
-            $relatedTestTaker = $this->getRelatedTestTaker($resultId);
-            $relatedDelivery  = $this->getRelatedDelivery($resultId);
-            $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
+            try{
+                $relatedTestTaker = $this->getRelatedTestTaker($resultId);
+                $relatedDelivery  = $this->getRelatedDelivery($resultId);
+                $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
 
-            if (!isset($relatedDelivery['deliveryResultIdentifier'])
-                || !isset($relatedDelivery['deliveryIdentifier'])
-                || !isset($relatedTestTaker['testTakerIdentifier']))
-            {
-                continue;
-            }
-
-            $deliveryResultIdentifier = $relatedDelivery['deliveryResultIdentifier'];
-
-            $resultStorage->storeRelatedDelivery(
-                $deliveryResultIdentifier,
-                $relatedDelivery['deliveryIdentifier']
-            );
-
-            $resultStorage->storeRelatedTestTaker(
-                $deliveryResultIdentifier,
-                $relatedTestTaker['testTakerIdentifier']
-            );
-
-            foreach ($itemsTestsRefs as $ref) {
-                $resultRow = $this->getResultRow($ref);
-
-                if ($resultRow instanceof ItemVariableStorable) {
-                    $resultStorage->storeItemVariable(
-                        $deliveryResultIdentifier,
-                        $resultRow->getTestIdentifier(),
-                        $resultRow->getItemIdentifier(),
-                        $resultRow->getVariable(),
-                        $deliveryResultIdentifier .'.'.$resultRow->getCallItemId()
-                    );
-
-                } else if ($resultRow instanceof TestVariableStorable) {
-                    $resultStorage->storeTestVariable(
-                        $deliveryResultIdentifier,
-                        $resultRow->getTestIdentifier(),
-                        $resultRow->getVariable(),
-                        $deliveryResultIdentifier
-                    );
+                if (!isset($relatedDelivery['deliveryResultIdentifier'])
+                    || !isset($relatedDelivery['deliveryIdentifier'])
+                    || !isset($relatedTestTaker['testTakerIdentifier']))
+                {
+                    continue;
                 }
-            }
 
-            $this->deleteRelatedDelivery($resultId);
-            $this->deleteRelatedTestTaker($resultId);
-            $this->deleteItemsTestsRefs($resultId);
-            $this->deleteResult($deliveryIdentifier, $resultId);
+                $deliveryResultIdentifier = $relatedDelivery['deliveryResultIdentifier'];
+
+                $resultStorage->storeRelatedDelivery(
+                    $deliveryResultIdentifier,
+                    $relatedDelivery['deliveryIdentifier']
+                );
+
+                $resultStorage->storeRelatedTestTaker(
+                    $deliveryResultIdentifier,
+                    $relatedTestTaker['testTakerIdentifier']
+                );
+
+                foreach ($itemsTestsRefs as $ref) {
+                    $resultRow = $this->getResultRow($ref);
+
+                    if ($resultRow instanceof ItemVariableStorable) {
+                        $resultStorage->storeItemVariable(
+                            $deliveryResultIdentifier,
+                            $resultRow->getTestIdentifier(),
+                            $resultRow->getItemIdentifier(),
+                            $resultRow->getVariable(),
+                            $deliveryResultIdentifier .'.'.$resultRow->getCallItemId()
+                        );
+
+                    } else if ($resultRow instanceof TestVariableStorable) {
+                        $resultStorage->storeTestVariable(
+                            $deliveryResultIdentifier,
+                            $resultRow->getTestIdentifier(),
+                            $resultRow->getVariable(),
+                            $deliveryResultIdentifier
+                        );
+                    }
+                }
+
+                $this->deleteRelatedDelivery($resultId);
+                $this->deleteRelatedTestTaker($resultId);
+                $this->deleteItemsTestsRefs($resultId);
+                $resultsDecrypted[] = $resultId;
+
+            }catch (\Exception $exception){
+                $this->logError('Result id cannot decrypted: '. $resultId);
+                $this->logError($exception->getMessage());
+            }
+        }
+
+        if ($results === $resultsDecrypted){
+            $this->deleteResultsReference($deliveryIdentifier);
+        } else {
+            $remainingResults = array_diff($results, $resultsDecrypted);
+            $this->setResultsReferences($deliveryIdentifier, $remainingResults);
         }
 
         return true;
@@ -258,7 +273,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     protected function getResults($deliveryIdentifier)
     {
-        return $this->getDeliveryResultsModel()->getResults($deliveryIdentifier);
+        return $this->getDeliveryResultsModel()->getResultsReferences($deliveryIdentifier);
     }
 
     /**
@@ -267,17 +282,20 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      * @return bool
      * @throws \Exception
      */
-    protected function deleteResult($deliveryIdentifier, $resultId)
+    protected function deleteResultsReference($deliveryIdentifier)
     {
-        $results = $this->getResults($deliveryIdentifier);
+        return $this->getDeliveryResultsModel()->deleteResultsReference($deliveryIdentifier);
+    }
 
-        if (($key = array_search($resultId, $results)) !== false) {
-            unset($results[$key]);
-
-            return $this->getDeliveryResultsModel()->setResults($deliveryIdentifier, $results);
-        }
-
-        return false;
+    /**
+     * @param $deliveryIdentifier
+     * @param array $results
+     * @return bool
+     * @throws \Exception
+     */
+    protected function setResultsReferences($deliveryIdentifier, array $results)
+    {
+        return $this->getDeliveryResultsModel()->setResultsReferences($deliveryIdentifier, $results);
     }
 
     /**
