@@ -19,6 +19,7 @@
  *
  */
 
+use oat\taoEncryption\controller\DecryptResultsAction;
 use oat\taoEncryption\scripts\install\RegisterDecryptResultStorage;
 use oat\taoEncryption\scripts\install\RegisterEncryptionAsymmetricService;
 use oat\taoEncryption\scripts\install\RegisterEncryptionSymmetricService;
@@ -33,16 +34,18 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.8.1',
+    'version' => '0.9.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
         'generis' => '>=7.4.0',
         'taoResultServer' => '>=6.2.0',
+        'taoOutcomeUi' => '>=5.9.1',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', EncryptionApi::class),
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', DecryptResultsAction::class),
     ),
     'install' => array(
         'rdf' => [
@@ -64,4 +67,7 @@ return array(
     'routes' => array(
         '/taoEncryption' => 'oat\\taoEncryption\\controller'
     ),
+    'extra' => array(
+        'structures' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'structures.xml'
+    )
 );

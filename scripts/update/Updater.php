@@ -77,5 +77,16 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('0.6.1', '0.8.1');
+
+        if ($this->isVersion('0.8.1')){
+            AclProxy::applyRule(
+                new AccessRule(
+                    AccessRule::GRANT,
+                    'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
+                    array('ext'=>'taoEncryption', 'mod' => 'DecryptResultsAction')
+                )
+            );
+            $this->setVersion('0.9.0');
+        }
     }
 }

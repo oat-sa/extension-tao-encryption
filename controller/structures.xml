@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE structures SYSTEM "../../tao/doc/structures.dtd">
+<structures>
+    <structure id="results" name="Results" level="5" group="main">
+        <sections>
+            <section id="manage_results" name="Manage Results" url="/taoEncryption/DecryptResultsAction/index">
+                <actions>
+                    <action id="decrypt-results" name="Decrypt Results" url="/taoEncryption/DecryptResultsAction/index" group="content" context="instance">
+                        <icon id="icon-unlock"/>
+                    </action>
+                </actions>
+            </section>
+        </sections>
+    </structure>
+</structures>
