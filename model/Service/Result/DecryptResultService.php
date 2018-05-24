@@ -29,6 +29,7 @@ use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoResultServer\models\classes\implementation\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
+use \common_report_Report as Report;
 
 class DecryptResultService extends ConfigurableService implements DecryptResult
 {
@@ -59,6 +60,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     public function decrypt($deliveryIdentifier)
     {
+        $report           = Report::createInfo('Decrypt Results for delivery id: '. $deliveryIdentifier);
         $resultStorage    = $this->getResultStorage($deliveryIdentifier);
         $results          = $this->getResults($deliveryIdentifier);
         $resultsDecrypted = [];
@@ -114,21 +116,21 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 $this->deleteRelatedTestTaker($resultId);
                 $this->deleteItemsTestsRefs($resultId);
                 $resultsDecrypted[] = $resultId;
-
+                $report->add(Report::createSuccess('Result decrypted with success:'. $resultId));
             }catch (\Exception $exception){
-                $this->logError('Result id cannot decrypted: '. $resultId);
-                $this->logError($exception->getMessage());
+                $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
             }
         }
 
         if ($results === $resultsDecrypted){
+            $report->add(Report::createSuccess('All results decrypted for delivery:'. $deliveryIdentifier));
             $this->deleteResultsReference($deliveryIdentifier);
         } else {
             $remainingResults = array_diff($results, $resultsDecrypted);
             $this->setResultsReferences($deliveryIdentifier, $remainingResults);
         }
 
-        return true;
+        return $report;
     }
 
     /**

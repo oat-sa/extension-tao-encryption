@@ -73,21 +73,23 @@ class SyncEncryptedResultService extends ResultService
 
                 $deliveryExecution = $this->spawnDeliveryExecution($delivery, $testtaker);
                 $deliveryExecutionId = $deliveryExecution->getIdentifier();
+                $resultsOfDeliveryMapper[$deliveryId][] = $deliveryExecutionId;
 
                 $this->getPersistence()->set(
                     EncryptResultService::PREFIX_TEST_TAKER . $deliveryExecutionId,
                     $this->getEncryptionService()->encrypt(json_encode([
                         "deliveryResultIdentifier" => $deliveryExecutionId,
                         "testTakerIdentifier" => $testtaker->getUri()
-                    ])) );
+                    ]))
+                );
 
                 $this->getPersistence()->set(
                     EncryptResultService::PREFIX_DELIVERY_EXECUTION . $deliveryExecutionId,
                     $this->getEncryptionService()->encrypt(json_encode([
                         "deliveryResultIdentifier" => $deliveryExecutionId,
                         "deliveryIdentifier" => $delivery->getUri()
-                    ])));
-
+                    ]))
+                );
 
                 foreach ($variables as $ref => $variableRow) {
                     $this->getPersistence()->set($ref, $variableRow);
@@ -108,8 +110,6 @@ class SyncEncryptedResultService extends ResultService
                     'success' => (int) $success,
                     'deliveryId' => $deliveryId,
                 ];
-                $resultsOfDeliveryMapper[$deliveryId][] = $resultId;
-
             } else {
                 $importAcknowledgment[$resultId] = [
                     'success' => (int) $success,

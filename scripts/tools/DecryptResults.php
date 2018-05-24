@@ -108,13 +108,12 @@ class DecryptResults extends ScriptAction
         $service = $this->getServiceLocator()->get(DecryptResultService::SERVICE_ID);
         try {
 
-            $service->decrypt($deliveryId);
-
+            $this->report->add($service->decrypt($deliveryId));
         }catch (DecryptionFailedException $exception){
-            $this->report = Report::createFailure($exception->getMessage());
+            $this->report->add(Report::createFailure($exception->getMessage()));
         }
 
-        $this->report->add(Report::createSuccess('Delivery: '. $deliveryId . ' results successfully decrypted'));
+        return $this->report;
     }
 
     /**
