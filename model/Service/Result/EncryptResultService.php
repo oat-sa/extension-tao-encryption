@@ -50,9 +50,6 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
     /** @var  EncryptionServiceInterface*/
     private $encryptionService;
 
-    /** @var DeliveryResultsModel */
-    private $deliveryResultsModel;
-
     /** @var DeliveryResultVarsRefsModel */
     public $deliveryResultVarsRefs;
 
@@ -99,11 +96,6 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
             "deliveryResultIdentifier" => $deliveryResultIdentifier,
             "deliveryIdentifier" => $deliveryIdentifier
         ])));
-
-        $results = $this->getDeliveryResultsModel()->getResults($deliveryIdentifier);
-        $results[] = $deliveryResultIdentifier;
-
-        $this->getDeliveryResultsModel()->setResults($deliveryIdentifier, $results);
     }
 
     /**
@@ -282,19 +274,6 @@ class EncryptResultService extends ConfigurableService implements EncryptResult
         }
 
         return $this->persistence;
-    }
-
-    /**
-     * @return DeliveryResultsModel
-     * @throws \Exception
-     */
-    protected function getDeliveryResultsModel()
-    {
-        if (is_null($this->deliveryResultsModel)){
-            $this->deliveryResultsModel = new DeliveryResultsModel($this->getPersistence());
-        }
-
-        return $this->deliveryResultsModel;
     }
 
     /**
