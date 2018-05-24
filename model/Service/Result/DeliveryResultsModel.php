@@ -41,7 +41,7 @@ class DeliveryResultsModel
      * @return mixed
      * @throws \Exception
      */
-    public function getResults($deliveryIdentifier)
+    public function getResultsReferences($deliveryIdentifier)
     {
         $results = (string)$this->persistence->get(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier);
         $results = $results === '' ? [] : json_decode($results, true);
@@ -55,8 +55,17 @@ class DeliveryResultsModel
      * @return bool
      * @throws \common_Exception
      */
-    public function setResults($deliveryIdentifier, array $results)
+    public function setResultsReferences($deliveryIdentifier, array $results)
     {
         return $this->persistence->set(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier, json_encode($results));
+    }
+
+    /**
+     * @param string $deliveryIdentifier
+     * @return bool
+     */
+    public function deleteResultsReference($deliveryIdentifier)
+    {
+        return $this->persistence->del(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier);
     }
 }

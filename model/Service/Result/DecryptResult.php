@@ -28,7 +28,7 @@ interface DecryptResult
     /**
      * @param string $deliveryIdentifier
      * @throws DecryptionFailedException
-     * @return bool
+     * @return \common_report_Report
      */
     public function decrypt($deliveryIdentifier);
 }

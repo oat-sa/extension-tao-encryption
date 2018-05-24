@@ -20,6 +20,8 @@
 namespace oat\taoEncryption\Test\Service\KeyProvider;
 
 
+use oat\oatbox\filesystem\Directory;
+use oat\oatbox\filesystem\File;
 use oat\oatbox\filesystem\FileSystem;
 use oat\oatbox\filesystem\FileSystemService;
 use oat\taoEncryption\Model\Key;
@@ -102,6 +104,11 @@ class FileKeyProviderServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testGetKeyFromFileSystem()
     {
+        $file = $this->getMockBuilder(File::class)->disableOriginalConstructor()->getMock();
+        $directory = $this->getMockBuilder(Directory::class)->disableOriginalConstructor()->getMock();
+        $directory
+            ->method('getFile')
+            ->willReturn($file);
         $fileSystem = $this->getMockBuilder(FileSystem::class)->disableOriginalConstructor()->getMock();
         $fileSystem
             ->method('read')
@@ -111,6 +118,9 @@ class FileKeyProviderServiceTest extends \PHPUnit_Framework_TestCase
         $fileSystemService
             ->method('getFileSystem')
             ->willReturn($fileSystem);
+        $fileSystemService
+            ->method('getDirectory')
+            ->willReturn($directory);
 
         $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
         $serviceLocator->method('get')

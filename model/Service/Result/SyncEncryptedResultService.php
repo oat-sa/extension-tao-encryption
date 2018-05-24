@@ -55,7 +55,8 @@ class SyncEncryptedResultService extends ResultService
      */
     public function importDeliveryResults(array $results)
     {
-        $importAcknowledgment = [];
+        $importAcknowledgment    = [];
+        $resultsOfDeliveryMapper = [];
 
         foreach ($results as $resultId => $result) {
             $success = true;
@@ -72,25 +73,23 @@ class SyncEncryptedResultService extends ResultService
 
                 $deliveryExecution = $this->spawnDeliveryExecution($delivery, $testtaker);
                 $deliveryExecutionId = $deliveryExecution->getIdentifier();
+                $resultsOfDeliveryMapper[$deliveryId][] = $deliveryExecutionId;
 
                 $this->getPersistence()->set(
                     EncryptResultService::PREFIX_TEST_TAKER . $deliveryExecutionId,
                     $this->getEncryptionService()->encrypt(json_encode([
                         "deliveryResultIdentifier" => $deliveryExecutionId,
                         "testTakerIdentifier" => $testtaker->getUri()
-                    ])) );
+                    ]))
+                );
 
                 $this->getPersistence()->set(
                     EncryptResultService::PREFIX_DELIVERY_EXECUTION . $deliveryExecutionId,
                     $this->getEncryptionService()->encrypt(json_encode([
                         "deliveryResultIdentifier" => $deliveryExecutionId,
                         "deliveryIdentifier" => $delivery->getUri()
-                    ])));
-
-                $results = $this->getDeliveryResultsModel()->getResults($delivery->getUri());
-                $results[] = $deliveryExecutionId;
-
-                $this->getDeliveryResultsModel()->setResults($delivery->getUri(), $results);
+                    ]))
+                );
 
                 foreach ($variables as $ref => $variableRow) {
                     $this->getPersistence()->set($ref, $variableRow);
@@ -118,26 +117,11 @@ class SyncEncryptedResultService extends ResultService
             }
         }
 
-        return $importAcknowledgment;
-    }
-
-    /**
-     * Get delivery executions by delivery
-     *
-     * @param \core_kernel_classes_Resource $delivery
-     * @return array|DeliveryExecution[]
-     * @throws \Exception
-     */
-    protected function getDeliveryExecutionByDelivery(\core_kernel_classes_Resource $delivery)
-    {
-        $resultsIds = $this->getDeliveryResultsModel()->getResults($delivery->getUri());
-        $serviceProxy = $this->getDeliveryExecutionService();
-        $executions = [];
-        foreach ($resultsIds as $resultId) {
-            $executions[] = $serviceProxy->getDeliveryExecution($resultId);
+        foreach ($resultsOfDeliveryMapper as $deliveryId => $resultsIds){
+            $this->getDeliveryResultsModel()->setResultsReferences($deliveryId, $resultsIds);
         }
 
-        return $executions;
+        return $importAcknowledgment;
     }
 
     /**
@@ -245,18 +229,17 @@ class SyncEncryptedResultService extends ResultService
      */
     protected function deleteSynchronizedResult(array $successfullyExportedResults)
     {
+        $deliveriesResultsDeleted = [];
+
         foreach ($successfullyExportedResults as $deliveryExecutionId => $deliveryId) {
 
             $this->getPersistence()->del(DecryptResultService::PREFIX_DELIVERY_EXECUTION . $deliveryExecutionId);
             $this->getPersistence()->del(DecryptResultService::PREFIX_TEST_TAKER . $deliveryExecutionId);
             $this->getDeliveryResultVarsRefsModel()->deleteRefs($deliveryExecutionId);
-            //delete results
-            $results = $this->getDeliveryResultsModel()->getResults($deliveryId);
-            if (($key = array_search($deliveryExecutionId, $results)) !== false) {
-                unset($results[$key]);
+        }
 
-                $this->getDeliveryResultsModel()->setResults($deliveryId, $results);
-            }
+        foreach ($deliveriesResultsDeleted as $deliveryId){
+            $this->getDeliveryResultsModel()->deleteResultsReference($deliveryId);
         }
 
         $this->report(count($successfullyExportedResults) . ' deleted.', LogLevel::INFO);

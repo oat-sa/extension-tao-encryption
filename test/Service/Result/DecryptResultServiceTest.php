@@ -38,7 +38,7 @@ class DecryptResultServiceTest extends \PHPUnit_Framework_TestCase
         $service = $this->getService();
         $service->setServiceLocator($this->mockServiceLocator());
 
-        $this->assertTrue($service->decrypt('delivery id'));
+        $this->assertInstanceOf(\common_report_Report::class, $service->decrypt('delivery id'));
     }
 
     /**
