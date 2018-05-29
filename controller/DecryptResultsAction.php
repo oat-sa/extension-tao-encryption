@@ -20,6 +20,7 @@
 
 namespace oat\taoEncryption\controller;
 
+use core_kernel_classes_Resource;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoEncryption\Task\DecryptResultsTask;
 use oat\taoTaskQueue\model\QueueDispatcher;
@@ -27,16 +28,21 @@ use tao_actions_CommonModule;
 
 class DecryptResultsAction extends tao_actions_CommonModule
 {
+    const PARAMETER_DELIVERY_URI = 'uri';
+    const PARAMETER_DELIVERY_CLASS_URI = 'classUri';
+
     /**
-     * @return \oat\taoTaskQueue\model\Task\CallbackTask|\oat\taoTaskQueue\model\Task\CallbackTaskInterface
+     * @return void
      */
     public function index()
     {
-        $deliveriesIds = [];
-        /** @var \core_kernel_classes_Resource $delivery */
-        foreach ($this->getDeliveryAssemblyService()->getAllAssemblies() as $delivery) {
-            $deliveriesIds[] =  $delivery->getUri();
+        // if delivery class has been selected, return nothing
+        if (!$this->hasRequestParameter(self::PARAMETER_DELIVERY_URI)) {
+            return;
         }
+
+        $delivery = new core_kernel_classes_Resource($this->getRequestParameter('id'));
+        $deliveriesIds[] = $delivery->getUri();
 
         $action = new DecryptResultsTask();
         $action->setServiceLocator($this->getServiceLocator());

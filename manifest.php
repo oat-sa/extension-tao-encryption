@@ -44,6 +44,7 @@ return array(
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
     'acl' => array(
+        array('grant', \oat\tao\model\user\TaoRoles::GLOBAL_MANAGER, array('ext' => 'taoEncryption')),
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', EncryptionApi::class),
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole', DecryptResultsAction::class),
     ),
@@ -67,6 +68,7 @@ return array(
     'routes' => array(
         '/taoEncryption' => 'oat\\taoEncryption\\controller'
     ),
+    "DIR_VIEWS"           => $extpath . "views" . DIRECTORY_SEPARATOR,
     'extra' => array(
         'structures' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'structures.xml'
     )

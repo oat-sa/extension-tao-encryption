@@ -22,8 +22,10 @@ namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
 use core_kernel_users_GenerisUser;
+use oat\generis\model\user\UserRdf;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
+use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
@@ -83,6 +85,13 @@ class Updater extends common_ext_ExtensionUpdater
                 new AccessRule(
                     AccessRule::GRANT,
                     'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
+                    array('ext'=>'taoEncryption', 'mod' => 'DecryptResultsAction')
+                )
+            );
+            AclProxy::applyRule(
+                new AccessRule(
+                    AccessRule::GRANT,
+                    TaoRoles::GLOBAL_MANAGER,
                     array('ext'=>'taoEncryption', 'mod' => 'DecryptResultsAction')
                 )
             );
