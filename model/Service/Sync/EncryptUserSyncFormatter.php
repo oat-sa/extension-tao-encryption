@@ -24,9 +24,9 @@ use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoEncryption\Service\EncryptionSymmetricServiceHelper;
 use core_kernel_classes_Literal;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
-use oat\taoSync\model\formatter\FormatterService;
+use oat\taoSync\model\formatter\UserFormatterService;
 
-class EncryptUserSyncFormatter extends FormatterService
+class EncryptUserSyncFormatter extends UserFormatterService
 {
     use LoggerAwareTrait;
     use EncryptionSymmetricServiceHelper;
@@ -130,12 +130,13 @@ class EncryptUserSyncFormatter extends FormatterService
     /**
      * @param array $triples
      * @param array $options
+     * @param array $params
      * @return array
      * @throws \Exception
      */
-    public function filterProperties(array $triples, array $options = [])
+    public function filterProperties(array $triples, array $options = [], array $params = [])
     {
-        $properties = $this->callParentFilterProperties($triples, $options);
+        $properties = $this->callParentFilterProperties($triples, $options, $params);
         $properties = $this->encryptProperties($properties);
 
         return $properties;
@@ -144,11 +145,12 @@ class EncryptUserSyncFormatter extends FormatterService
     /**
      * @param array $triples
      * @param array $options
+     * @param array $params
      * @return array
      */
-    protected function callParentFilterProperties(array $triples, array $options = [])
+    protected function callParentFilterProperties(array $triples, array $options = [], array $params = [])
     {
-        return parent::filterProperties($triples, $options);
+        return parent::filterProperties($triples, $options, $params);
     }
 
     /**
