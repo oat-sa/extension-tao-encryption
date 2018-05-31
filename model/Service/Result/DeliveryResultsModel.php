@@ -54,10 +54,16 @@ class DeliveryResultsModel
      * @param array $results
      * @return bool
      * @throws \common_Exception
+     * @throws \Exception
      */
     public function setResultsReferences($deliveryIdentifier, array $results)
     {
-        return $this->persistence->set(static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier, json_encode($results));
+        $oldResults = $this->getResultsReferences($deliveryIdentifier);
+
+        return $this->persistence->set(
+            static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier,
+            json_encode(array_merge($oldResults, $results))
+        );
     }
 
     /**
