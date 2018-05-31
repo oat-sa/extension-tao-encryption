@@ -58,11 +58,9 @@ class DeliveryResultsModel
      */
     public function setResultsReferences($deliveryIdentifier, array $results)
     {
-        $oldResults = $this->getResultsReferences($deliveryIdentifier);
-
         return $this->persistence->set(
             static::PREFIX_DELIVERY_RESULTS . $deliveryIdentifier,
-            json_encode(array_merge($oldResults, $results))
+            json_encode($results)
         );
     }
 
