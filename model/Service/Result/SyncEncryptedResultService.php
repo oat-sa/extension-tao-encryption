@@ -118,7 +118,12 @@ class SyncEncryptedResultService extends ResultService
         }
 
         foreach ($resultsOfDeliveryMapper as $deliveryId => $resultsIds){
-            $this->getDeliveryResultsModel()->setResultsReferences($deliveryId, $resultsIds);
+            $oldResults = $this->getDeliveryResultsModel()->getResultsReferences($deliveryId);
+
+            $this->getDeliveryResultsModel()->setResultsReferences(
+                $deliveryId,
+                array_merge($oldResults, $resultsIds)
+            );
         }
 
         return $importAcknowledgment;
