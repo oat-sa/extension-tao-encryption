@@ -22,7 +22,9 @@ namespace oat\taoEncryption\Service\SessionState;
 use common_session_SessionManager;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\log\LoggerAwareTrait;
+use oat\oatbox\user\AnonymousUser;
 use oat\taoEncryption\Service\EncryptionSymmetricServiceHelper;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\EncryptedUser;
 use tao_models_classes_service_StateStorage;
 
@@ -88,6 +90,13 @@ class EncryptedStateStorage extends tao_models_classes_service_StateStorage
     protected function getUserKey()
     {
         $user = $this->getUser();
+
+        if ($user instanceof AnonymousUser){
+            /** @var SimpleKeyProviderService $keyProvider */
+            $keyProvider = $this->getServiceLocator()->get($this->getOptionEncryptionKeyProvider());
+
+            return base64_decode($keyProvider->getKey()->getKey());
+        }
 
         if (!$user instanceof EncryptedUser){
             throw new \Exception('EncryptedStateStorage should work only with EncryptedUser');
