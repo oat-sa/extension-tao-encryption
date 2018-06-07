@@ -34,13 +34,12 @@ class EncryptRdfDeliverySyncFormatter extends FormatterService
     /**
      * @param array $triples
      * @param array $options
+     * @param array $params
      * @return array
-     * @throws \common_exception_Error
-     * @throws \common_exception_NotFound
      */
-    public function filterProperties(array $triples, array $options = [])
+    public function filterProperties(array $triples, array $options = [], array $params = [])
     {
-        $properties = $this->callParentFilterProperties($triples, $options);
+        $properties = $this->callParentFilterProperties($triples, $options, $params);
 
         $this->properties = $properties;
 
@@ -54,11 +53,12 @@ class EncryptRdfDeliverySyncFormatter extends FormatterService
     /**
      * @param array $triples
      * @param array $options
+     * @param array $params
      * @return array
      */
-    protected function callParentFilterProperties(array $triples, array $options = [])
+    protected function callParentFilterProperties(array $triples, array $options = [], array $params = [])
     {
-        return parent::filterProperties($triples, $options);
+        return parent::filterProperties($triples, $options, $params);
     }
 
     /**
