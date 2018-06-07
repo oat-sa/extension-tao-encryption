@@ -25,6 +25,7 @@ use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
+use oat\taoEncryption\Model\Exception\EmptyContentException;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoResultServer\models\classes\implementation\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
@@ -177,6 +178,9 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     protected function getRelatedTestTaker($resultId)
     {
         $value = $this->getPersistence()->get(static::PREFIX_TEST_TAKER . $resultId);
+        if (!$value){
+            throw new EmptyContentException();
+        }
         $value = $this->getEncryptionService()->decrypt($value);
 
         return json_decode($value, true);
@@ -200,6 +204,9 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     protected function getRelatedDelivery($resultId)
     {
         $value = $this->getPersistence()->get(static::PREFIX_DELIVERY_EXECUTION . $resultId);
+        if (!$value){
+            throw new EmptyContentException();
+        }
         $value = $this->getEncryptionService()->decrypt($value);
 
         return json_decode($value, true);
@@ -256,7 +263,9 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     protected function getResultRow($ref)
     {
         $value = (string)$this->getPersistence()->get($ref);
-
+        if (!$value){
+            throw new EmptyContentException();
+        }
         $value = json_decode($this->getEncryptionService()->decrypt($value), true);
 
         if (isset($value['item'])) {
