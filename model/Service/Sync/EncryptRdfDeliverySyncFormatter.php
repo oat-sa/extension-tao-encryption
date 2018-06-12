@@ -20,6 +20,8 @@
 
 namespace oat\taoEncryption\Service\Sync;
 
+use oat\generis\model\OntologyRdf;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoEncryption\Rdf\EncryptedDeliveryRdf;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoSync\model\formatter\FormatterService;
@@ -41,6 +43,9 @@ class EncryptRdfDeliverySyncFormatter extends FormatterService
     public function filterProperties(array $triples, array $options = [])
     {
         $properties = $this->callParentFilterProperties($triples, $options);
+        if (isset($properties[OntologyRdf::RDF_TYPE])){
+            $properties[OntologyRdf::RDF_TYPE] = DeliveryAssemblyService::CLASS_URI;
+        }
 
         $this->properties = $properties;
 
