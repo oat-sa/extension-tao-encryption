@@ -41,7 +41,7 @@ class EncryptRdfDeliverySyncFormatter extends FormatterService
      */
     public function filterProperties(array $triples, array $options = [], array $params = [])
     {
-        $properties = $this->callParentFilterProperties($triples, $options);
+        $properties = $this->callParentFilterProperties($triples, $options, $params);
         if (isset($properties[OntologyRdf::RDF_TYPE])){
             $properties[OntologyRdf::RDF_TYPE] = DeliveryAssemblyService::CLASS_URI;
         }
