@@ -118,18 +118,20 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 $this->deleteItemsTestsRefs($resultId);
                 $resultsDecrypted[] = $resultId;
                 $report->add(Report::createSuccess('Result decrypted with success:'. $resultId));
-            }catch (\Exception $exception){
+            } catch (EmptyContentException $exception) {
+                $resultsDecrypted[] = $resultId;
+                $report->add(Report::createInfo('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
+            } catch (\Exception $exception) {
                 $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
             }
         }
 
         if ($results === $resultsDecrypted){
             $report->add(Report::createSuccess('All results decrypted for delivery:'. $deliveryIdentifier));
-            $this->deleteResultsReference($deliveryIdentifier);
-        } else {
-            $remainingResults = array_diff($results, $resultsDecrypted);
-            $this->setResultsReferences($deliveryIdentifier, $remainingResults);
         }
+        $newResults = $this->getDeliveryResultsModel()->getResultsReferences($deliveryIdentifier);
+        $remainingResults = array_diff($newResults, $resultsDecrypted);
+        $this->setResultsReferences($deliveryIdentifier, $remainingResults);
 
         return $report;
     }
