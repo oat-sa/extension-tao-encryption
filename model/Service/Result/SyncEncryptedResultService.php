@@ -23,7 +23,6 @@ namespace oat\taoEncryption\Service\Result;
 use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\generis\model\OntologyAwareTrait;
-use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
@@ -101,6 +100,7 @@ class SyncEncryptedResultService extends ResultService
                     }
                 }
 
+                $this->mapOfflineResultIdToOnlineResultId($resultId, $deliveryExecutionId);
             } catch (\Exception $e) {
                 $success = false;
             }
