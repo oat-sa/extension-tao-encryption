@@ -102,6 +102,7 @@ class SyncEncryptedResultService extends ResultService
                     }
                 }
 
+                $this->mapOfflineResultIdToOnlineResultId($resultId, $deliveryExecutionId);
             } catch (\Exception $e) {
                 $success = false;
             }
