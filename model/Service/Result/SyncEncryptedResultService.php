@@ -111,10 +111,6 @@ class SyncEncryptedResultService extends ResultService
                 $success = false;
             }
 
-            if ($success == true) {
-                $this->triggerResultEvent($deliveryExecution);
-            }
-
             if (isset($deliveryId)) {
                 $importAcknowledgment[$resultId] = [
                     'success' => (int) $success,
@@ -274,15 +270,5 @@ class SyncEncryptedResultService extends ResultService
         $this->propagate($decryptResultTask);
 
         $queue->createTask($decryptResultTask, ['deliveryId' => $deliveryId], 'Decrypt Results');
-    }
-
-    /**
-     * @param $deliveryExecution
-     */
-    protected function triggerResultEvent($deliveryExecution)
-    {
-        /** @var EventManager $eventManager */
-        $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
-        $eventManager->trigger(new ResultCreated($deliveryExecution));
     }
 }
