@@ -283,7 +283,6 @@ class SyncEncryptedResultService extends ResultService
     {
         /** @var EventManager $eventManager */
         $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
-        \common_Logger::i('triggerResultEvent');
         $eventManager->trigger(new ResultCreated($deliveryExecution));
     }
 }
