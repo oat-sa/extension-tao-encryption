@@ -75,6 +75,8 @@ class SyncEncryptedResultService extends ResultService
                 $testtaker = $this->getResource($details['test-taker']);
 
                 $deliveryExecution = $this->spawnDeliveryExecution($delivery, $testtaker);
+                $deliveryExecution = $this->updateDeliveryExecution($details, $deliveryExecution);
+
                 $deliveryExecutionId = $deliveryExecution->getIdentifier();
                 $resultsOfDeliveryMapper[$deliveryId][] = $deliveryExecutionId;
 
