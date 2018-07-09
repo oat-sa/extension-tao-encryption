@@ -38,7 +38,7 @@ return array(
     'requires' => array(
         'tao' => '>=17.7.0',
         'generis' => '>=7.4.0',
-        'taoResultServer' => '>=6.2.0',
+        'taoResultServer' => '>=6.4.0',
         'taoSync' => '>=1.2.1',
         'taoProctoring' => '>=8.10.2',
     ),
