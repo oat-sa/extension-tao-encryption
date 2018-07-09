@@ -23,11 +23,13 @@ namespace oat\taoEncryption\Service\Result;
 use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\generis\model\OntologyAwareTrait;
+use oat\oatbox\event\EventManager;
 use oat\tao\model\taskQueue\QueueDispatcher;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Task\DecryptResultTask;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
+use oat\taoResultServer\models\Events\ResultCreated;
 use oat\taoSync\model\ResultService;
 use Psr\Log\LogLevel;
 
@@ -107,6 +109,10 @@ class SyncEncryptedResultService extends ResultService
                 $this->mapOfflineResultIdToOnlineResultId($resultId, $deliveryExecutionId);
             } catch (\Exception $e) {
                 $success = false;
+            }
+
+            if ($success == true) {
+                $this->triggerResultEvent($deliveryExecution);
             }
 
             if (isset($deliveryId)) {
@@ -268,5 +274,15 @@ class SyncEncryptedResultService extends ResultService
         $this->propagate($decryptResultTask);
 
         $queue->createTask($decryptResultTask, ['deliveryId' => $deliveryId], 'Decrypt Results');
+    }
+
+    /**
+     * @param $deliveryExecution
+     */
+    protected function triggerResultEvent($deliveryExecution)
+    {
+        /** @var EventManager $eventManager */
+        $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
+        $eventManager->trigger(new ResultCreated($deliveryExecution));
     }
 }
