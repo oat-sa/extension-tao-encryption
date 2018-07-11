@@ -122,7 +122,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 $resultsDecrypted[] = $resultId;
 
                 $deliveryExecution = $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID)->getDeliveryExecution($resultId);
-                $resultService->triggerResultEvent($deliveryExecution);
+                $resultService->touchTestSession($deliveryExecution);
 
                 $report->add(Report::createSuccess('Result decrypted with success:'. $resultId));
             } catch (EmptyContentException $exception) {
