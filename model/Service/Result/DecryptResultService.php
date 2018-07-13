@@ -24,7 +24,6 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Model\Exception\EmptyContentException;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
@@ -62,8 +61,6 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     public function decrypt($deliveryIdentifier)
     {
-        /** @var SyncEncryptedResultService $resultService */
-        $resultService    = $this->getServiceLocator()->get(SyncEncryptedResultService::SERVICE_ID);
         $report           = Report::createInfo('Decrypt Results for delivery id: '. $deliveryIdentifier);
         $resultStorage    = $this->getResultStorage($deliveryIdentifier);
         $results          = $this->getResults($deliveryIdentifier);
@@ -120,9 +117,6 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 $this->deleteRelatedTestTaker($resultId);
                 $this->deleteItemsTestsRefs($resultId);
                 $resultsDecrypted[] = $resultId;
-
-                $deliveryExecution = $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID)->getDeliveryExecution($resultId);
-                $resultService->touchTestSession($deliveryExecution);
 
                 $report->add(Report::createSuccess('Result decrypted with success:'. $resultId));
             } catch (EmptyContentException $exception) {
