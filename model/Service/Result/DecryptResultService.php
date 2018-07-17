@@ -24,13 +24,16 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Model\Exception\EmptyContentException;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
+use oat\taoEncryption\Service\Mapper\TestSessionSyncMapper;
 use oat\taoResultServer\models\classes\implementation\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
 use \common_report_Report as Report;
+use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 
 class DecryptResultService extends ConfigurableService implements DecryptResult
 {
@@ -118,6 +121,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 $this->deleteItemsTestsRefs($resultId);
                 $resultsDecrypted[] = $resultId;
 
+                $this->postDecryptOfResult($deliveryResultIdentifier);
                 $report->add(Report::createSuccess('Result decrypted with success:'. $resultId));
             } catch (EmptyContentException $exception) {
                 $resultsDecrypted[] = $resultId;
@@ -336,5 +340,38 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         }
 
         return $this->deliveryResultVarsRefs;
+    }
+
+    /**
+     * @param string $deliveryResultIdentifier
+     * @throws \Exception
+     */
+    protected function postDecryptOfResult($deliveryResultIdentifier)
+    {
+        $sessionSynced = (bool)$this->getTestSessionSyncMapper()->get($deliveryResultIdentifier);
+
+        if ($sessionSynced) {
+            $deliveryExecution = $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID)
+                ->getDeliveryExecution($deliveryResultIdentifier);
+
+            $this->getSyncTestSessionService()->touchTestSession($deliveryExecution);
+            $this->getSyncTestSessionService()->delete($deliveryResultIdentifier);
+        }
+    }
+
+    /**
+     * @return array|TestSessionSyncMapper|object
+     */
+    private function getTestSessionSyncMapper()
+    {
+        return $this->getServiceLocator()->get(TestSessionSyncMapper::SERVICE_ID);
+    }
+
+    /**
+     * @return array|SyncTestSessionServiceInterface|object
+     */
+    private function getSyncTestSessionService()
+    {
+        return $this->getServiceLocator()->get(SyncTestSessionServiceInterface::SERVICE_ID);
     }
 }

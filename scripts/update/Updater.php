@@ -25,10 +25,13 @@ use core_kernel_users_GenerisUser;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
+use oat\taoEncryption\Service\TestSession\EncryptSyncTestSessionService;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\User\EncryptedUserFactoryService;
+use oat\taoEncryption\scripts\install\RegisterTestSessionSyncMapper;
+use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 
 class Updater extends common_ext_ExtensionUpdater
 {
@@ -77,5 +80,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('0.6.1', '0.11.2');
+
+        if ($this->isVersion('0.11.2')) {
+            $script = new RegisterTestSessionSyncMapper();
+            $this->getServiceManager()->propagate($script);
+            $script->__invoke([]);
+
+            $this->getServiceManager()->register(SyncTestSessionServiceInterface::SERVICE_ID, new EncryptSyncTestSessionService());
+
+            $this->setVersion('0.12.0');
+        }
     }
 }
