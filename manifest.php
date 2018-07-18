@@ -27,19 +27,20 @@ use oat\taoEncryption\scripts\install\RegisterFileKeyProviderService;
 use oat\taoEncryption\scripts\install\RegisterKeyPairProviderService;
 use oat\taoEncryption\controller\EncryptionApi;
 use oat\taoEncryption\scripts\install\RegisterSimpleKeyProviderService;
+use oat\taoEncryption\scripts\install\RegisterTestSessionSyncMapper;
 
 return array(
     'name' => 'taoEncryption',
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.11.1',
+    'version' => '0.12.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
         'generis' => '>=7.4.0',
         'taoResultServer' => '>=6.2.0',
-        'taoSync' => '>=1.2.1',
+        'taoSync' => '>=1.3.0',
         'taoProctoring' => '>=8.10.2',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
@@ -58,6 +59,7 @@ return array(
             RegisterDecryptResultStorage::class,
             RegisterSimpleKeyProviderService::class,
             RegisterFileKeyProviderService::class,
+            RegisterTestSessionSyncMapper::class,
         ]
     ),
     'uninstall' => array(
