@@ -64,6 +64,8 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     public function decrypt($deliveryIdentifier)
     {
+        //touch session generate a undefined index notice.
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $report           = Report::createInfo('Decrypt Results for delivery id: '. $deliveryIdentifier);
         $resultStorage    = $this->getResultStorage($deliveryIdentifier);
         $results          = $this->getResults($deliveryIdentifier);
