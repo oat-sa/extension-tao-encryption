@@ -26,6 +26,7 @@ use oat\taoEncryption\Service\DeliveryLog\EncryptedDeliveryLogService;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoSync\model\DeliveryLog\SyncDeliveryLogService;
 
 /**
  * sudo -u www-data php index.php 'oat\taoEncryption\scripts\tools\SetupEncryptedDeliveryLogService'
@@ -54,6 +55,11 @@ class SetupEncryptedDeliveryLogService extends InstallAction
 
         $this->registerService(EncryptedDeliveryLogService::SERVICE_ID, $encryptedDeliveryLog);
 
-        return Report::createSuccess('EncryptedDeliveryLogService configured');
+        /** @var SyncDeliveryLogService $syncDeliveryLog */
+        $syncDeliveryLog = $this->getServiceManager()->get(SyncDeliveryLogService::SERVICE_ID);
+        $syncDeliveryLog->setOption(SyncDeliveryLogService::OPTION_SHOULD_DECODE_BEFORE_SYNC, false);
+        $this->getServiceManager()->register(SyncDeliveryLogService::SERVICE_ID, $syncDeliveryLog);
+
+        return Report::createSuccess('EncryptedDeliveryLogService configured and SyncDeliveryLogService should decode set to false');
     }
 }

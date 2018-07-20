@@ -40,7 +40,7 @@ return array(
         'tao' => '>=17.7.0',
         'generis' => '>=7.4.0',
         'taoResultServer' => '>=6.2.0',
-        'taoSync' => '>=1.3.0',
+        'taoSync' => '>=1.4.0',
         'taoProctoring' => '>=8.10.2',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
