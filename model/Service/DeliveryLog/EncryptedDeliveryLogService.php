@@ -44,9 +44,14 @@ class EncryptedDeliveryLogService extends RdsDeliveryLogService
      */
     protected function decodeData($data)
     {
-        $data = $this->getEncryptionService($this->getApplicationKey())->decrypt($data);
+        $applicationKey = $this->getApplicationKey();
+        if (is_null($applicationKey)) {
+            return $data;
+        }
 
-        return parent::decodeData(base64_decode($data));
+        $data = $this->getEncryptionService($this->getApplicationKey())->decrypt(base64_decode($data));
+
+        return parent::decodeData($data);
     }
 
     /**
@@ -59,7 +64,11 @@ class EncryptedDeliveryLogService extends RdsDeliveryLogService
     {
         $data = parent::encodeData($data);
 
-        $data = $this->getEncryptionService($this->getApplicationKey())->encrypt($data);
+        $applicationKey = $this->getApplicationKey();
+        if (is_null($applicationKey)) {
+            return $data;
+        }
+        $data = $this->getEncryptionService($applicationKey)->encrypt($data);
 
         return base64_encode($data);
     }
@@ -77,6 +86,9 @@ class EncryptedDeliveryLogService extends RdsDeliveryLogService
             /** @var SimpleKeyProviderService $keyProvider */
             $keyProvider = $this->getServiceLocator()->get($this->getOptionEncryptionKeyProvider());
 
+            if ($keyProvider->getKey() === null) {
+                return null;
+            }
             return base64_decode($keyProvider->getKey()->getKey());
         }
 

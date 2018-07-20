@@ -43,11 +43,11 @@ class DecryptDeliveryLogFormatterService extends DeliveryLogFormatterService
     public function format(array $deliveryLog)
     {
         $data = $deliveryLog[DeliveryLog::DATA];
-        $data = base64_decode($this->getEncryptionService($this->getApplicationKey())->decrypt($data));
+        $data = $this->getEncryptionService($this->getApplicationKey())->decrypt(base64_decode($data));
 
         $deliveryLog[DeliveryLog::DATA] = $data;
 
-        return parent::format($deliveryLog);
+        return $deliveryLog;
     }
 
     /**
@@ -69,13 +69,12 @@ class DecryptDeliveryLogFormatterService extends DeliveryLogFormatterService
     /**
      * @return string
      * @throws \Exception
-     * @throws \common_exception_Error
      */
     protected function getApplicationKey()
     {
         /** @var FileKeyProviderService $keyProvider */
         $keyProvider = $this->getServiceLocator()->get($this->getOptionEncryptionKeyProvider());
 
-        return base64_decode($keyProvider->getKey()->getKey());
+        return $keyProvider->getKeyFromFileSystem();
     }
 }
