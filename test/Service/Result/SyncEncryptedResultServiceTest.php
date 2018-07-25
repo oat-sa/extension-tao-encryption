@@ -97,7 +97,7 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getMockBuilder(SyncEncryptedResultService::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getResource', 'spawnDeliveryExecution'])
+            ->setMethods(['getResource', 'dispatchDecryptTask', 'spawnDeliveryExecution', 'updateDeliveryExecution', 'mapOfflineResultIdToOnlineResultId'])
             ->getMockForAbstractClass();
 
         $service
@@ -107,6 +107,18 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
         $service
             ->method('spawnDeliveryExecution')
             ->willReturn($this->mockDeliveryExecution());
+
+        $service
+            ->method('updateDeliveryExecution')
+            ->willReturn($this->mockDeliveryExecution());
+
+        $service
+            ->method('mapOfflineResultIdToOnlineResultId')
+            ->willReturn(true);
+
+        $service
+            ->method('dispatchDecryptTask')
+            ->willReturn(true);
 
         $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
         $serviceLocator->method('get')

@@ -21,11 +21,14 @@ namespace oat\taoEncryption\Test\Service\Result;
 
 use common_persistence_KeyValuePersistence;
 use common_persistence_Manager;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
+use oat\taoEncryption\Service\Mapper\TestSessionSyncMapper;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 use oat\taoResultServer\models\classes\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
+use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 use taoResultServer_models_classes_Variable;
 use taoResultServer_models_classes_WritableResultStorage;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -42,13 +45,13 @@ class DecryptResultServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return DecryptResultService
      */
     protected function getService()
     {
         $service = $this->getMockBuilder(DecryptResultService::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getResultRow'])
+            ->setMethods(['getResultRow', 'getDeliveryExecution'])
             ->getMockForAbstractClass()
         ;
 
@@ -69,6 +72,10 @@ class DecryptResultServiceTest extends \PHPUnit_Framework_TestCase
                 $testVariable
             );
 
+        $service
+            ->method('getDeliveryExecution')
+            ->willReturn($this->mockDeliveryExecution());
+
         return $service;
     }
 
@@ -79,10 +86,22 @@ class DecryptResultServiceTest extends \PHPUnit_Framework_TestCase
             ->willReturnOnConsecutiveCalls(
                 $this->mockResultService(),
                 $this->mockPersistence(),
-                $this->mockEncryptionService()
+                $this->mockEncryptionService(),
+                $this->mockTestSessionSyncMapper(),
+                $this->mockSyncTestSessionService()
             );
 
         return $serviceLocator;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function mockDeliveryExecution()
+    {
+        $deliveryExec = $this->getMockBuilder(DeliveryExecution::class)->disableOriginalConstructor()->getMock();
+
+        return $deliveryExec;
     }
 
     protected function mockResultService()
@@ -110,6 +129,38 @@ class DecryptResultServiceTest extends \PHPUnit_Framework_TestCase
                     'deliveryIdentifier' => 'delivery identifier 1',
                 ])
             );
+
+        return $service;
+    }
+
+    /**
+     * @return TestSessionSyncMapper
+     */
+    protected function mockTestSessionSyncMapper()
+    {
+        $service = $this->getMockBuilder(TestSessionSyncMapper::class)->getMock();
+
+        $service
+            ->method('get')
+            ->willReturn('some id');
+
+        $service
+            ->method('delete')
+            ->willReturn(true);
+
+        return $service;
+    }
+
+    /**
+     * @return SyncTestSessionServiceInterface
+     */
+    protected function mockSyncTestSessionService()
+    {
+        $service = $this->getMockForAbstractClass(SyncTestSessionServiceInterface::class);
+
+        $service
+            ->method('touchTestSession')
+            ->willReturn(true);
 
         return $service;
     }
