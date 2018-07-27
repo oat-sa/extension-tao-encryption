@@ -24,6 +24,7 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Model\Exception\EmptyContentException;
@@ -57,7 +58,13 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     private $deliveryResultsModel;
 
     /** @var DeliveryResultVarsRefsModel */
-    public $deliveryResultVarsRefs;
+    private $deliveryResultVarsRefs;
+
+    /** @var TestSessionSyncMapper */
+    private $testSessionSyncMapper;
+
+    /** @var SyncTestSessionServiceInterface */
+    private $syncTestSessionService;
 
     /**
      * @inheritdoc
@@ -353,8 +360,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         $sessionSynced = (bool)$this->getTestSessionSyncMapper()->get($deliveryResultIdentifier);
 
         if ($sessionSynced) {
-            $deliveryExecution = $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID)
-                ->getDeliveryExecution($deliveryResultIdentifier);
+            $deliveryExecution = $this->getDeliveryExecution($deliveryResultIdentifier);
 
             $this->getSyncTestSessionService()->touchTestSession($deliveryExecution);
             $this->getTestSessionSyncMapper()->delete($deliveryResultIdentifier);
@@ -362,11 +368,24 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     }
 
     /**
+     * @param $deliveryResultIdentifier
+     * @return DeliveryExecution
+     */
+    protected function getDeliveryExecution($deliveryResultIdentifier)
+    {
+        return $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID)
+            ->getDeliveryExecution($deliveryResultIdentifier);
+    }
+    /**
      * @return array|TestSessionSyncMapper|object
      */
     private function getTestSessionSyncMapper()
     {
-        return $this->getServiceLocator()->get(TestSessionSyncMapper::SERVICE_ID);
+        if (is_null($this->testSessionSyncMapper)) {
+            $this->testSessionSyncMapper = $this->getServiceLocator()->get(TestSessionSyncMapper::SERVICE_ID);
+        }
+
+        return $this->testSessionSyncMapper;
     }
 
     /**
@@ -374,6 +393,10 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     private function getSyncTestSessionService()
     {
-        return $this->getServiceLocator()->get(SyncTestSessionServiceInterface::SERVICE_ID);
+        if (is_null($this->syncTestSessionService)) {
+            $this->syncTestSessionService = $this->getServiceLocator()->get(SyncTestSessionServiceInterface::SERVICE_ID);
+        }
+
+        return $this->syncTestSessionService;
     }
 }

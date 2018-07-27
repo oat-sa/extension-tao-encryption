@@ -72,7 +72,7 @@ class SyncEncryptedResultService extends ResultService
                 $delivery = $this->getResource($deliveryId);
                 $testtaker = $this->getResource($details['test-taker']);
 
-                $deliveryExecution = $this->spawnDeliveryExecution($delivery, $testtaker);
+                $deliveryExecution = $this->spawnDeliveryExecution($resultId, $delivery, $testtaker);
                 $deliveryExecution = $this->updateDeliveryExecution($details, $deliveryExecution);
 
                 $deliveryExecutionId = $deliveryExecution->getIdentifier();
