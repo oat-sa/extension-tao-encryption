@@ -149,13 +149,12 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                     $this->deleteResultRef($resultId);
                     $resultsDecrypted[] = $resultId;
 
+                    $this->postDecryptOfResult($deliveryResultIdentifier);
+
                     $report->add(Report::createSuccess('Result decrypted with success:' . $resultId));
                 } else {
                     $report->add(Report::createInfo('Result decrypted partially:' . $resultId));
                 }
-
-                $this->postDecryptOfResult($deliveryResultIdentifier);
-
             }catch (\Exception $exception) {
                 $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
             }
