@@ -103,8 +103,24 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                     $relatedTestTaker['testTakerIdentifier']
                 );
 
+                $allItemsRefsDecrypted = true;
                 foreach ($itemsTestsRefs as $ref) {
-                    $resultRow = $this->getResultRow($ref);
+                    try {
+                        $resultRow = $this->getResultRow($ref);
+
+                    } catch (EmptyContentException $exception) {
+                        $report->add(Report::createInfo(
+                            'Variable decryption skipped:'. $ref . ' '. $exception->getMessage())
+                        );
+                        $allItemsRefsDecrypted = false;
+                        continue;
+                    } catch (DecryptionFailedException $exception) {
+                        $report->add(Report::createInfo(
+                            'Variable decryption skipped:'. $ref . ' '. $exception->getMessage())
+                        );
+                        $allItemsRefsDecrypted = false;
+                        continue;
+                    }
 
                     if ($resultRow instanceof ItemVariableStorable) {
                         $resultStorage->storeItemVariable(
@@ -115,6 +131,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                             $resultRow->getCallItemId() . '|' .$deliveryResultIdentifier
                         );
 
+                        $this->deleteRef($ref);
                     } else if ($resultRow instanceof TestVariableStorable) {
                         $resultStorage->storeTestVariable(
                             $deliveryResultIdentifier,
@@ -122,20 +139,24 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                             $resultRow->getVariable(),
                             $deliveryResultIdentifier
                         );
+                        $this->deleteRef($ref);
                     }
                 }
 
-                $this->deleteRelatedDelivery($resultId);
-                $this->deleteRelatedTestTaker($resultId);
-                $this->deleteItemsTestsRefs($resultId);
-                $resultsDecrypted[] = $resultId;
+                if ($allItemsRefsDecrypted) {
+                    $this->deleteRelatedDelivery($resultId);
+                    $this->deleteRelatedTestTaker($resultId);
+                    $this->deleteResultRef($resultId);
+                    $resultsDecrypted[] = $resultId;
+
+                    $report->add(Report::createSuccess('Result decrypted with success:' . $resultId));
+                } else {
+                    $report->add(Report::createInfo('Result decrypted partially:' . $resultId));
+                }
 
                 $this->postDecryptOfResult($deliveryResultIdentifier);
-                $report->add(Report::createSuccess('Result decrypted with success:'. $resultId));
-            } catch (EmptyContentException $exception) {
-                $resultsDecrypted[] = $resultId;
-                $report->add(Report::createInfo('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
-            } catch (\Exception $exception) {
+
+            }catch (\Exception $exception) {
                 $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
             }
         }
@@ -253,9 +274,19 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      * @return mixed
      * @throws \Exception
      */
-    protected function deleteItemsTestsRefs($resultId)
+    protected function deleteResultRef($resultId)
     {
-        return $this->getDeliveryResultVarsRefsModel()->deleteRefs($resultId);
+        return $this->getDeliveryResultVarsRefsModel()->deleteResult($resultId);
+    }
+
+    /**
+     * @param $reference
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function deleteRef($reference)
+    {
+        return $this->getDeliveryResultVarsRefsModel()->deleteRef($reference);
     }
 
     /**
@@ -275,6 +306,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      * @return bool|DecryptResultService|ItemVariableStorable|TestVariableStorable
      * @throws DecryptionFailedException
      * @throws \Exception
+     * @throws EmptyContentException
      */
     protected function getResultRow($ref)
     {

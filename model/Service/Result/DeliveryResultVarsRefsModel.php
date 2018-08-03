@@ -61,6 +61,15 @@ class DeliveryResultVarsRefsModel
     }
 
     /**
+     * @param $reference
+     * @return bool
+     */
+    public function deleteRef($reference)
+    {
+        return $this->persistence->del($reference);
+    }
+
+    /**
      * @param $resultId
      * @return bool
      */
@@ -71,6 +80,15 @@ class DeliveryResultVarsRefsModel
             $this->persistence->del($ref);
         }
 
+        return $this->persistence->del(static::PREFIX_DELIVERY_RESULTS_ITEMS . $resultId);
+    }
+
+    /**
+     * @param $resultId
+     * @return bool
+     */
+    public function deleteResult($resultId)
+    {
         return $this->persistence->del(static::PREFIX_DELIVERY_RESULTS_ITEMS . $resultId);
     }
 }
