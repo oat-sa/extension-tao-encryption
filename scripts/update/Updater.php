@@ -96,6 +96,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('0.13.0')) {
             $setup = new SetupDecryptDeliveryLogFormatterService();
+            $this->getServiceManager()->propagate($setup);
             $setup->__invoke([]);
 
             $this->setVersion('0.13.1');
