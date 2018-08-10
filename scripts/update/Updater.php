@@ -25,6 +25,7 @@ use core_kernel_users_GenerisUser;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
+use oat\taoEncryption\scripts\tools\SetupDecryptDeliveryLogFormatterService;
 use oat\taoEncryption\Service\TestSession\EncryptSyncTestSessionService;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
@@ -92,5 +93,13 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('0.12.0', '0.13.0');
+
+        if ($this->isVersion('0.13.0')) {
+            $setup = new SetupDecryptDeliveryLogFormatterService();
+            $this->getServiceManager()->propagate($setup);
+            $setup->__invoke([]);
+
+            $this->setVersion('0.13.1');
+        }
     }
 }
