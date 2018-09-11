@@ -34,7 +34,7 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.13.1',
+    'version' => '0.14.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
@@ -50,6 +50,7 @@ return array(
     'install' => array(
         'rdf' => [
             __DIR__ . '/model/ontology/encryptionRole.rdf',
+            __DIR__ . '/model/ontology/oauth.rdf',
         ],
         'php' => [
             RegisterKeyPairProviderService::class,
