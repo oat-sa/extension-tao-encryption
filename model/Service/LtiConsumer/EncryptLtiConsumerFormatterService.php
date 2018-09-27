@@ -46,17 +46,15 @@ class EncryptLtiConsumerFormatterService extends FormatterService
     {
         $properties = $this->callParentFilterProperties($triples, $options, $params);
 
-        if (isset($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY])
-            && !empty($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY])
-        ) {
-            $properties[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]
-                = $this->encryptAppKey($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
-
-            unset($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
-            return $properties;
+        if (empty($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY])) {
+            throw new \Exception('Customer Application Key not set to Lti Consumer');
         }
 
-        throw new \Exception('Customer Application Key not set to Lti Consumer');
+        $properties[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]
+            = $this->encryptAppKey($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
+
+        unset($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
+        return $properties;
     }
 
     /**
