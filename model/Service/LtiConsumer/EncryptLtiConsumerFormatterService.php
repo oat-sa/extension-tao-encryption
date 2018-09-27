@@ -35,8 +35,6 @@ class EncryptLtiConsumerFormatterService extends FormatterService
     /** @var EncryptionSymmetricService */
     private $encryptionService;
 
-    /** @var array */
-    private $properties;
     /**
      * @param array $triples
      * @param array $options
@@ -46,16 +44,16 @@ class EncryptLtiConsumerFormatterService extends FormatterService
      */
     protected function filterProperties(array $triples, array $options = [], array $params = [])
     {
-        $this->properties = $this->callParentFilterProperties($triples, $options, $params);
+        $properties = $this->callParentFilterProperties($triples, $options, $params);
 
         if (!empty($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY])) {
-            $this->properties[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]
+            $properties[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]
                 = $this->encryptAppKey($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
 
-            unset($this->properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
+            unset($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
         }
 
-        return $this->properties;
+        return $properties;
     }
 
     /**
@@ -124,18 +122,5 @@ class EncryptLtiConsumerFormatterService extends FormatterService
         $keyProvider = $this->getServiceLocator()->get($this->getOptionEncryptionKeyProvider());
 
         return $keyProvider->getKeyFromFileSystem();
-    }
-
-    /**
-     * @param array $properties
-     * @return string
-     */
-    protected function hashProperties(array $properties)
-    {
-        if (is_null($this->properties)){
-            return parent::hashProperties($properties);
-        }
-
-        return parent::hashProperties($this->properties);
     }
 }
