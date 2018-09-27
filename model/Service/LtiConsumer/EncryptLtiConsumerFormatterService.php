@@ -72,7 +72,7 @@ class EncryptLtiConsumerFormatterService extends FormatterService
 
         $this->getEncryptionService()->setKeyProvider($keyProvider);
 
-        return $this->getEncryptionService()->encrypt($this->getApplicationKey());
+        return base64_encode($this->getEncryptionService()->encrypt($this->getApplicationKey()));
     }
 
     /**
@@ -93,7 +93,9 @@ class EncryptLtiConsumerFormatterService extends FormatterService
     protected function getEncryptionService()
     {
         if (is_null($this->encryptionService)){
-            $service = $this->getServiceLocator()->get(static::OPTION_ENCRYPTION_SERVICE);
+            $service = $this->getServiceLocator()->get(
+                $this->getOption(static::OPTION_ENCRYPTION_SERVICE)
+            );
             if (!$service instanceof EncryptionSymmetricService) {
                 throw new \Exception('Encryption Service must be instance of EncryptionSymmetricService');
             }
