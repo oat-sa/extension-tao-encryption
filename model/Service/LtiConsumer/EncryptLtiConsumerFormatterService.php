@@ -52,6 +52,7 @@ class EncryptLtiConsumerFormatterService extends FormatterService
 
             unset($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
         }
+        ksort($properties);
 
         return $properties;
     }
