@@ -42,7 +42,7 @@ class EncryptLtiConsumerFormatterService extends FormatterService
      * @return array
      * @throws \Exception
      */
-    protected function filterProperties(array $triples, array $options = [], array $params = [])
+    public function filterProperties(array $triples, array $options = [], array $params = [])
     {
         $properties = $this->callParentFilterProperties($triples, $options, $params);
 
@@ -103,7 +103,6 @@ class EncryptLtiConsumerFormatterService extends FormatterService
 
         return $this->encryptionService;
     }
-
 
     /**
      * @return string
