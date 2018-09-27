@@ -46,17 +46,16 @@ class EncryptLtiConsumerFormatterService extends FormatterService
      */
     protected function filterProperties(array $triples, array $options = [], array $params = [])
     {
-        $properties = $this->callParentFilterProperties($triples, $options, $params);
-        $this->properties = $properties;
+        $this->properties = $this->callParentFilterProperties($triples, $options, $params);
 
         if (!empty($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY])) {
-            $properties[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]
+            $this->properties[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]
                 = $this->encryptAppKey($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
 
-            unset($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
+            unset($this->properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
         }
 
-        return $properties;
+        return $this->properties;
     }
 
     /**
