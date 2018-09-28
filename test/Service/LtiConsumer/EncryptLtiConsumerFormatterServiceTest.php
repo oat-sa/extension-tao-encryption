@@ -17,6 +17,7 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoEncryption\Test\Service\LtiConsumer;
 
 use oat\taoEncryption\Service\EncryptionSymmetricService;
@@ -29,8 +30,6 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class EncryptLtiConsumerFormatterServiceTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @throws \common_exception_Error
-     * @throws \common_exception_NotFound
      * @throws \Exception
      */
     public function testFilterPropertiesEncryptsAppKey()

@@ -48,7 +48,7 @@ class EncryptLtiConsumerFormatterService extends FormatterService
 
         if (!empty($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY])) {
             $properties[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]
-                = $this->encryptAppKey($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
+                = $this->encryptCustomerAppKey($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
 
             unset($properties[EncryptedLtiConsumer::PROPERTY_CUSTOMER_APP_KEY]);
         }
@@ -62,7 +62,7 @@ class EncryptLtiConsumerFormatterService extends FormatterService
      * @return string
      * @throws \Exception
      */
-    protected function encryptAppKey($customerAppKey)
+    protected function encryptCustomerAppKey($customerAppKey)
     {
         /** @var SimpleKeyProviderService $keyProvider */
         $keyProvider = $this->getServiceLocator()->get(SimpleKeyProviderService::SERVICE_ID);
@@ -90,7 +90,7 @@ class EncryptLtiConsumerFormatterService extends FormatterService
      */
     protected function getEncryptionService()
     {
-        if (is_null($this->encryptionService)){
+        if (is_null($this->encryptionService)) {
             $service = $this->getServiceLocator()->get(
                 $this->getOption(static::OPTION_ENCRYPTION_SERVICE)
             );
