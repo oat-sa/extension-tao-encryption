@@ -37,23 +37,26 @@ class EncryptLtiUser extends EncryptedUser implements LtiUserInterface, ServiceL
     public function getApplicationKey()
     {
         if (is_null($this->applicationKey)) {
-            $ltiConsumer = $this->realUser->getLaunchData()->getLtiConsumer();
+            $ltiConsumer = $this->getLaunchData()->getLtiConsumer();
             $value = $ltiConsumer->getUniquePropertyValue(
                 new \core_kernel_classes_Property(EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY)
             );
             $appKey = $value->literal;
-
-            $variables = $this->realUser->getLaunchData()->getVariables();
+            $variables = $this->getLaunchData()->getVariables();
             if (!isset($variables[static::PARAM_CUSTOM_CUSTOMER_APP_KEY])) {
                 throw new \common_Exception('Customer App Key needs to be set.');
             }
 
-            $customerAppKey = $variables[static::PARAM_CUSTOM_CUSTOMER_APP_KEY];
-
-            $this->applicationKey = $this->decryptAppKey($customerAppKey, $appKey);
+            $this->applicationKey = $this->decryptAppKey($variables[static::PARAM_CUSTOM_CUSTOMER_APP_KEY], $appKey);
         }
 
-        return parent::getApplicationKey();
+        return $this->callParentGetApplicationKey();
+    }
+
+
+    public function __wakeup()
+    {
+        $this->setServiceLocator(ServiceManager::getServiceManager());
     }
 
     /**
@@ -75,8 +78,11 @@ class EncryptLtiUser extends EncryptedUser implements LtiUserInterface, ServiceL
         return $encryptService->decrypt(base64_decode($appKey));
     }
 
-    public function __wakeup()
+    /**
+     * @return string
+     */
+    protected function callParentGetApplicationKey()
     {
-        $this->setServiceLocator(ServiceManager::getServiceManager());
+        return parent::getApplicationKey();
     }
 }

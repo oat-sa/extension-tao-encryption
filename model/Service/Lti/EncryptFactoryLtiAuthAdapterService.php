@@ -31,10 +31,19 @@ class EncryptFactoryLtiAuthAdapterService extends FactoryLtiAuthAdapterService
      */
     public function create(common_http_Request $request)
     {
-        $adapter = parent::create($request);
+        $adapter = $this->callParentCreate($request);
         $class = new EncryptLtiAuthAdapter($adapter);
         $this->propagate($class);
 
         return $class;
+    }
+
+    /**
+     * @param common_http_Request $request
+     * @return common_user_auth_Adapter
+     */
+    protected function callParentCreate(common_http_Request $request)
+    {
+        return parent::create($request);
     }
 }
