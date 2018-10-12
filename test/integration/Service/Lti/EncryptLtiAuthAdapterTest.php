@@ -17,16 +17,16 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoEncryption\Test\Service\Lti;
+namespace oat\taoEncryption\Test\integration\Service\Lti;
 
-use oat\generis\test\TestCase;
+use oat\generis\test\GenerisPhpUnitTestRunner;
 use oat\taoEncryption\Service\Lti\EncryptLtiAuthAdapter;
 use oat\taoEncryption\Service\Session\EncryptedLtiUser;
 use oat\taoLti\models\classes\LtiAuthAdapter;
 use oat\taoLti\models\classes\user\LtiUser;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class EncryptLtiAuthAdapterTest extends TestCase
+class EncryptLtiAuthAdapterTest extends GenerisPhpUnitTestRunner
 {
 
     public function testAuthenticate()
