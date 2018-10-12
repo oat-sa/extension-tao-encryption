@@ -17,6 +17,7 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoEncryption\Test\Service\Lti;
 
 use common_ext_Extension;
@@ -47,19 +48,11 @@ class EncryptFactoryLtiAuthAdapterServiceTest extends TestCase
             ->setMethods(['propagate'])
             ->getMockForAbstractClass();
 
-        $service->setServiceLocator($this->mockServiceLocator());
+        $service->setServiceLocator($this->getServiceLocatorMock([
+            common_ext_ExtensionsManager::SERVICE_ID => $this->mockExtensionManager()
+        ]));
+
         return $service;
-    }
-
-    protected function mockServiceLocator()
-    {
-        $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
-        $serviceLocator->method('get')
-            ->willReturn(
-                $this->mockExtensionManager()
-            );
-
-        return $serviceLocator;
     }
 
     protected function mockExtensionManager()

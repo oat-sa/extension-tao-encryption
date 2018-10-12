@@ -21,7 +21,7 @@ namespace oat\taoEncryption\Test\Service\Lti;
 
 use oat\generis\test\TestCase;
 use oat\taoEncryption\Service\Lti\EncryptLtiAuthAdapter;
-use oat\taoEncryption\Service\Session\EncryptLtiUser;
+use oat\taoEncryption\Service\Session\EncryptedLtiUser;
 use oat\taoLti\models\classes\LtiAuthAdapter;
 use oat\taoLti\models\classes\user\LtiUser;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -35,7 +35,7 @@ class EncryptLtiAuthAdapterTest extends TestCase
         $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
         $adapter->setServiceLocator($serviceLocator);
 
-        $this->assertInstanceOf(EncryptLtiUser::class, $adapter->authenticate());
+        $this->assertInstanceOf(EncryptedLtiUser::class, $adapter->authenticate());
     }
 
     /**

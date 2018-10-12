@@ -21,7 +21,7 @@
 namespace oat\taoEncryption\Service\Lti;
 
 use common_user_auth_Adapter;
-use oat\taoEncryption\Service\Session\EncryptLtiUser;
+use oat\taoEncryption\Service\Session\EncryptedLtiUser;
 use oat\taoLti\models\classes\LtiAuthAdapter;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
@@ -46,7 +46,7 @@ class EncryptLtiAuthAdapter implements \common_user_auth_Adapter, ServiceLocator
      */
     public function authenticate()
     {
-        $user = new EncryptLtiUser($this->ltiAuthAdapter->authenticate());
+        $user = new EncryptedLtiUser($this->ltiAuthAdapter->authenticate());
 
         $user->setServiceLocator($this->getServiceLocator());
 

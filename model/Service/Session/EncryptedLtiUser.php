@@ -10,7 +10,7 @@ use oat\taoLti\models\classes\user\LtiUserInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
-class EncryptLtiUser extends EncryptedUser implements LtiUserInterface, ServiceLocatorAwareInterface
+class EncryptedLtiUser extends EncryptedUser implements LtiUserInterface, ServiceLocatorAwareInterface
 {
     use ServiceLocatorAwareTrait;
 
@@ -42,12 +42,12 @@ class EncryptLtiUser extends EncryptedUser implements LtiUserInterface, ServiceL
                 new \core_kernel_classes_Property(EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY)
             );
             $appKey = $value->literal;
-            $variables = $this->getLaunchData()->getVariables();
-            if (!isset($variables[static::PARAM_CUSTOM_CUSTOMER_APP_KEY])) {
+            $launchData = $this->getLaunchData();
+            if ( $launchData->hasVariable(static::PARAM_CUSTOM_CUSTOMER_APP_KEY)) {
                 throw new \common_Exception('Customer App Key needs to be set.');
             }
 
-            $this->applicationKey = $this->decryptAppKey($variables[static::PARAM_CUSTOM_CUSTOMER_APP_KEY], $appKey);
+            $this->applicationKey = $this->decryptAppKey($launchData->getVariable(static::PARAM_CUSTOM_CUSTOMER_APP_KEY), $appKey);
         }
 
         return parent::getApplicationKey();

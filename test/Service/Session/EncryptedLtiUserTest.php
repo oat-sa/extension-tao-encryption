@@ -24,11 +24,11 @@ use core_kernel_classes_Resource;
 use oat\generis\test\TestCase;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
-use oat\taoEncryption\Service\Session\EncryptLtiUser;
+use oat\taoEncryption\Service\Session\EncryptedLtiUser;
 use oat\taoLti\models\classes\LtiLaunchData;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class EncryptLtiUserTest extends TestCase
+class EncryptedLtiUserTest extends TestCase
 {
 
     public function testGetApplicationKey()
@@ -39,11 +39,11 @@ class EncryptLtiUserTest extends TestCase
     }
 
     /**
-     * @return EncryptLtiUser
+     * @return EncryptedLtiUser
      */
     public function mockEncryptLtiUser()
     {
-        $user = $this->getMockBuilder(EncryptLtiUser::class)->disableOriginalConstructor()
+        $user = $this->getMockBuilder(EncryptedLtiUser::class)->disableOriginalConstructor()
             ->setMethods(['getLaunchData','getServiceLocator'])
             ->getMockForAbstractClass();
 
