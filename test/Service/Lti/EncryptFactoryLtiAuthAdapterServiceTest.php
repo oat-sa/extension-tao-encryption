@@ -32,27 +32,14 @@ class EncryptFactoryLtiAuthAdapterServiceTest extends TestCase
 {
     public function testCreate()
     {
-        $service = $this->mockService();
-
-        $request = $this->getMockBuilder(common_http_Request::class)->disableOriginalConstructor()->getMock();
-
-        $this->assertInstanceOf(EncryptLtiAuthAdapter::class, $service->create($request));
-    }
-
-    /**
-     * @return EncryptFactoryLtiAuthAdapterService
-     */
-    protected function mockService()
-    {
-        $service = $this->getMockBuilder(EncryptFactoryLtiAuthAdapterService::class)->disableOriginalConstructor()
-            ->setMethods(['propagate'])
-            ->getMockForAbstractClass();
-
+        $service = new EncryptFactoryLtiAuthAdapterService();
         $service->setServiceLocator($this->getServiceLocatorMock([
             common_ext_ExtensionsManager::SERVICE_ID => $this->mockExtensionManager()
         ]));
 
-        return $service;
+        $request = $this->getMockBuilder(common_http_Request::class)->disableOriginalConstructor()->getMock();
+
+        $this->assertInstanceOf(EncryptLtiAuthAdapter::class, $service->create($request));
     }
 
     protected function mockExtensionManager()
