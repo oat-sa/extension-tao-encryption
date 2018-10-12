@@ -19,11 +19,13 @@
  */
 namespace oat\taoEncryption\Test\Service\Lti;
 
+use common_ext_Extension;
+use common_ext_ExtensionsManager;
 use common_http_Request;
 use oat\generis\test\TestCase;
 use oat\taoEncryption\Service\Lti\EncryptFactoryLtiAuthAdapterService;
 use oat\taoEncryption\Service\Lti\EncryptLtiAuthAdapter;
-use oat\taoLti\models\classes\LtiAuthAdapter;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 class EncryptFactoryLtiAuthAdapterServiceTest extends TestCase
 {
@@ -41,16 +43,39 @@ class EncryptFactoryLtiAuthAdapterServiceTest extends TestCase
      */
     protected function mockService()
     {
-        $adapter = $this->getMockBuilder(LtiAuthAdapter::class)->disableOriginalConstructor()->getMock();
-
         $service = $this->getMockBuilder(EncryptFactoryLtiAuthAdapterService::class)->disableOriginalConstructor()
-            ->setMethods(['callParentCreate', 'propagate'])
+            ->setMethods(['propagate'])
             ->getMockForAbstractClass();
 
-        $service
-            ->method('callParentCreate')
-            ->willReturn($adapter);
-
+        $service->setServiceLocator($this->mockServiceLocator());
         return $service;
+    }
+
+    protected function mockServiceLocator()
+    {
+        $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
+        $serviceLocator->method('get')
+            ->willReturn(
+                $this->mockExtensionManager()
+            );
+
+        return $serviceLocator;
+    }
+
+    protected function mockExtensionManager()
+    {
+        $extension = $this->getMockBuilder(common_ext_Extension::class)->disableOriginalConstructor()->getMock();
+        $extension
+            ->method('getConfig')
+            ->willReturn([
+                'adapter' => 'oat\\taoLti\\models\\classes\\LtiAuthAdapter'
+            ]);
+
+        $manager = $this->getMockBuilder(common_ext_ExtensionsManager::class)->disableOriginalConstructor()->getMock();
+        $manager
+            ->method('getExtensionById')
+            ->willReturn($extension);
+
+        return $manager;
     }
 }

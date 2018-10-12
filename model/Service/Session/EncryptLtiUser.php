@@ -50,7 +50,7 @@ class EncryptLtiUser extends EncryptedUser implements LtiUserInterface, ServiceL
             $this->applicationKey = $this->decryptAppKey($variables[static::PARAM_CUSTOM_CUSTOMER_APP_KEY], $appKey);
         }
 
-        return $this->callParentGetApplicationKey();
+        return parent::getApplicationKey();
     }
 
 
@@ -76,13 +76,5 @@ class EncryptLtiUser extends EncryptedUser implements LtiUserInterface, ServiceL
         $encryptService->setKeyProvider($simpleKeyProvider);
 
         return $encryptService->decrypt(base64_decode($appKey));
-    }
-
-    /**
-     * @return string
-     */
-    protected function callParentGetApplicationKey()
-    {
-        return parent::getApplicationKey();
     }
 }
