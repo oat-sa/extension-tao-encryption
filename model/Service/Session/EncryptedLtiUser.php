@@ -43,7 +43,7 @@ class EncryptedLtiUser extends EncryptedUser implements LtiUserInterface, Servic
             );
             $appKey = $value->literal;
             $launchData = $this->getLaunchData();
-            if ( $launchData->hasVariable(static::PARAM_CUSTOM_CUSTOMER_APP_KEY)) {
+            if (!$launchData->hasVariable(static::PARAM_CUSTOM_CUSTOMER_APP_KEY)) {
                 throw new \common_Exception('Customer App Key needs to be set.');
             }
 
