@@ -34,7 +34,7 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '0.16.1',
+    'version' => '1.0.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
@@ -42,6 +42,7 @@ return array(
         'taoResultServer' => '>=6.2.0',
         'taoSync' => '>=1.4.0',
         'taoProctoring' => '>=8.10.2',
+        'taoTestCenter' => '>=3.20.0'
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
     'acl' => array(
