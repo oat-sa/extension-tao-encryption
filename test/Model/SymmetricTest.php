@@ -19,16 +19,17 @@
  */
 namespace oat\taoEncryption\Model\Model;
 
+use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Model\Key;
 use oat\taoEncryption\Model\Symmetric\Symmetric;
-use phpseclib\Crypt\RC4;
+use phpseclib\Crypt\AES;
 use PHPUnit\Framework\TestCase;
 
 class SymmetricTest extends TestCase
 {
     public function testSuccessFlow()
     {
-        $sym = new Symmetric(new RC4());
+        $sym = new Symmetric(new AES());
 
         $myKey = new Key('secret key');
 
@@ -38,4 +39,21 @@ class SymmetricTest extends TestCase
 
         $this->assertSame('secret banana',  $sym->decrypt($myKey, $encrypted));
     }
+
+    public function testUnSuccessFlow()
+    {
+        $this->setExpectedException(DecryptionFailedException::class);
+
+        $sym = new Symmetric(new AES());
+
+        $myKey = new Key('secret key');
+
+        $encrypted = $sym->encrypt($myKey, 'secret banana');
+
+        $this->assertInternalType('string', $encrypted);
+
+        $sym->decrypt(new Key('anotherkey'), $encrypted);
+    }
+
+
 }

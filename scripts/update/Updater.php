@@ -26,6 +26,7 @@ use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoEncryption\scripts\tools\SetupDecryptDeliveryLogFormatterService;
+use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\TestSession\EncryptSyncTestSessionService;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
@@ -108,5 +109,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('0.14.0', '0.16.1');
+
+        if ($this->isVersion('0.16.1')) {
+            /** @var AlgorithmSymmetricService $algorithmService */
+            $algorithmService = $this->getServiceManager()->get(AlgorithmSymmetricService::SERVICE_ID);
+            $algorithmService->setOption(AlgorithmSymmetricService::OPTION_ALGORITHM, 'AES');
+
+            $this->getServiceManager()->register(AlgorithmSymmetricService::SERVICE_ID, $algorithmService);
+
+            $this->setVersion('1.0.0');
+        }
     }
 }
