@@ -33,7 +33,7 @@ class RegisterEncryptionSymmetricService extends InstallAction
     public function __invoke($params)
     {
         $algo = new AlgorithmSymmetricService([
-            AlgorithmSymmetricService::OPTION_ALGORITHM => 'AES'
+            AlgorithmSymmetricService::OPTION_ALGORITHM => 'RC4'
         ]);
         $this->registerService(AlgorithmSymmetricService::SERVICE_ID, $algo);
 
