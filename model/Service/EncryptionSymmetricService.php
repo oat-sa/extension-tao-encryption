@@ -37,6 +37,14 @@ class EncryptionSymmetricService extends EncryptionServiceAbstract
     private $keyProvider;
 
     /**
+     * @param AlgorithmSymmetricServiceInterface $algorithmSymmetricService
+     */
+    public function setAlgorithm(AlgorithmSymmetricServiceInterface $algorithmSymmetricService)
+    {
+        $this->algorithm = $algorithmSymmetricService;
+    }
+
+    /**
      * @return AlgorithmServiceInterface
      * @throws \Exception
      */

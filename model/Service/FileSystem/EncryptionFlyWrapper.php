@@ -23,7 +23,10 @@ namespace oat\taoEncryption\Service\FileSystem;
 use League\Flysystem\AdapterInterface;
 use oat\oatbox\filesystem\utils\FlyWrapperTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoEncryption\Model\AlgorithmFactory;
 use oat\taoEncryption\Model\FileSystem\EncryptionAdapter;
+use oat\taoEncryption\Model\Symmetric\Symmetric;
+use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 
 /**
@@ -48,6 +51,7 @@ class EncryptionFlyWrapper extends ConfigurableService implements AdapterInterfa
      * Returns the actual underlying adapter in use for this wrapper.
      *
      * @return EncryptionAdapter
+     * @throws \Exception
      */
     public function getAdapter()
     {
@@ -59,6 +63,13 @@ class EncryptionFlyWrapper extends ConfigurableService implements AdapterInterfa
             $keyProvider = $this->getServiceLocator()->get($this->getOption(self::OPTION_ENCRYPTION_KEY_PROVIDER_SERVICE));
             $encryptionService->setKeyProvider($keyProvider);
         }
+
+        /** @var AlgorithmSymmetricService  $algorithmService */
+        $algorithmService = $this->getServiceLocator()->get(AlgorithmSymmetricService::SERVICE_ID);
+        $algorithmService->setAlgorithm(new Symmetric(
+           AlgorithmFactory::create('AES')
+        ));
+        $encryptionService->setAlgorithm($algorithmService);
 
         return new EncryptionAdapter(
             $this->getOption(self::OPTION_ROOT),

@@ -19,6 +19,7 @@
  */
 namespace oat\taoEncryption\Service\Algorithm;
 
+use oat\taoEncryption\Model\Symmetric\Symmetric;
 use oat\taoEncryption\Service\KeyProvider\SymmetricKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SymmetricProvider;
 
@@ -29,6 +30,11 @@ interface AlgorithmSymmetricServiceInterface extends AlgorithmServiceInterface, 
      */
     public function setKeyProvider(SymmetricKeyProviderService $keyProviderService);
 
+    /**
+     * @param Symmetric $algorithm
+     * @return mixed
+     */
+    public function setAlgorithm(Symmetric $algorithm);
     /**
      * @param string $data
      * @return string

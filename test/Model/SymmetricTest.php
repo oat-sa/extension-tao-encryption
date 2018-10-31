@@ -23,13 +23,14 @@ use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Model\Key;
 use oat\taoEncryption\Model\Symmetric\Symmetric;
 use phpseclib\Crypt\AES;
+use phpseclib\Crypt\RC4;
 use PHPUnit\Framework\TestCase;
 
 class SymmetricTest extends TestCase
 {
     public function testSuccessFlow()
     {
-        $sym = new Symmetric(new AES());
+        $sym = new Symmetric(new RC4());
 
         $myKey = new Key('secret key');
 

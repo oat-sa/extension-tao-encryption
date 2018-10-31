@@ -37,7 +37,6 @@ class Symmetric implements Encrypt
     public function __construct(Base $cripter)
     {
         $this->crypter = $cripter;
-        $this->crypter->enablePadding();
     }
 
     /**
@@ -62,10 +61,20 @@ class Symmetric implements Encrypt
         $this->crypter->setKey($key->getKey());
 
         $decrypted = $this->crypter->decrypt($data);
-        if ($decrypted === false) {
+
+        if (!$this->isSuccessDecrypted($decrypted)) {
             throw new DecryptionFailedException('Decryption Failed, incorrect key.');
         }
 
         return $decrypted;
+    }
+
+    /**
+     * @param $decrypted
+     * @return bool
+     */
+    private function isSuccessDecrypted($decrypted)
+    {
+        return $decrypted !== false;
     }
 }
