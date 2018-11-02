@@ -64,16 +64,18 @@ class EncryptionFlyWrapper extends ConfigurableService implements AdapterInterfa
             $encryptionService->setKeyProvider($keyProvider);
         }
 
+        $encryptionServiceClone = clone $encryptionService;
         /** @var AlgorithmSymmetricService  $algorithmService */
         $algorithmService = $this->getServiceLocator()->get(AlgorithmSymmetricService::SERVICE_ID);
-        $algorithmService->setAlgorithm(new Symmetric(
+        $algorithmServiceClone = clone $algorithmService;
+        $algorithmServiceClone->setAlgorithm(new Symmetric(
            AlgorithmFactory::create('AES')
         ));
-        $encryptionService->setAlgorithm($algorithmService);
+        $encryptionServiceClone->setAlgorithm($algorithmServiceClone);
 
         return new EncryptionAdapter(
             $this->getOption(self::OPTION_ROOT),
-            $encryptionService
+            $encryptionServiceClone
         );
     }
 }
