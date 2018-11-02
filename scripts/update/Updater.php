@@ -22,9 +22,11 @@ namespace oat\taoEncryption\scripts\update;
 
 use common_ext_ExtensionUpdater;
 use core_kernel_users_GenerisUser;
+use oat\oatbox\event\EventManager;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
+use oat\taoEncryption\Event\ProctorCreatedHandler;
 use oat\taoEncryption\scripts\tools\SetupDecryptDeliveryLogFormatterService;
 use oat\taoEncryption\Service\TestSession\EncryptSyncTestSessionService;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
@@ -33,6 +35,7 @@ use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\User\EncryptedUserFactoryService;
 use oat\taoEncryption\scripts\install\RegisterTestSessionSyncMapper;
 use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
+use oat\taoTestCenter\model\event\ProctorCreatedEvent;
 
 class Updater extends common_ext_ExtensionUpdater
 {
@@ -108,5 +111,13 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('0.14.0', '0.16.1');
+
+        if ($this->isVersion('0.16.1')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->attach(ProctorCreatedEvent::class, [ProctorCreatedHandler::class, 'handle']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+
+            $this->setVersion('1.0.0');
+        }
     }
 }
