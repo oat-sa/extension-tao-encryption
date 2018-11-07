@@ -22,6 +22,8 @@ namespace oat\taoEncryption\Model\FileSystem;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Config;
+use oat\generis\common\exception\FileReadFailedException;
+use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 
 /**
@@ -97,10 +99,14 @@ class EncryptionAdapter extends Local
 
     public function read($path)
     {
-        $contents = parent::read($path);
-        $contents['contents'] = $this->encryptionService->decrypt($contents['contents']);
+        try {
+            $contents = parent::read($path);
+            $contents['contents'] = $this->encryptionService->decrypt($contents['contents']);
 
-        return $contents;
+            return $contents;
+        } catch (DecryptionFailedException $e) {
+            throw new FileReadFailedException($e->getMessage());
+        }
     }
 
     public function readStream($path)
