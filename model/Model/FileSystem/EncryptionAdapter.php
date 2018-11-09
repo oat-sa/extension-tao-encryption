@@ -22,7 +22,7 @@ namespace oat\taoEncryption\Model\FileSystem;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Config;
-use oat\generis\common\exception\FileReadFailedException;
+use \common_exception_FileReadFailedException;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 
@@ -105,7 +105,7 @@ class EncryptionAdapter extends Local
 
             return $contents;
         } catch (DecryptionFailedException $e) {
-            throw new FileReadFailedException($e->getMessage());
+            throw new common_exception_FileReadFailedException($e->getMessage());
         }
     }
 
