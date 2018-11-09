@@ -43,10 +43,13 @@ class EncryptLtiAuthAdapter implements \common_user_auth_Adapter, ServiceLocator
 
     /**
      * @inheritdoc
+     * @throws \Exception
      */
     public function authenticate()
     {
-        $user = new EncryptedLtiUser($this->ltiAuthAdapter->authenticate());
+        $ltiUser = $this->ltiAuthAdapter->authenticate();
+
+        $user = new EncryptedLtiUser($ltiUser);
 
         $user->setServiceLocator($this->getServiceLocator());
 

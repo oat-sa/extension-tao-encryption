@@ -1,0 +1,234 @@
+<?php
+/**
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ *
+ */
+
+namespace oat\taoEncryption\Service\Lti\LaunchData;
+
+use common_persistence_SqlPersistence;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Schema\Schema;
+use oat\oatbox\service\ConfigurableService;
+use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
+
+class EncryptedLtiLaunchDataStorage extends ConfigurableService
+{
+    const SERVICE_ID = 'taoEncryption/EncryptedLtiLaunchDataStorage';
+
+    const OPTION_PERSISTENCE = 'persistence';
+
+    const PREFIX_KEY = 'lti_launch_data';
+
+    const TABLE_NAME = 'lti_launch_data_sync';
+    const COLUMN_USER_ID = 'user_id';
+    const COLUMN_SERIALIZED = 'serialized';
+    const COLUMN_IS_SYNC = 'is_sync';
+
+    /** @var common_persistence_SqlPersistence */
+    private $persistence;
+
+    /** @var AlgorithmSymmetricService */
+    private $symmetricEncryption;
+
+    /**
+     * @param $limit
+     * @param $offset
+     * @return array
+     * @throws \Exception
+     */
+    public function getUsersToSync($limit = 20, $offset = 0)
+    {
+        $qb = $this->getQueryBuilder()
+            ->select(static::COLUMN_USER_ID ,static::COLUMN_SERIALIZED)
+            ->from(static::TABLE_NAME)
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->andWhere(self::COLUMN_IS_SYNC .' = :is_sync')
+            ->setParameter('is_sync', 0);
+
+        return $qb->execute()->fetchAll();
+    }
+
+    /**
+     * @param $userIds
+     * @return bool
+     * @throws \Exception
+     */
+    public function setUsersAsSynced($userIds)
+    {
+        $dataToSave = [];
+        foreach ($userIds as $entityId) {
+            $dataToSave[] = [
+                'conditions' => [
+                    static::COLUMN_USER_ID => $entityId,
+                ],
+                'updateValues' => [
+                    self::COLUMN_IS_SYNC => 1,
+                ]
+            ];
+        }
+
+        if (!empty($dataToSave)) {
+            return $this->getPersistence()->updateMultiple(
+                static::TABLE_NAME,
+                $dataToSave
+            );
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $userId
+     * @return bool|string
+     * @throws \Exception
+     */
+    public function getEncrypted($userId)
+    {
+        $qb = $this->getQueryBuilder()
+            ->select(static::COLUMN_SERIALIZED)
+            ->from(static::TABLE_NAME)
+            ->andWhere(static::COLUMN_USER_ID .' = :user_id')
+            ->setParameter('user_id', $userId);
+
+        return $qb->execute()->fetchColumn();
+    }
+
+    /**
+     * @param string $userId
+     * @param EncryptedLtiLaunchData $launchData
+     * @return bool
+     * @throws \common_Exception
+     * @throws \Exception
+     */
+    public function save($userId, EncryptedLtiLaunchData $launchData)
+    {
+        $appKey = $launchData->getApplicationKey();
+        $encrypted = base64_encode($this->getEncryptionService($appKey)->encrypt(serialize($launchData)));
+        $existedLtiData = $this->getEncrypted($userId);
+
+        if ($existedLtiData !== false) {
+            $qb = $this->getQueryBuilder()
+                ->update(static::TABLE_NAME)
+                ->set(static::COLUMN_SERIALIZED, ':serialized')
+                ->set(static::COLUMN_IS_SYNC, ':is_sync')
+                ->where(self::COLUMN_USER_ID .' = :user_id')
+                ->setParameter('user_id', (string) $userId)
+                ->setParameter('serialized', $encrypted)
+                ->setParameter('is_sync', 0);
+
+            return $qb->execute();
+        }
+
+        if ($existedLtiData == false){
+            return $this->getPersistence()->insert(static::TABLE_NAME,[
+                static::COLUMN_USER_ID => $userId,
+                static::COLUMN_SERIALIZED => $encrypted,
+                static::COLUMN_IS_SYNC => 0,
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $encrypted
+     * @param $appKey
+     * @return EncryptedLtiLaunchData
+     * @throws \Exception
+     */
+    public function decryptLtiLaunchData($encrypted, $appKey)
+    {
+        return unserialize($this->getEncryptionService($appKey)->decrypt(base64_decode($encrypted)));
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function createTable()
+    {
+        $schemaManager = $this->getPersistence()->getDriver()->getSchemaManager();
+        /** @var Schema $schema */
+        $schema = $schemaManager->createSchema();
+        $fromSchema = clone $schema;
+
+        if (!$schema->hasTable(static::TABLE_NAME)){
+            $tableLog = $schema->createTable(static::TABLE_NAME);
+            $tableLog->addOption('engine', 'InnoDB');
+            $tableLog->addColumn(static::COLUMN_USER_ID, 'string', ['notnull' => true, 'length' => 255]);
+            $tableLog->addColumn(static::COLUMN_SERIALIZED, 'text', ['notnull' => true]);
+            $tableLog->addColumn(static::COLUMN_IS_SYNC, 'string', ['notnull' => false, 'length' => 255]);
+            $tableLog->setPrimaryKey([static::COLUMN_USER_ID]);
+
+            $queries = $this->getPersistence()->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+            foreach ($queries as $query) {
+                $this->getPersistence()->exec($query);
+            }
+        }
+    }
+
+    /**
+     * @throws \Exception
+     * @return common_persistence_SqlPersistence
+     */
+    protected function getPersistence()
+    {
+        if (is_null($this->persistence)){
+            $persistenceId = $this->getOption(self::OPTION_PERSISTENCE);
+            $persistence = $this->getServiceLocator()->get(\common_persistence_Manager::SERVICE_ID)->getPersistenceById($persistenceId);
+
+            if (!$persistence instanceof common_persistence_SqlPersistence) {
+                throw new \Exception('Only common_persistence_SqlPersistence supported');
+            }
+
+            $this->persistence = $persistence;
+        }
+
+        return $this->persistence;
+    }
+
+    /**
+     * @param $applicationKey
+     * @return array|AlgorithmSymmetricService|object
+     */
+    protected function getEncryptionService($applicationKey)
+    {
+        if (is_null($this->symmetricEncryption)) {
+            $this->symmetricEncryption = $this->getServiceLocator()->get(AlgorithmSymmetricService::SERVICE_ID);
+        }
+
+        /** @var SimpleKeyProviderService $keyProvider */
+        $keyProvider = $this->getServiceLocator()->get(SimpleKeyProviderService::SERVICE_ID);
+        $keyProvider->setKey($applicationKey);
+
+        $this->symmetricEncryption->setKeyProvider($keyProvider);
+
+        return $this->symmetricEncryption;
+    }
+
+    /**
+     * @return QueryBuilder
+     * @throws \Exception
+     */
+    private function getQueryBuilder()
+    {
+        /**@var \common_persistence_sql_pdo_mysql_Driver $driver */
+        return $this->getPersistence()->getPlatform()->getQueryBuilder();
+    }
+}

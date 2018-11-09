@@ -2,9 +2,11 @@
 
 namespace oat\taoEncryption\Service\Session;
 
+use common_user_User;
 use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
+use oat\taoEncryption\Service\Lti\LaunchData\EncryptedLtiLaunchData;
 use oat\taoEncryption\Service\LtiConsumer\EncryptedLtiConsumer;
 use oat\taoLti\models\classes\user\LtiUserInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -20,11 +22,36 @@ class EncryptedLtiUser extends EncryptedUser implements LtiUserInterface, Servic
     protected $realUser;
 
     /**
+     * EncryptedUser constructor.
+     * @param common_user_User $user
+     * @param null $hashForEncryption
+     * @throws \Exception
+     */
+    public function __construct(common_user_User $user, $hashForEncryption = null)
+    {
+        $user = $this->switchEncryptionOff($user);
+
+        parent::__construct($user, $hashForEncryption);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getLaunchData()
     {
         return $this->realUser->getLaunchData();
+    }
+
+    /**
+     * @param $property
+     * @return array
+     * @throws \Exception
+     */
+    public function getPropertyValues($property)
+    {
+        $values = $this->realUser->getPropertyValues($property);
+
+        return $values;
     }
 
     /**
@@ -53,6 +80,14 @@ class EncryptedLtiUser extends EncryptedUser implements LtiUserInterface, Servic
         return parent::getApplicationKey();
     }
 
+    /**
+     * @param string $userId
+     * @return mixed|void
+     */
+    public function setIdentifier($userId)
+    {
+        $this->realUser->setIdentifier($userId);
+    }
 
     public function __wakeup()
     {
@@ -76,5 +111,22 @@ class EncryptedLtiUser extends EncryptedUser implements LtiUserInterface, Servic
         $encryptService->setKeyProvider($simpleKeyProvider);
 
         return $encryptService->decrypt(base64_decode($appKey));
+    }
+
+    /**
+     * @param common_user_User $user
+     * @return common_user_User
+     */
+    protected function switchEncryptionOff(common_user_User $user)
+    {
+        if ($user instanceof LtiUserInterface) {
+            $launchData = $user->getLaunchData();
+
+            if ($launchData instanceof EncryptedLtiLaunchData) {
+                $launchData->disableEncryption();
+            }
+        }
+
+        return $user;
     }
 }
