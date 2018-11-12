@@ -38,6 +38,8 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
     const TABLE_NAME = 'lti_launch_data_sync';
     const COLUMN_USER_ID = 'user_id';
     const COLUMN_SERIALIZED = 'serialized';
+    const COLUMN_CONSUMER = 'consumer';
+    const COLUMN_CLIENT_USER_ID = 'client_user_id';
     const COLUMN_IS_SYNC = 'is_sync';
 
     /** @var common_persistence_SqlPersistence */
@@ -55,7 +57,7 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
     public function getUsersToSync($limit = 20, $offset = 0)
     {
         $qb = $this->getQueryBuilder()
-            ->select(static::COLUMN_USER_ID ,static::COLUMN_SERIALIZED)
+            ->select(static::COLUMN_USER_ID ,static::COLUMN_SERIALIZED, static::COLUMN_CONSUMER)
             ->from(static::TABLE_NAME)
             ->setMaxResults($limit)
             ->setFirstResult($offset)
@@ -113,13 +115,15 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
     /**
      * @param string $userId
      * @param EncryptedLtiLaunchData $launchData
+     * @param null $clientUserId
      * @return bool
-     * @throws \common_Exception
-     * @throws \Exception
+     * @throws \oat\taoLti\models\classes\LtiVariableMissingException
      */
-    public function save($userId, EncryptedLtiLaunchData $launchData)
+    public function save($userId, EncryptedLtiLaunchData $launchData, $clientUserId = null)
     {
         $appKey = $launchData->getApplicationKey();
+        $consumer = $launchData->getLtiConsumer()->getUri();
+
         $encrypted = base64_encode($this->getEncryptionService($appKey)->encrypt(serialize($launchData)));
         $existedLtiData = $this->getEncrypted($userId);
 
@@ -128,20 +132,34 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
                 ->update(static::TABLE_NAME)
                 ->set(static::COLUMN_SERIALIZED, ':serialized')
                 ->set(static::COLUMN_IS_SYNC, ':is_sync')
+                ->set(static::COLUMN_CONSUMER, ':consumer')
                 ->where(self::COLUMN_USER_ID .' = :user_id')
                 ->setParameter('user_id', (string) $userId)
                 ->setParameter('serialized', $encrypted)
+                ->setParameter('consumer', $encrypted)
                 ->setParameter('is_sync', 0);
 
+            if (!is_null($clientUserId)) {
+                $qb->set(static::COLUMN_CLIENT_USER_ID, ':client_user_id')
+                    ->setParameter('client_user_id', $clientUserId);
+            }
             return $qb->execute();
         }
 
         if ($existedLtiData == false){
-            return $this->getPersistence()->insert(static::TABLE_NAME,[
+
+            $data = [
                 static::COLUMN_USER_ID => $userId,
                 static::COLUMN_SERIALIZED => $encrypted,
+                static::COLUMN_CONSUMER => $consumer,
                 static::COLUMN_IS_SYNC => 0,
-            ]);
+            ];
+
+
+            if (!is_null($clientUserId)) {
+                $data[static::COLUMN_CLIENT_USER_ID] = $clientUserId;
+            }
+            return $this->getPersistence()->insert(static::TABLE_NAME, $data);
         }
 
         return true;
@@ -173,6 +191,8 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
             $tableLog->addOption('engine', 'InnoDB');
             $tableLog->addColumn(static::COLUMN_USER_ID, 'string', ['notnull' => true, 'length' => 255]);
             $tableLog->addColumn(static::COLUMN_SERIALIZED, 'text', ['notnull' => true]);
+            $tableLog->addColumn(static::COLUMN_CONSUMER, 'string', ['notnull' => true]);
+            $tableLog->addColumn(static::COLUMN_CLIENT_USER_ID, 'string', ['notnull' => false]);
             $tableLog->addColumn(static::COLUMN_IS_SYNC, 'string', ['notnull' => false, 'length' => 255]);
             $tableLog->setPrimaryKey([static::COLUMN_USER_ID]);
 

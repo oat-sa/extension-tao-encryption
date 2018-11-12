@@ -21,9 +21,8 @@
 namespace oat\taoEncryption\scripts\tools;
 
 use oat\oatbox\extension\InstallAction;
-use oat\taoEncryption\Service\Lti\EncryptFactoryLtiAuthAdapterService;
 use oat\taoEncryption\Service\Lti\EncryptLtiUserFactoryService;
-use oat\taoLti\models\classes\FactoryLtiAuthAdapterServiceInterface;
+use oat\taoEncryption\Service\Lti\LaunchData\EncryptedLtiLaunchDataStorage;
 use common_report_Report as Report;
 use oat\taoLti\models\classes\user\LtiUserService;
 
@@ -39,7 +38,9 @@ class SetupEncryptLtiUserFactoryService extends InstallAction
      */
     public function __invoke($params)
     {
-        $service = new EncryptLtiUserFactoryService();
+        $service = new EncryptLtiUserFactoryService([
+            EncryptLtiUserFactoryService::OPTION_LAUNCH_DATA_STORAGE => EncryptedLtiLaunchDataStorage::SERVICE_ID
+        ]);
 
         $this->getServiceManager()->register(EncryptLtiUserFactoryService::SERVICE_ID, $service);
 
