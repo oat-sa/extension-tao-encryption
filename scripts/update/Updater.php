@@ -28,6 +28,7 @@ use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoEncryption\Event\ProctorCreatedHandler;
 use oat\taoEncryption\scripts\tools\SetupDecryptDeliveryLogFormatterService;
+use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\TestSession\EncryptSyncTestSessionService;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
@@ -119,5 +120,7 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('1.0.0');
         }
+      
+        $this->skip('1.0.0', '1.1.0');
     }
 }

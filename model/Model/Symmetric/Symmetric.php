@@ -20,6 +20,7 @@
 namespace oat\taoEncryption\Model\Symmetric;
 
 use oat\taoEncryption\Model\Encrypt;
+use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Model\Key;
 use phpseclib\Crypt\Base;
 use phpseclib\Crypt\RC4;
@@ -53,11 +54,27 @@ class Symmetric implements Encrypt
     /**
      * @param $data
      * @return string
+     * @throws DecryptionFailedException
      */
     public function decrypt(Key $key, $data)
     {
         $this->crypter->setKey($key->getKey());
 
-        return $this->crypter->decrypt($data);
+        $decrypted = $this->crypter->decrypt($data);
+
+        if (!$this->isSuccessDecrypted($decrypted)) {
+            throw new DecryptionFailedException('Decryption Failed, incorrect key.');
+        }
+
+        return $decrypted;
+    }
+
+    /**
+     * @param $decrypted
+     * @return bool
+     */
+    private function isSuccessDecrypted($decrypted)
+    {
+        return $decrypted !== false;
     }
 }
