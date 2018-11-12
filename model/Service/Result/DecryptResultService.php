@@ -24,6 +24,7 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoActOffline\model\synchronizer\ltiuser\MapperLtiClientUserIdToCentralUserIdService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
@@ -74,13 +75,19 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      */
     public function decryptByExecution($resultId)
     {
+        //touch session generate a undefined index notice.
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $report  = Report::createInfo('Decrypt Results for delivery execution id: '. $resultId);
         /** @var RdsResultStorage $resultStorage */
         $resultStorage = $this->getServiceLocator()->get(RdsResultStorage::SERVICE_ID);
         $resultsDecrypted = [];
 
+        /** @var MapperLtiClientUserIdToCentralUserIdService $mapper */
+        $mapper = $this->getServiceLocator()->get(MapperLtiClientUserIdToCentralUserIdService::SERVICE_ID);
+
         try{
             $relatedTestTaker = $this->getRelatedTestTaker($resultId);
+
             $relatedDelivery  = $this->getRelatedDelivery($resultId);
             $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
 
@@ -89,6 +96,11 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 || !isset($relatedTestTaker['testTakerIdentifier']))
             {
                 return $report;
+            }
+
+            $ltiCentralUserId = $mapper->getCentralUserId($relatedTestTaker['testTakerIdentifier']);
+            if (!is_null($ltiCentralUserId)) {
+                $relatedTestTaker['testTakerIdentifier'] = $ltiCentralUserId;
             }
 
             $deliveryResultIdentifier = $relatedDelivery['deliveryResultIdentifier'];

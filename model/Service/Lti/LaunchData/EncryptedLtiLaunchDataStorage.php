@@ -39,7 +39,6 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
     const COLUMN_USER_ID = 'user_id';
     const COLUMN_SERIALIZED = 'serialized';
     const COLUMN_CONSUMER = 'consumer';
-    const COLUMN_CLIENT_USER_ID = 'client_user_id';
     const COLUMN_IS_SYNC = 'is_sync';
 
     /** @var common_persistence_SqlPersistence */
@@ -115,12 +114,12 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
     /**
      * @param string $userId
      * @param EncryptedLtiLaunchData $launchData
-     * @param null $clientUserId
      * @return bool
      * @throws \oat\taoLti\models\classes\LtiVariableMissingException
      */
-    public function save($userId, EncryptedLtiLaunchData $launchData, $clientUserId = null)
+    public function save($userId, EncryptedLtiLaunchData $launchData)
     {
+        $userId = $launchData->getUserID();
         $appKey = $launchData->getApplicationKey();
         $consumer = $launchData->getLtiConsumer()->getUri();
 
@@ -139,10 +138,6 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
                 ->setParameter('consumer', $encrypted)
                 ->setParameter('is_sync', 0);
 
-            if (!is_null($clientUserId)) {
-                $qb->set(static::COLUMN_CLIENT_USER_ID, ':client_user_id')
-                    ->setParameter('client_user_id', $clientUserId);
-            }
             return $qb->execute();
         }
 
@@ -155,10 +150,6 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
                 static::COLUMN_IS_SYNC => 0,
             ];
 
-
-            if (!is_null($clientUserId)) {
-                $data[static::COLUMN_CLIENT_USER_ID] = $clientUserId;
-            }
             return $this->getPersistence()->insert(static::TABLE_NAME, $data);
         }
 
@@ -192,7 +183,6 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
             $tableLog->addColumn(static::COLUMN_USER_ID, 'string', ['notnull' => true, 'length' => 255]);
             $tableLog->addColumn(static::COLUMN_SERIALIZED, 'text', ['notnull' => true]);
             $tableLog->addColumn(static::COLUMN_CONSUMER, 'string', ['notnull' => true]);
-            $tableLog->addColumn(static::COLUMN_CLIENT_USER_ID, 'string', ['notnull' => false]);
             $tableLog->addColumn(static::COLUMN_IS_SYNC, 'string', ['notnull' => false, 'length' => 255]);
             $tableLog->setPrimaryKey([static::COLUMN_USER_ID]);
 

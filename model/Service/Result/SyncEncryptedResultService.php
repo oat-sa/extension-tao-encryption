@@ -24,6 +24,7 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\generis\model\OntologyAwareTrait;
 use oat\tao\model\taskQueue\QueueDispatcher;
+use oat\taoActOffline\model\synchronizer\ltiuser\MapperLtiClientUserIdToCentralUserIdService;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Task\DecryptResultTask;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
@@ -58,6 +59,8 @@ class SyncEncryptedResultService extends ResultService
     {
         $importAcknowledgment    = [];
         $resultsOfDeliveryMapper = [];
+        /** @var MapperLtiClientUserIdToCentralUserIdService $mapper */
+        $mapper = $this->getServiceLocator()->get(MapperLtiClientUserIdToCentralUserIdService::SERVICE_ID);
 
         foreach ($results as $resultId => $result) {
             $success = true;
@@ -70,6 +73,12 @@ class SyncEncryptedResultService extends ResultService
                 $variables = $result['variables'];
 
                 $delivery = $this->getResource($deliveryId);
+
+                $ltiCentralUserId = $mapper->getCentralUserId($details['test-taker']);
+                if (!is_null($ltiCentralUserId)) {
+                    $details['test-taker'] = $ltiCentralUserId;
+                }
+
                 $testtaker = $this->getResource($details['test-taker']);
 
                 $deliveryExecution = $this->spawnDeliveryExecution($resultId, $delivery, $testtaker);
