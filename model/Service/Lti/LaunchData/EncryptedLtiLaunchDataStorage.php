@@ -112,12 +112,11 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
     }
 
     /**
-     * @param string $userId
      * @param EncryptedLtiLaunchData $launchData
      * @return bool
      * @throws \oat\taoLti\models\classes\LtiVariableMissingException
      */
-    public function save($userId, EncryptedLtiLaunchData $launchData)
+    public function save(EncryptedLtiLaunchData $launchData)
     {
         $userId = $launchData->getUserID();
         $appKey = $launchData->getApplicationKey();
