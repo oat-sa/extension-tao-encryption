@@ -35,14 +35,18 @@ class DecryptResultTask extends AbstractAction implements \JsonSerializable
     public function __invoke($params)
     {
         if (!isset($params['deliveryResultId'])){
+            throw new \Exception('The delivery result id it is not in the params');
+        }
+        if (!isset($params['deliveryIdentifier'])){
             throw new \Exception('The delivery id it is not in the params');
         }
 
         $deliveryResultId = $params['deliveryResultId'];
+        $deliveryIdentifier = $params['deliveryIdentifier'];
         /** @var DecryptResultService $decryptService */
         $decryptService = $this->getServiceLocator()->get(DecryptResultService::SERVICE_ID);
 
-        return $decryptService->decryptByExecution($deliveryResultId);
+        return $decryptService->decryptByExecution($deliveryIdentifier, $deliveryResultId);
     }
 
     /**

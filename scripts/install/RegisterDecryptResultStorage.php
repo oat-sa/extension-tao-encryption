@@ -22,7 +22,9 @@ namespace oat\taoEncryption\scripts\install;
 use common_report_Report as Report;
 use oat\oatbox\extension\InstallAction;
 use oat\taoEncryption\Service\EncryptionAsymmetricService;
+use oat\taoEncryption\Service\Mapper\DummyMapper;
 use oat\taoEncryption\Service\Result\DecryptResultService;
+use oat\taoEncryption\Service\Result\StoreVariableService;
 
 /**
  * sudo -u www-data php index.php 'oat\taoEncryption\scripts\install\RegisterDecryptResultStorage'
@@ -49,9 +51,18 @@ class RegisterDecryptResultStorage extends InstallAction
             ));
         }
 
+
+        $mapper = new DummyMapper();
+        $this->getServiceManager()->register(DummyMapper::SERVICE_ID, $mapper);
+
+        $storeVariableStore = new StoreVariableService();
+        $this->getServiceManager()->register(StoreVariableService::SERVICE_ID, $storeVariableStore);
+
         $decrypt = new DecryptResultService([
             DecryptResultService::OPTION_PERSISTENCE => $persistenceId,
             DecryptResultService::OPTION_ENCRYPTION_SERVICE => EncryptionAsymmetricService::SERVICE_ID,
+            DecryptResultService::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL => DummyMapper::SERVICE_ID,
+            DecryptResultService::OPTION_STORE_VARIABLE_SERVICE => StoreVariableService::SERVICE_ID,
         ]);
 
         $this->registerService(DecryptResultService::SERVICE_ID, $decrypt);

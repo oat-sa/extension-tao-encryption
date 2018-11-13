@@ -24,14 +24,13 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoActOffline\model\synchronizer\ltiuser\MapperLtiClientUserIdToCentralUserIdService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Model\Exception\EmptyContentException;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
+use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Service\Mapper\TestSessionSyncMapper;
-use oat\taoOutcomeRds\model\RdsResultStorage;
 use oat\taoResultServer\models\classes\implementation\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
@@ -45,6 +44,10 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     const OPTION_ENCRYPTION_SERVICE = EncryptResultService::OPTION_ENCRYPTION_SERVICE;
 
     const OPTION_PERSISTENCE =  EncryptResultService::OPTION_PERSISTENCE;
+
+    const OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL = 'userIdClientToUserIdCentral';
+
+    const OPTION_STORE_VARIABLE_SERVICE = 'storeVariableService';
 
     const PREFIX_DELIVERY_EXECUTION = EncryptResultService::PREFIX_DELIVERY_EXECUTION;
 
@@ -69,25 +72,64 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     private $syncTestSessionService;
 
     /**
+     * @param $deliveryIdentifier
      * @param $resultId
      * @return Report
      * @throws \common_exception_Error
      */
-    public function decryptByExecution($resultId)
+    public function decryptByExecution($deliveryIdentifier, $resultId)
     {
         //touch session generate a undefined index notice.
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $report  = Report::createInfo('Decrypt Results for delivery execution id: '. $resultId);
-        /** @var RdsResultStorage $resultStorage */
-        $resultStorage = $this->getServiceLocator()->get(RdsResultStorage::SERVICE_ID);
         $resultsDecrypted = [];
 
-        /** @var MapperLtiClientUserIdToCentralUserIdService $mapper */
-        $mapper = $this->getServiceLocator()->get(MapperLtiClientUserIdToCentralUserIdService::SERVICE_ID);
+        return $this->decryptByResult($deliveryIdentifier, $resultId, $resultsDecrypted);
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \Exception
+     */
+    public function decrypt($deliveryIdentifier)
+    {
+        //touch session generate a undefined index notice.
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $report           = Report::createInfo('Decrypt Results for delivery id: '. $deliveryIdentifier);
+        $results          = $this->getResults($deliveryIdentifier);
+        $resultsDecrypted = [];
+
+        foreach ($results as $resultId){
+            $report->add($this->decryptByResult($deliveryIdentifier, $resultId, $resultsDecrypted));
+        }
+
+        if ($results === $resultsDecrypted){
+            $report->add(Report::createSuccess('All results decrypted for delivery:'. $deliveryIdentifier));
+        }
+
+        $newResults = $this->getDeliveryResultsModel()->getResultsReferences($deliveryIdentifier);
+        $remainingResults = array_diff($newResults, $resultsDecrypted);
+        $this->setResultsReferences($deliveryIdentifier, $remainingResults);
+
+        return $report;
+    }
+
+    /**
+     * @param $deliveryIdentifier
+     * @param $resultId
+     * @param $resultsDecrypted
+     * @return Report
+     * @throws \common_exception_Error
+     * @throws \Exception
+     */
+    protected function decryptByResult($deliveryIdentifier, $resultId, &$resultsDecrypted)
+    {
+        $report  = Report::createInfo('Decrypt Results for delivery execution id: '. $resultId);
+        $resultStorage = $this->getResultStorage($deliveryIdentifier);
+        $mapper        = $this->getUserIdClientToUserIdCentralMapper();
+        $variableStoreService = $this->getStoreVariableService();
 
         try{
             $relatedTestTaker = $this->getRelatedTestTaker($resultId);
-
             $relatedDelivery  = $this->getRelatedDelivery($resultId);
             $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
 
@@ -99,7 +141,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             }
 
             $ltiCentralUserId = $mapper->getCentralUserId($relatedTestTaker['testTakerIdentifier']);
-            if (!is_null($ltiCentralUserId)) {
+            if ($ltiCentralUserId !== false) {
                 $relatedTestTaker['testTakerIdentifier'] = $ltiCentralUserId;
             }
 
@@ -116,25 +158,11 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             );
 
             foreach ($itemsTestsRefs as $ref) {
-                $resultRow = $this->getResultRow($ref);
-
-                if ($resultRow instanceof ItemVariableStorable) {
-                    $resultStorage->storeItemVariable(
-                        $deliveryResultIdentifier,
-                        $resultRow->getTestIdentifier(),
-                        $resultRow->getItemIdentifier(),
-                        $resultRow->getVariable(),
-                        $resultRow->getCallItemId() . '|' .$deliveryResultIdentifier
-                    );
-
-                } else if ($resultRow instanceof TestVariableStorable) {
-                    $resultStorage->storeTestVariable(
-                        $deliveryResultIdentifier,
-                        $resultRow->getTestIdentifier(),
-                        $resultRow->getVariable(),
-                        $deliveryResultIdentifier
-                    );
-                }
+                $variableStoreService->save(
+                    $deliveryResultIdentifier,
+                    $this->getResultRow($ref),
+                    $resultStorage
+                );
             }
 
             $this->deleteRelatedDelivery($resultId);
@@ -153,92 +181,8 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         }
 
         return $report;
+
     }
-    /**
-     * @inheritdoc
-     */
-    public function decrypt($deliveryIdentifier)
-    {
-        //touch session generate a undefined index notice.
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $report           = Report::createInfo('Decrypt Results for delivery id: '. $deliveryIdentifier);
-        $resultStorage    = $this->getResultStorage($deliveryIdentifier);
-        $results          = $this->getResults($deliveryIdentifier);
-        $resultsDecrypted = [];
-
-        foreach ($results as $resultId){
-            try{
-                $relatedTestTaker = $this->getRelatedTestTaker($resultId);
-                $relatedDelivery  = $this->getRelatedDelivery($resultId);
-                $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
-
-                if (!isset($relatedDelivery['deliveryResultIdentifier'])
-                    || !isset($relatedDelivery['deliveryIdentifier'])
-                    || !isset($relatedTestTaker['testTakerIdentifier']))
-                {
-                    continue;
-                }
-
-                $deliveryResultIdentifier = $relatedDelivery['deliveryResultIdentifier'];
-
-                $resultStorage->storeRelatedDelivery(
-                    $deliveryResultIdentifier,
-                    $relatedDelivery['deliveryIdentifier']
-                );
-
-                $resultStorage->storeRelatedTestTaker(
-                    $deliveryResultIdentifier,
-                    $relatedTestTaker['testTakerIdentifier']
-                );
-
-                foreach ($itemsTestsRefs as $ref) {
-                    $resultRow = $this->getResultRow($ref);
-
-                    if ($resultRow instanceof ItemVariableStorable) {
-                        $resultStorage->storeItemVariable(
-                            $deliveryResultIdentifier,
-                            $resultRow->getTestIdentifier(),
-                            $resultRow->getItemIdentifier(),
-                            $resultRow->getVariable(),
-                            $resultRow->getCallItemId() . '|' .$deliveryResultIdentifier
-                        );
-
-                    } else if ($resultRow instanceof TestVariableStorable) {
-                        $resultStorage->storeTestVariable(
-                            $deliveryResultIdentifier,
-                            $resultRow->getTestIdentifier(),
-                            $resultRow->getVariable(),
-                            $deliveryResultIdentifier
-                        );
-                    }
-                }
-
-                $this->deleteRelatedDelivery($resultId);
-                $this->deleteRelatedTestTaker($resultId);
-                $this->deleteItemsTestsRefs($resultId);
-
-                $resultsDecrypted[] = $resultId;
-
-                $this->postDecryptOfResult($deliveryResultIdentifier);
-                $report->add(Report::createSuccess('Result decrypted with success:'. $resultId));
-            } catch (EmptyContentException $exception) {
-                $resultsDecrypted[] = $resultId;
-                $report->add(Report::createInfo('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
-            } catch (\Exception $exception) {
-                $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
-            }
-        }
-
-        if ($results === $resultsDecrypted){
-            $report->add(Report::createSuccess('All results decrypted for delivery:'. $deliveryIdentifier));
-        }
-        $newResults = $this->getDeliveryResultsModel()->getResultsReferences($deliveryIdentifier);
-        $remainingResults = array_diff($newResults, $resultsDecrypted);
-        $this->setResultsReferences($deliveryIdentifier, $remainingResults);
-
-        return $report;
-    }
-
     /**
      * @return EncryptionServiceInterface
      */
@@ -487,5 +431,37 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         }
 
         return $this->syncTestSessionService;
+    }
+
+    /**
+     * @return MapperClientUserIdToCentralUserIdInterface
+     * @throws \Exception
+     */
+    protected function getUserIdClientToUserIdCentralMapper()
+    {
+        /** @var MapperClientUserIdToCentralUserIdInterface $mapper */
+        $mapper = $this->getServiceLocator()->get($this->getOption(static::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL));
+
+        if (!$mapper instanceof MapperClientUserIdToCentralUserIdInterface) {
+            throw new \Exception('Mapper needs to be a MapperLtiClientUserIdToCentralUserIdInterface');
+        }
+
+        return $mapper;
+    }
+
+    /**
+     * @return StoreVariableServiceInterface
+     * @throws \Exception
+     */
+    protected function getStoreVariableService()
+    {
+        /** @var StoreVariableServiceInterface $service */
+        $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_STORE_VARIABLE_SERVICE));
+
+        if (!$service instanceof StoreVariableServiceInterface) {
+            throw new \Exception('Store Service needs to be a StoreVariableServiceInterface');
+        }
+
+        return $service;
     }
 }

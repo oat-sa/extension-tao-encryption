@@ -24,8 +24,8 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\generis\model\OntologyAwareTrait;
 use oat\tao\model\taskQueue\QueueDispatcher;
-use oat\taoActOffline\model\synchronizer\ltiuser\MapperLtiClientUserIdToCentralUserIdService;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
+use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Task\DecryptResultTask;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
@@ -39,6 +39,8 @@ class SyncEncryptedResultService extends ResultService
     const OPTION_PERSISTENCE = 'persistence';
 
     const OPTION_ENCRYPTION_SERVICE = 'asymmetricEncryptionService';
+
+    const OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL = 'userIdClientToUserIdCentral';
 
     /** @var  common_persistence_KvDriver*/
     private $persistence;
@@ -54,13 +56,13 @@ class SyncEncryptedResultService extends ResultService
 
     /**
      * @inheritdoc
+     * @throws \Exception
      */
     public function importDeliveryResults(array $results)
     {
         $importAcknowledgment    = [];
         $resultsOfDeliveryMapper = [];
-        /** @var MapperLtiClientUserIdToCentralUserIdService $mapper */
-        $mapper = $this->getServiceLocator()->get(MapperLtiClientUserIdToCentralUserIdService::SERVICE_ID);
+        $mapper = $this->getUserIdClientToUserIdCentralMapper();
 
         foreach ($results as $resultId => $result) {
             $success = true;
@@ -75,7 +77,7 @@ class SyncEncryptedResultService extends ResultService
                 $delivery = $this->getResource($deliveryId);
 
                 $ltiCentralUserId = $mapper->getCentralUserId($details['test-taker']);
-                if (!is_null($ltiCentralUserId)) {
+                if ($ltiCentralUserId !== false) {
                     $details['test-taker'] = $ltiCentralUserId;
                 }
 
@@ -139,7 +141,7 @@ class SyncEncryptedResultService extends ResultService
             );
 
             foreach ($resultsIds as $resultId) {
-                $this->dispatchDecryptTask($resultId);
+                $this->dispatchDecryptTask($deliveryId, $resultId);
             }
         }
 
@@ -268,9 +270,10 @@ class SyncEncryptedResultService extends ResultService
     }
 
     /**
-     * @param string $deliveryId
+     * @param $deliveryId
+     * @param string $resultId
      */
-    protected function dispatchDecryptTask($resultId)
+    protected function dispatchDecryptTask($deliveryId, $resultId)
     {
         /** @var QueueDispatcher $queue */
         $queue = $this->getServiceLocator()->get(QueueDispatcher::SERVICE_ID);
@@ -278,6 +281,25 @@ class SyncEncryptedResultService extends ResultService
         $decryptResultTask = new DecryptResultTask();
         $this->propagate($decryptResultTask);
 
-        $queue->createTask($decryptResultTask, ['deliveryResultId' => $resultId], 'Decrypt Results');
+        $queue->createTask($decryptResultTask, [
+            'deliveryIdentifier' => $deliveryId,
+            'deliveryResultId' => $resultId,
+        ], 'Decrypt Results');
+    }
+
+    /**
+     * @return MapperClientUserIdToCentralUserIdInterface
+     * @throws \Exception
+     */
+    protected function getUserIdClientToUserIdCentralMapper()
+    {
+        /** @var MapperClientUserIdToCentralUserIdInterface $mapper */
+        $mapper = $this->getServiceLocator()->get($this->getOption(static::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL));
+
+        if (!$mapper instanceof MapperClientUserIdToCentralUserIdInterface) {
+            throw new \Exception('Mapper needs to be a MapperLtiClientUserIdToCentralUserIdInterface');
+        }
+
+        return $mapper;
     }
 }

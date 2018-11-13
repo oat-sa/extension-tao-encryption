@@ -134,7 +134,7 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
                 ->where(self::COLUMN_USER_ID .' = :user_id')
                 ->setParameter('user_id', (string) $userId)
                 ->setParameter('serialized', $encrypted)
-                ->setParameter('consumer', $encrypted)
+                ->setParameter('consumer', $consumer)
                 ->setParameter('is_sync', 0);
 
             return $qb->execute();

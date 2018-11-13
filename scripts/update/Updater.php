@@ -28,6 +28,10 @@ use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoEncryption\Event\ProctorCreatedHandler;
 use oat\taoEncryption\scripts\tools\SetupDecryptDeliveryLogFormatterService;
+use oat\taoEncryption\Service\Mapper\DummyMapper;
+use oat\taoEncryption\Service\Result\DecryptResultService;
+use oat\taoEncryption\Service\Result\StoreVariableService;
+use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
 use oat\taoEncryption\Service\TestSession\EncryptSyncTestSessionService;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
@@ -118,6 +122,30 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
 
             $this->setVersion('1.0.0');
+        }
+
+        if ($this->isVersion('1.0.0')) {
+            $dummyMapper = new DummyMapper();
+            $this->getServiceManager()->register(DummyMapper::SERVICE_ID, $dummyMapper);
+
+            /** @var SyncEncryptedResultService $syncResults */
+            $syncResults = $this->getServiceManager()->get(SyncEncryptedResultService::SERVICE_ID);
+            $syncResults->setOption(SyncEncryptedResultService::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL, $dummyMapper);
+
+            $this->getServiceManager()->register(SyncEncryptedResultService::SERVICE_ID, $syncResults);
+
+            $storeVariableStore = new StoreVariableService();
+            $this->getServiceManager()->register(StoreVariableService::SERVICE_ID, $storeVariableStore);
+
+            /** @var DecryptResultService $decryptResult */
+            $decryptResult = $this->getServiceManager()->get(DecryptResultService::SERVICE_ID);
+            $decryptResult->setOption(DecryptResultService::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL, DummyMapper::SERVICE_ID);
+            $decryptResult->setOption(DecryptResultService::OPTION_STORE_VARIABLE_SERVICE, StoreVariableService::SERVICE_ID);
+
+            $this->getServiceManager()->register(DecryptResultService::SERVICE_ID, $decryptResult);
+
+            $this->setVersion('1.1.0');
+
         }
     }
 }
