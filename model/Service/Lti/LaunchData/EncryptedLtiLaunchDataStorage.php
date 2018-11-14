@@ -73,26 +73,14 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
      */
     public function setUsersAsSynced($userIds)
     {
-        $dataToSave = [];
-        foreach ($userIds as $entityId) {
-            $dataToSave[] = [
-                'conditions' => [
-                    static::COLUMN_USER_ID => $entityId,
-                ],
-                'updateValues' => [
-                    self::COLUMN_IS_SYNC => 1,
-                ]
-            ];
-        }
+        $qb = $this->getQueryBuilder()
+            ->update(static::TABLE_NAME)
+            ->set(static::COLUMN_IS_SYNC, ':is_sync')
+            ->where(static::COLUMN_USER_ID . ' IN (:user_ids)')
+            ->setParameter('user_ids', $userIds, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+            ->setParameter('is_sync', 1);
 
-        if (!empty($dataToSave)) {
-            return $this->getPersistence()->updateMultiple(
-                static::TABLE_NAME,
-                $dataToSave
-            );
-        }
-
-        return false;
+        return $qb->execute();
     }
 
     /**
