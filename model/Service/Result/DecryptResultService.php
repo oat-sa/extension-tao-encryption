@@ -443,7 +443,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         $mapper = $this->getServiceLocator()->get($this->getOption(static::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL));
 
         if (!$mapper instanceof MapperClientUserIdToCentralUserIdInterface) {
-            throw new \Exception('Mapper needs to be a MapperLtiClientUserIdToCentralUserIdInterface');
+            throw new \Exception('Mapper needs to be a MapperClientUserIdToCentralUserIdInterface');
         }
 
         return $mapper;

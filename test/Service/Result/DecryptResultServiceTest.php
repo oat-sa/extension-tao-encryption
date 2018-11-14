@@ -21,10 +21,13 @@ namespace oat\taoEncryption\Test\Service\Result;
 
 use common_persistence_KeyValuePersistence;
 use common_persistence_Manager;
+use oat\generis\test\TestCase;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
+use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Service\Mapper\TestSessionSyncMapper;
 use oat\taoEncryption\Service\Result\DecryptResultService;
+use oat\taoEncryption\Service\Result\StoreVariableServiceInterface;
 use oat\taoResultServer\models\classes\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
@@ -33,7 +36,7 @@ use taoResultServer_models_classes_Variable;
 use taoResultServer_models_classes_WritableResultStorage;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class DecryptResultServiceTest extends \PHPUnit_Framework_TestCase
+class DecryptResultServiceTest extends TestCase
 {
 
     public function testDecrypt()
@@ -51,7 +54,7 @@ class DecryptResultServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getMockBuilder(DecryptResultService::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getResultRow', 'getDeliveryExecution'])
+            ->setMethods(['getResultRow', 'getDeliveryExecution', 'getStoreVariableService', 'getUserIdClientToUserIdCentralMapper'])
             ->getMockForAbstractClass()
         ;
 
@@ -76,20 +79,26 @@ class DecryptResultServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getDeliveryExecution')
             ->willReturn($this->mockDeliveryExecution());
 
+        $service
+            ->method('getStoreVariableService')
+            ->willReturn($this->getMockForAbstractClass(StoreVariableServiceInterface::class));
+
+        $service
+            ->method('getUserIdClientToUserIdCentralMapper')
+            ->willReturn($this->getMockForAbstractClass(MapperClientUserIdToCentralUserIdInterface::class));
+
         return $service;
     }
 
     protected function mockServiceLocator()
     {
-        $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
-        $serviceLocator->method('get')
-            ->willReturnOnConsecutiveCalls(
-                $this->mockResultService(),
-                $this->mockPersistence(),
-                $this->mockEncryptionService(),
-                $this->mockTestSessionSyncMapper(),
-                $this->mockSyncTestSessionService()
-            );
+        $serviceLocator = $this->getServiceLocatorMock([
+            ResultServerService::SERVICE_ID => $this->mockResultService(),
+            common_persistence_Manager::SERVICE_ID => $this->mockPersistence(),
+            EncryptionServiceInterface::class =>$this->mockEncryptionService(),
+            TestSessionSyncMapper::SERVICE_ID => $this->mockTestSessionSyncMapper(),
+            SyncTestSessionServiceInterface::SERVICE_ID => $this->mockSyncTestSessionService()
+        ]);
 
         return $serviceLocator;
     }
