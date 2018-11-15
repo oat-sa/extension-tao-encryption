@@ -113,6 +113,12 @@ class EncryptLtiUserFactoryService extends ConfigurableService implements LtiUse
      */
     protected function getLtiLaunchDataStorage()
     {
-        return $this->getServiceLocator()->get($this->getOption(static::OPTION_LAUNCH_DATA_STORAGE));
+        $service = $this->getServiceLocator()->get($this->getOption(static::OPTION_LAUNCH_DATA_STORAGE));
+
+        if (!$service instanceof EncryptedLtiLaunchDataStorage) {
+            throw new \Exception('EncryptedLtiLaunchDataStorage not set');
+        }
+
+        return $service;
     }
 }
