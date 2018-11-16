@@ -20,6 +20,7 @@
 namespace oat\taoEncryption\Test\Service\DeliveryMonitoring;
 
 use oat\taoEncryption\Model\FileSystem\EncryptionAdapter;
+use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\FileSystem\EncryptionFlyWrapper;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
@@ -31,10 +32,11 @@ class EncryptionFlyWrapperTest extends \PHPUnit_Framework_TestCase
     {
         $symService = $this->getMockBuilder(EncryptionSymmetricService::class)->disableOriginalConstructor()->getMock();
         $keyProvider = $this->getMockBuilder(FileKeyProviderService::class)->disableOriginalConstructor()->getMock();
+        $algorithmService = $this->getMockBuilder(AlgorithmSymmetricService::class)->disableOriginalConstructor()->getMock();
 
         $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
         $serviceLocator->method('get')
-            ->willReturnOnConsecutiveCalls($symService, $keyProvider);
+            ->willReturnOnConsecutiveCalls($symService, $keyProvider, $algorithmService);
 
         /** @var EncryptionFlyWrapper $flyWrapper */
         $flyWrapper = $this->getMockBuilder(EncryptionFlyWrapper::class)->disableOriginalConstructor()->getMockForAbstractClass();

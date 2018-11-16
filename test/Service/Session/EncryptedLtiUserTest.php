@@ -70,6 +70,10 @@ class EncryptedLtiUserTest extends TestCase
                 'custom_customer_app_key' => 'customer_app_key'
             ]);
 
+        $data
+            ->method('hasVariable')
+            ->willReturn(true);
+
         return $data;
     }
 

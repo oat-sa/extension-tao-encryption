@@ -32,7 +32,7 @@ class EncryptedMonitoringServiceTest extends \PHPUnit_Framework_TestCase
     {
         /** @var EncryptedMonitoringService $service */
         $service = $this->getMockBuilder(EncryptedMonitoringService::class)
-            ->setMethods(['getData', 'save'])
+            ->setMethods(['save', 'createMonitoringData'])
             ->disableOriginalConstructor()->getMockForAbstractClass();
 
         $dataMock = $this->getMockForAbstractClass(DeliveryMonitoringData::class);
@@ -44,7 +44,7 @@ class EncryptedMonitoringServiceTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $service
-            ->method('getData')
+            ->method('createMonitoringData')
             ->willReturn($dataMock);
 
         $service

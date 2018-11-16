@@ -69,6 +69,15 @@ class AlgorithmSymmetricService extends ConfigurableService implements Algorithm
     }
 
     /**
+     * @param Symmetric $algorithm
+     * @return mixed
+     */
+    public function setAlgorithm(Symmetric $algorithm)
+    {
+        $this->algorithm = $algorithm;
+    }
+
+    /**
      * @return array|SymmetricKeyProviderService|object
      * @throws \Exception
      */

@@ -6,6 +6,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\LtiConsumer\EncryptedLtiConsumer;
+use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\user\LtiUserInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
@@ -44,7 +45,7 @@ class EncryptedLtiUser extends EncryptedUser implements LtiUserInterface, Servic
             $appKey = $value->literal;
             $launchData = $this->getLaunchData();
             if (!$launchData->hasVariable(static::PARAM_CUSTOM_CUSTOMER_APP_KEY)) {
-                throw new \common_Exception('Customer App Key needs to be set.');
+                throw new LtiException('Customer App Key needs to be set.');
             }
 
             $this->applicationKey = $this->decryptAppKey($launchData->getVariable(static::PARAM_CUSTOM_CUSTOMER_APP_KEY), $appKey);
