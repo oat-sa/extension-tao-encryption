@@ -152,7 +152,7 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
      */
     public function decryptLtiLaunchData($encrypted, $appKey)
     {
-        $data = json_decode($this->getEncryptionService($appKey)->decrypt(base64_decode($encrypted)));
+        $data = json_decode($this->getEncryptionService($appKey)->decrypt(base64_decode($encrypted)), true);
         $launchData = new LtiLaunchData(
             $data['variables'],
             $data['customParams']
