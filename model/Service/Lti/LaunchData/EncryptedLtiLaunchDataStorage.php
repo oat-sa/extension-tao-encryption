@@ -111,7 +111,7 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
         $appKey = $launchData->getApplicationKey();
         $consumer = $launchData->getLtiConsumer()->getUri();
 
-        $encrypted = base64_encode($this->getEncryptionService($appKey)->encrypt(json_encode($launchData)));
+        $encrypted = base64_encode($this->getEncryptionService($appKey)->encrypt(json_encode($launchData->getLaunchData())));
         $existedLtiData = $this->getEncrypted($userId);
 
         if ($existedLtiData !== false) {
