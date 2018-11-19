@@ -26,6 +26,7 @@ use Doctrine\DBAL\Schema\Schema;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
+use oat\taoLti\models\classes\LtiLaunchData;
 
 class EncryptedLtiLaunchDataStorage extends ConfigurableService
 {
@@ -110,7 +111,7 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
         $appKey = $launchData->getApplicationKey();
         $consumer = $launchData->getLtiConsumer()->getUri();
 
-        $encrypted = base64_encode($this->getEncryptionService($appKey)->encrypt(serialize($launchData)));
+        $encrypted = base64_encode($this->getEncryptionService($appKey)->encrypt(json_encode($launchData)));
         $existedLtiData = $this->getEncrypted($userId);
 
         if ($existedLtiData !== false) {
@@ -151,7 +152,12 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
      */
     public function decryptLtiLaunchData($encrypted, $appKey)
     {
-        return unserialize($this->getEncryptionService($appKey)->decrypt(base64_decode($encrypted)));
+        $data = json_decode($this->getEncryptionService($appKey)->decrypt(base64_decode($encrypted)));
+        $launchData = new LtiLaunchData(
+            $data['variables'],
+            $data['customParams']
+        );
+        return new EncryptedLtiLaunchData($launchData, $appKey);
     }
 
     /**
