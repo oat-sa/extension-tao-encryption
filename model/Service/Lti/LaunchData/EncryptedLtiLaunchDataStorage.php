@@ -24,15 +24,14 @@ use common_persistence_SqlPersistence;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
-use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
-use oat\taoLti\models\classes\LtiLaunchData;
 
 class EncryptedLtiLaunchDataStorage extends ConfigurableService
 {
     const SERVICE_ID = 'taoEncryption/EncryptedLtiLaunchDataStorage';
 
     const OPTION_PERSISTENCE = 'persistence';
+
+    const OPTION_ENCRYPTION_DATA = 'encryption_data';
 
     const PREFIX_KEY = 'lti_launch_data';
 
@@ -44,9 +43,6 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
 
     /** @var common_persistence_SqlPersistence */
     private $persistence;
-
-    /** @var AlgorithmSymmetricService */
-    private $symmetricEncryption;
 
     /**
      * @param $limit
@@ -108,10 +104,9 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
     public function save(EncryptedLtiLaunchData $launchData)
     {
         $userId = $launchData->getUserID();
-        $appKey = $launchData->getApplicationKey();
         $consumer = $launchData->getLtiConsumer()->getUri();
 
-        $encrypted = base64_encode($this->getEncryptionService($appKey)->encrypt(json_encode($launchData)));
+        $encrypted = $this->getEncryptLaunchDataService()->encrypt($launchData);
         $existedLtiData = $this->getEncrypted($userId);
 
         if ($existedLtiData !== false) {
@@ -150,14 +145,9 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
      * @return EncryptedLtiLaunchData
      * @throws \Exception
      */
-    public function decryptLtiLaunchData($encrypted, $appKey)
+    public function getDecryptedLtiLaunchData($encrypted, $appKey)
     {
-        $data = json_decode($this->getEncryptionService($appKey)->decrypt(base64_decode($encrypted)), true);
-        $launchData = new LtiLaunchData(
-            $data['variables'],
-            $data['customParams']
-        );
-        return new EncryptedLtiLaunchData($launchData, $appKey);
+        return $this->getEncryptLaunchDataService()->decrypt($encrypted, $appKey);
     }
 
     /**
@@ -207,22 +197,11 @@ class EncryptedLtiLaunchDataStorage extends ConfigurableService
     }
 
     /**
-     * @param $applicationKey
-     * @return array|AlgorithmSymmetricService|object
+     * @return EncryptLaunchDataService
      */
-    protected function getEncryptionService($applicationKey)
+    protected function getEncryptLaunchDataService()
     {
-        if (is_null($this->symmetricEncryption)) {
-            $this->symmetricEncryption = $this->getServiceLocator()->get(AlgorithmSymmetricService::SERVICE_ID);
-        }
-
-        /** @var SimpleKeyProviderService $keyProvider */
-        $keyProvider = $this->getServiceLocator()->get(SimpleKeyProviderService::SERVICE_ID);
-        $keyProvider->setKey($applicationKey);
-
-        $this->symmetricEncryption->setKeyProvider($keyProvider);
-
-        return $this->symmetricEncryption;
+        return $this->getServiceLocator()->get($this->getOption(static::OPTION_ENCRYPTION_DATA));
     }
 
     /**
