@@ -46,7 +46,7 @@ class EncryptLaunchDataService extends ConfigurableService
     {
         $appKey = $launchData->getApplicationKey();
 
-        return base64_encode($this->getEncryptionService($appKey)->encrypt(json_encode($launchData)));
+        return base64_encode($this->getEncryptionService($appKey)->encrypt(json_encode($launchData->getLaunchData())));
     }
 
     /**
@@ -59,10 +59,8 @@ class EncryptLaunchDataService extends ConfigurableService
     {
         $data = $this->getEncryptionService($appKey)->decrypt(base64_decode($encrypted));
 
-        if (
-            is_array($data = json_decode($data, true))
+        if (is_array($data = json_decode($data, true))
             && json_last_error() === JSON_ERROR_NONE
-            && is_array($data)
         ) {
             $launchData = new LtiLaunchData(
                 $data['variables'],
