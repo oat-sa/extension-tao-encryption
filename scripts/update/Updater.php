@@ -32,6 +32,7 @@ use oat\taoEncryption\Service\Mapper\DummyMapper;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 use oat\taoEncryption\Service\Result\StoreVariableService;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
+use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\TestSession\EncryptSyncTestSessionService;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
@@ -123,8 +124,9 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('1.0.0');
         }
-
-        if ($this->isVersion('1.0.0')) {
+        $this->skip('1.0.0', '1.1.0');
+      
+        if ($this->isVersion('1.1.0')) {
             $dummyMapper = new DummyMapper();
             $this->getServiceManager()->register(DummyMapper::SERVICE_ID, $dummyMapper);
 
@@ -144,8 +146,7 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->getServiceManager()->register(DecryptResultService::SERVICE_ID, $decryptResult);
 
-            $this->setVersion('1.1.0');
-
+            $this->setVersion('1.2.0');
         }
     }
 }

@@ -44,7 +44,7 @@ class EncryptedMonitoringServiceTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $service
-            ->method('getData')
+            ->method('createMonitoringData')
             ->willReturn($dataMock);
 
         $service

@@ -21,14 +21,20 @@ namespace oat\taoEncryption\Test\Service\Session;
 
 
 use common_user_User;
+use oat\oatbox\service\ServiceManager;
+use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\EncryptedUser;
 
 class EncryptedUserTest extends \PHPUnit_Framework_TestCase
 {
 
+    /**
+     * @throws \Exception
+     */
     public function testConstructingEncryptedUser()
     {
-        $encryptUser = new EncryptedUser($this->mockCommonUser('user identifier'), 'some hash');
+        $encryptUser = new EncryptedUser($this->mockCommonUser('user identifier', 'some hash'), 'some hash');
 
         $this->assertSame('user identifier', $encryptUser->getIdentifier());
         $this->assertInternalType('string', $encryptUser->getKey());
@@ -37,10 +43,20 @@ class EncryptedUserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return common_user_User
+     * @param $userIdentifier
+     * @param $hashForEncryption
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @throws \Exception
      */
-    protected function mockCommonUser($userIdentifier)
+    protected function mockCommonUser($userIdentifier, $hashForEncryption)
     {
+        /** @var EncryptionSymmetricService $encryptService */
+        $encryptService = ServiceManager::getServiceManager()->get(EncryptionSymmetricService::SERVICE_ID);
+        /** @var SimpleKeyProviderService $simpleKeyProvider */
+        $simpleKeyProvider = ServiceManager::getServiceManager()->get(SimpleKeyProviderService::SERVICE_ID);
+        $simpleKeyProvider->setKey($hashForEncryption);
+        $encryptService->setKeyProvider($simpleKeyProvider);
+
         $commonUser = $this->getMockForAbstractClass(common_user_User::class);
         $commonUser
             ->method('getPropertyValues')
@@ -49,7 +65,7 @@ class EncryptedUserTest extends \PHPUnit_Framework_TestCase
                     'password',
                 ],
                 [
-                    'application key',
+                    base64_encode($encryptService->encrypt('application key'))
                 ]
             );
 

@@ -38,10 +38,10 @@ return array(
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
-        'generis' => '>=7.4.0',
+        'generis' => '>=7.11.0',
         'taoResultServer' => '>=6.2.0',
         'taoSync' => '>=1.4.0',
-        'taoProctoring' => '>=8.10.2',
+        'taoProctoring' => '>=12.3.0',
         'taoTestCenter' => '>=4.1.0'
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
