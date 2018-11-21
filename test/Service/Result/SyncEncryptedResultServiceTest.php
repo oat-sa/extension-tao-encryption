@@ -24,6 +24,7 @@ use common_persistence_Manager;
 use core_kernel_classes_Resource;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
+use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -97,7 +98,7 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getMockBuilder(SyncEncryptedResultService::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getResource', 'dispatchDecryptTask', 'spawnDeliveryExecution', 'updateDeliveryExecution', 'mapOfflineResultIdToOnlineResultId'])
+            ->setMethods(['getResource', 'getUserIdClientToUserIdCentralMapper', 'dispatchDecryptTask', 'spawnDeliveryExecution', 'updateDeliveryExecution', 'mapOfflineResultIdToOnlineResultId'])
             ->getMockForAbstractClass();
 
         $service
@@ -119,6 +120,10 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
         $service
             ->method('dispatchDecryptTask')
             ->willReturn(true);
+        $service
+            ->method('getUserIdClientToUserIdCentralMapper')
+            ->willReturn($this->getMockForAbstractClass(MapperClientUserIdToCentralUserIdInterface::class));
+
 
         $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
         $serviceLocator->method('get')

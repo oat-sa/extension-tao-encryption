@@ -56,17 +56,16 @@ class EncryptedUser extends common_user_User implements UserInternalInterface
             $this->key = GenerateKey::generate($hashForEncryption, $salt);
         }
 
-        /** @var EncryptionSymmetricService $encryptService */
-        $encryptService = ServiceManager::getServiceManager()->get(EncryptionSymmetricService::SERVICE_ID);
-        /** @var SimpleKeyProviderService $simpleKeyProvider */
-        $simpleKeyProvider = ServiceManager::getServiceManager()->get(SimpleKeyProviderService::SERVICE_ID);
-        $simpleKeyProvider->setKey($hashForEncryption);
-        $encryptService->setKeyProvider($simpleKeyProvider);
-
         $appKey = $this->getPropertyValues(EncryptedUserRdf::PROPERTY_ENCRYPTION_PUBLIC_KEY);
         if (isset($appKey[0])){
-            $appKey = $appKey[0];
+            /** @var EncryptionSymmetricService $encryptService */
+            $encryptService = ServiceManager::getServiceManager()->get(EncryptionSymmetricService::SERVICE_ID);
+            /** @var SimpleKeyProviderService $simpleKeyProvider */
+            $simpleKeyProvider = ServiceManager::getServiceManager()->get(SimpleKeyProviderService::SERVICE_ID);
+            $simpleKeyProvider->setKey($hashForEncryption);
+            $encryptService->setKeyProvider($simpleKeyProvider);
 
+            $appKey = $appKey[0];
             $this->applicationKey = $encryptService->decrypt(base64_decode($appKey));
         }
     }
