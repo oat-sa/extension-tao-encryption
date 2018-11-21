@@ -18,41 +18,33 @@
  *
  */
 
-namespace oat\taoEncryption\Service\Lti;
+namespace oat\taoEncryption\Service\Mapper;
 
-use common_user_auth_Adapter;
-use oat\taoEncryption\Service\Session\EncryptedLtiUser;
-use oat\taoLti\models\classes\LtiAuthAdapter;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorAwareTrait;
+use oat\oatbox\service\ConfigurableService;
 
-class EncryptLtiAuthAdapter implements \common_user_auth_Adapter, ServiceLocatorAwareInterface
+class DummyMapper extends ConfigurableService implements MapperClientUserIdToCentralUserIdInterface
 {
-    use ServiceLocatorAwareTrait;
-
-    /** @var common_user_auth_Adapter */
-    private $ltiAuthAdapter;
+    const SERVICE_ID = 'taoEncryption/DummyMapper';
 
     /**
-     * @param LtiAuthAdapter $ltiAuthAdapter
+     * @param string $clientUserId
+     * @param string $centralUserId
+     * @return bool
+     * @throws \common_Exception
+     * @throws \Exception
      */
-    public function __construct(LtiAuthAdapter $ltiAuthAdapter)
+    public function set($clientUserId, $centralUserId)
     {
-        $this->ltiAuthAdapter = $ltiAuthAdapter;
+        return true;
     }
 
     /**
-     * @inheritdoc
+     * @param string $clientUserId
+     * @return bool|int|null|string
      * @throws \Exception
      */
-    public function authenticate()
+    public function getCentralUserId($clientUserId)
     {
-        $ltiUser = $this->ltiAuthAdapter->authenticate();
-
-        $user = new EncryptedLtiUser($ltiUser);
-
-        $user->setServiceLocator($this->getServiceLocator());
-
-        return $user;
+        return $clientUserId;
     }
 }

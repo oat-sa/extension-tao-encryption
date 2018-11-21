@@ -24,6 +24,7 @@ use common_ext_ExtensionsManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoEncryption\Service\EncryptionAsymmetricService;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
+use oat\taoEncryption\Service\Mapper\DummyMapper;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
 use oat\taoSync\model\event\SynchronisationStart;
 use oat\taoSync\model\ResultService;
@@ -56,12 +57,16 @@ class SetupEncryptedSyncResult extends InstallAction
 
         $report = Report::createInfo('Configuring SyncEncryptedResult service...');
 
+        $mapper = new DummyMapper();
+        $this->getServiceManager()->register(DummyMapper::SERVICE_ID, $mapper);
+
         /** @var ResultService $stateStorage */
         $stateStorage = $this->getServiceLocator()->get(ResultService::SERVICE_ID);
         $options = $stateStorage->getOptions();
 
         $encrypted = new SyncEncryptedResultService(array_merge([
                 SyncEncryptedResultService::OPTION_PERSISTENCE => 'encryptedResults',
+                SyncEncryptedResultService::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL => DummyMapper::SERVICE_ID,
                 SyncEncryptedResultService::OPTION_ENCRYPTION_SERVICE => EncryptionAsymmetricService::SERVICE_ID,
             ], $options)
         );
