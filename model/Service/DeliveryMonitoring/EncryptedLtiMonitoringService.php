@@ -42,18 +42,24 @@ class EncryptedLtiMonitoringService extends MonitorCacheService
     {
         $result = parent::find($criteria, $options, $together);
 
-        foreach ($result as &$row) {
+        foreach ($result as $deliveryMonitoringData) {
+            $row = $deliveryMonitoringData->get();
             if (isset($row[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])) {
-                $row[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME] = $this->decryptTestTakerInfo(
+                $decrypted = $this->decryptTestTakerInfo(
                     $row[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME],
                     $this->getApplicationKey()
                 );
+
+                $deliveryMonitoringData->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $decrypted, true);
             }
             if (isset($row[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])) {
-                $row[DeliveryMonitoringService::TEST_TAKER_LAST_NAME] = $this->decryptTestTakerInfo(
+                $decrypted = $this->decryptTestTakerInfo(
                     $row[DeliveryMonitoringService::TEST_TAKER_LAST_NAME],
                     $this->getApplicationKey()
                 );
+
+                $deliveryMonitoringData->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $decrypted, true);
+
             }
         }
 
