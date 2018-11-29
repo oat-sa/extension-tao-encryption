@@ -40,6 +40,7 @@ class EncryptedLtiMonitoringService extends MonitorCacheService
      */
     public function find(array $criteria = [], array $options = [], $together = false)
     {
+        $options['asArray'] = false;
         $result = parent::find($criteria, $options, $together);
 
         foreach ($result as $deliveryMonitoringData) {
