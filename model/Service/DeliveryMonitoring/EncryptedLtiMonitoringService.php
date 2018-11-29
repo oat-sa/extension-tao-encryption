@@ -40,18 +40,23 @@ class EncryptedLtiMonitoringService extends MonitorCacheService
      */
     public function find(array $criteria = [], array $options = [], $together = false)
     {
-        $options['asArray'] = false;
         $result = parent::find($criteria, $options, $together);
 
-        foreach ($result as $deliveryMonitoringData) {
-            $row = $deliveryMonitoringData->get();
+        foreach ($result as &$deliveryMonitoringData) {
+            $isObject = is_object($deliveryMonitoringData);
+            $row = $isObject === true  ? $deliveryMonitoringData->get() : $deliveryMonitoringData;
+
             if (isset($row[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])) {
                 $decrypted = $this->decryptTestTakerInfo(
                     $row[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME],
                     $this->getApplicationKey()
                 );
 
-                $deliveryMonitoringData->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $decrypted, true);
+                if ($isObject) {
+                    $deliveryMonitoringData->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $decrypted, true);
+                } else {
+                    $deliveryMonitoringData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME] = $decrypted;
+                }
             }
             if (isset($row[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])) {
                 $decrypted = $this->decryptTestTakerInfo(
@@ -59,7 +64,11 @@ class EncryptedLtiMonitoringService extends MonitorCacheService
                     $this->getApplicationKey()
                 );
 
-                $deliveryMonitoringData->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $decrypted, true);
+                if ($isObject) {
+                    $deliveryMonitoringData->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $decrypted, true);
+                } else {
+                    $deliveryMonitoringData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME] = $decrypted;
+                }
 
             }
         }
