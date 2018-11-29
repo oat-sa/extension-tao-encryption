@@ -172,7 +172,7 @@ class SyncEncryptedResultService extends ResultService
      * @throws \Exception
      * @return common_persistence_KeyValuePersistence
      */
-    protected function getPersistence()
+    public function getPersistence()
     {
         if (is_null($this->persistence)){
             $persistenceId = $this->getOption(self::OPTION_PERSISTENCE);

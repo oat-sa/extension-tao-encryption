@@ -158,11 +158,15 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             );
 
             foreach ($itemsTestsRefs as $ref) {
-                $variableStoreService->save(
+                $status = $variableStoreService->save(
                     $deliveryResultIdentifier,
                     $this->getResultRow($ref),
                     $resultStorage
                 );
+
+                if ($status) {
+                    $this->deleteVariable($ref);
+                }
             }
 
             $this->deleteRelatedDelivery($resultId);
@@ -289,6 +293,19 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     protected function deleteItemsTestsRefs($resultId)
     {
         return $this->getDeliveryResultVarsRefsModel()->deleteRefs($resultId);
+    }
+
+    /**
+     * @param $reference
+     * @return bool
+     * @throws \Exception
+     */
+    protected function deleteVariable($reference)
+    {
+        /** @var SyncEncryptedResultService $encryptedStorage */
+        $encryptedStorage = $this->getServiceLocator()->get(SyncEncryptedResultService::SERVICE_ID);
+
+        return $encryptedStorage->getPersistence()->del($reference);
     }
 
     /**
