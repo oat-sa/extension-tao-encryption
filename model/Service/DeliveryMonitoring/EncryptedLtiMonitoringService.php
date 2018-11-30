@@ -42,18 +42,34 @@ class EncryptedLtiMonitoringService extends MonitorCacheService
     {
         $result = parent::find($criteria, $options, $together);
 
-        foreach ($result as &$row) {
+        foreach ($result as &$deliveryMonitoringData) {
+            $isObject = is_object($deliveryMonitoringData);
+            $row = $isObject === true  ? $deliveryMonitoringData->get() : $deliveryMonitoringData;
+
             if (isset($row[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])) {
-                $row[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME] = $this->decryptTestTakerInfo(
+                $decrypted = $this->decryptTestTakerInfo(
                     $row[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME],
                     $this->getApplicationKey()
                 );
+
+                if ($isObject) {
+                    $deliveryMonitoringData->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $decrypted, true);
+                } else {
+                    $deliveryMonitoringData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME] = $decrypted;
+                }
             }
             if (isset($row[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])) {
-                $row[DeliveryMonitoringService::TEST_TAKER_LAST_NAME] = $this->decryptTestTakerInfo(
+                $decrypted = $this->decryptTestTakerInfo(
                     $row[DeliveryMonitoringService::TEST_TAKER_LAST_NAME],
                     $this->getApplicationKey()
                 );
+
+                if ($isObject) {
+                    $deliveryMonitoringData->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $decrypted, true);
+                } else {
+                    $deliveryMonitoringData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME] = $decrypted;
+                }
+
             }
         }
 
