@@ -129,9 +129,7 @@ class SyncEncryptedResultService extends ResultService
                 array_merge($oldResults, $resultsIds)
             );
 
-            foreach ($resultsIds as $resultId) {
-                $this->dispatchDecryptTask($resultId);
-            }
+            $this->dispatchDecryptTask($deliveryId);
         }
 
         return $importAcknowledgment;
@@ -261,7 +259,7 @@ class SyncEncryptedResultService extends ResultService
     /**
      * @param string $deliveryId
      */
-    protected function dispatchDecryptTask($resultId)
+    protected function dispatchDecryptTask($deliveryId)
     {
         /** @var QueueDispatcher $queue */
         $queue = $this->getServiceLocator()->get(QueueDispatcher::SERVICE_ID);
@@ -269,6 +267,6 @@ class SyncEncryptedResultService extends ResultService
         $decryptResultTask = new DecryptResultTask();
         $this->propagate($decryptResultTask);
 
-        $queue->createTask($decryptResultTask, ['deliveryResultId' => $resultId], 'Decrypt Results');
+        $queue->createTask($decryptResultTask, ['deliveryId' => $deliveryId], 'Decrypt Results');
     }
 }

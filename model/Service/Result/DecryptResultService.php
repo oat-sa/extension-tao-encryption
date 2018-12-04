@@ -161,66 +161,16 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         $results = $this->getResults($deliveryIdentifier);
 
         foreach ($results as $resultId){
-            try{
-                $relatedTestTaker = $this->getRelatedTestTaker($resultId);
-                $relatedDelivery  = $this->getRelatedDelivery($resultId);
-                $itemsTestsRefs   = $this->getItemsTestsRefs($resultId);
+            /** @var QueueDispatcher $queue */
+            $queue = $this->getServiceLocator()->get(QueueDispatcher::SERVICE_ID);
 
-                if (!isset($relatedDelivery['deliveryResultIdentifier'])
-                    || !isset($relatedDelivery['deliveryIdentifier'])
-                    || !isset($relatedTestTaker['testTakerIdentifier']))
-                {
-                    continue;
-                }
+            $decryptResultTask = new DecryptDeliveryExecutionTask();
+            $this->propagate($decryptResultTask);
 
-                $deliveryResultIdentifier = $relatedDelivery['deliveryResultIdentifier'];
-
-                $resultStorage->storeRelatedDelivery(
-                    $deliveryResultIdentifier,
-                    $relatedDelivery['deliveryIdentifier']
-                );
-
-                $resultStorage->storeRelatedTestTaker(
-                    $deliveryResultIdentifier,
-                    $relatedTestTaker['testTakerIdentifier']
-                );
-
-                foreach ($itemsTestsRefs as $ref) {
-                    $resultRow = $this->getResultRow($ref);
-
-                    if ($resultRow instanceof ItemVariableStorable) {
-                        $resultStorage->storeItemVariable(
-                            $deliveryResultIdentifier,
-                            $resultRow->getTestIdentifier(),
-                            $resultRow->getItemIdentifier(),
-                            $resultRow->getVariable(),
-                            $resultRow->getCallItemId() . '|' .$deliveryResultIdentifier
-                        );
-
-                    } else if ($resultRow instanceof TestVariableStorable) {
-                        $resultStorage->storeTestVariable(
-                            $deliveryResultIdentifier,
-                            $resultRow->getTestIdentifier(),
-                            $resultRow->getVariable(),
-                            $deliveryResultIdentifier
-                        );
-                    }
-                }
-
-                $this->deleteRelatedDelivery($resultId);
-                $this->deleteRelatedTestTaker($resultId);
-                $this->deleteItemsTestsRefs($resultId);
-
-                $resultsDecrypted[] = $resultId;
-
-                $this->postDecryptOfResult($deliveryResultIdentifier);
-                $report->add(Report::createSuccess('Result decrypted with success:'. $resultId));
-            } catch (EmptyContentException $exception) {
-                $resultsDecrypted[] = $resultId;
-                $report->add(Report::createInfo('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
-            } catch (\Exception $exception) {
-                $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
-            }
+            $queue->createTask($decryptResultTask, [
+                    'deliveryId' => $deliveryIdentifier,
+                    'deliveryExecutionId' => $resultId
+                ], 'Decrypt Results For delivery execution: '. $resultId);
         }
 
         return $report;
