@@ -24,13 +24,14 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\tao\model\taskQueue\QueueDispatcher;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
 use oat\taoEncryption\Model\Exception\EmptyContentException;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Mapper\TestSessionSyncMapper;
-use oat\taoOutcomeRds\model\RdsResultStorage;
+use oat\taoEncryption\Task\DecryptDeliveryExecutionTask;
 use oat\taoResultServer\models\classes\implementation\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
@@ -68,15 +69,18 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     private $syncTestSessionService;
 
     /**
+     * @param $deliveryIdentifier
      * @param $resultId
      * @return Report
      * @throws \common_exception_Error
+     * @throws \Exception
      */
-    public function decryptByExecution($resultId)
+    public function decryptByExecution($deliveryIdentifier, $resultId)
     {
+        //touch session generate a undefined index notice.
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $report  = Report::createInfo('Decrypt Results for delivery execution id: '. $resultId);
-        /** @var RdsResultStorage $resultStorage */
-        $resultStorage = $this->getServiceLocator()->get(RdsResultStorage::SERVICE_ID);
+        $resultStorage    = $this->getResultStorage($deliveryIdentifier);
         $resultsDecrypted = [];
 
         try{
@@ -140,6 +144,10 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
         }
 
+        $newResults = $this->getDeliveryResultsModel()->getResultsReferences($deliveryIdentifier);
+        $remainingResults = array_diff($newResults, $resultsDecrypted);
+        $this->setResultsReferences($deliveryIdentifier, $remainingResults);
+
         return $report;
     }
     /**
@@ -149,10 +157,8 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
     {
         //touch session generate a undefined index notice.
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $report           = Report::createInfo('Decrypt Results for delivery id: '. $deliveryIdentifier);
-        $resultStorage    = $this->getResultStorage($deliveryIdentifier);
-        $results          = $this->getResults($deliveryIdentifier);
-        $resultsDecrypted = [];
+        $report  = Report::createInfo('Decrypt Results for delivery id: '. $deliveryIdentifier);
+        $results = $this->getResults($deliveryIdentifier);
 
         foreach ($results as $resultId){
             try{
@@ -216,13 +222,6 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                 $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
             }
         }
-
-        if ($results === $resultsDecrypted){
-            $report->add(Report::createSuccess('All results decrypted for delivery:'. $deliveryIdentifier));
-        }
-        $newResults = $this->getDeliveryResultsModel()->getResultsReferences($deliveryIdentifier);
-        $remainingResults = array_diff($newResults, $resultsDecrypted);
-        $this->setResultsReferences($deliveryIdentifier, $remainingResults);
 
         return $report;
     }
