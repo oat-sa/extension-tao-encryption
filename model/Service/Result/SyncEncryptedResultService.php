@@ -128,8 +128,6 @@ class SyncEncryptedResultService extends ResultService
                 $deliveryId,
                 array_merge($oldResults, $resultsIds)
             );
-
-            $this->dispatchDecryptTask($deliveryId);
         }
 
         return $importAcknowledgment;
