@@ -25,6 +25,7 @@ use common_persistence_KvDriver;
 use oat\generis\model\OntologyAwareTrait;
 use oat\tao\model\taskQueue\QueueDispatcher;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
+use oat\taoEncryption\Task\DecryptDeliveryExecutionTask;
 use oat\taoEncryption\Task\DecryptResultTask;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
@@ -128,6 +129,10 @@ class SyncEncryptedResultService extends ResultService
                 $deliveryId,
                 array_merge($oldResults, $resultsIds)
             );
+
+            foreach ($resultsIds as $deId){
+                $this->dispatchDecryptTask($deliveryId, $deId);
+            }
         }
 
         return $importAcknowledgment;
@@ -256,15 +261,20 @@ class SyncEncryptedResultService extends ResultService
 
     /**
      * @param string $deliveryId
+     * @param $deliveryExecutionId
      */
-    protected function dispatchDecryptTask($deliveryId)
+    protected function dispatchDecryptTask($deliveryId, $deliveryExecutionId)
     {
         /** @var QueueDispatcher $queue */
         $queue = $this->getServiceLocator()->get(QueueDispatcher::SERVICE_ID);
 
-        $decryptResultTask = new DecryptResultTask();
+        $decryptResultTask = new DecryptDeliveryExecutionTask();
         $this->propagate($decryptResultTask);
 
-        $queue->createTask($decryptResultTask, ['deliveryId' => $deliveryId], 'Decrypt Results');
+        $queue->createTask($decryptResultTask,
+            [
+                'deliveryId' => $deliveryId,
+                'deliveryExecutionId' => $deliveryExecutionId
+            ], 'Decrypt Delivery Execution');
     }
 }
