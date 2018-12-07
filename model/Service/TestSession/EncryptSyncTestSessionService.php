@@ -34,7 +34,8 @@ class EncryptSyncTestSessionService extends SyncTestSessionService
      */
     protected function afterImportSession($deliveryExecution)
     {
-       return $this->getTestSessionSyncMapper()->set($deliveryExecution->getIdentifier(), 1);
+        $this->touchTestSession($deliveryExecution);
+        return $this->getTestSessionSyncMapper()->set($deliveryExecution->getIdentifier(), 1);
     }
 
     /**
