@@ -395,7 +395,6 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         if ($sessionSynced) {
             $deliveryExecution = $this->getDeliveryExecution($deliveryResultIdentifier);
 
-            $this->getSyncTestSessionService()->touchTestSession($deliveryExecution);
             $this->getTestSessionSyncMapper()->delete($deliveryResultIdentifier);
         }
     }
