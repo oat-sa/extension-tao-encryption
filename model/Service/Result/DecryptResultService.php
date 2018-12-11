@@ -49,6 +49,8 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
     const OPTION_STORE_VARIABLE_SERVICE = 'storeVariableService';
 
+    const OPTION_REMOVE_VARIABLE_AFTER_DECRYPT = 'removeVariableAfterDecrypt';
+
     const PREFIX_DELIVERY_EXECUTION = EncryptResultService::PREFIX_DELIVERY_EXECUTION;
 
     const PREFIX_TEST_TAKER = EncryptResultService::PREFIX_TEST_TAKER;
@@ -164,7 +166,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                     $resultStorage
                 );
 
-                if ($status) {
+                if ($status && $this->isDeleteAfterDecryptEnabled()) {
                     $this->deleteVariable($ref);
                 }
             }
@@ -180,8 +182,6 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         } catch (EmptyContentException $exception) {
             $resultsDecrypted[] = $resultId;
             $report->add(Report::createInfo('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
-        } catch (\Exception $exception) {
-            $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
         }
 
         return $report;
@@ -241,6 +241,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
 
     /**
      * @param $resultId
+     * @return bool
      * @throws \Exception
      */
     protected function deleteRelatedTestTaker($resultId)
@@ -305,7 +306,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         /** @var SyncEncryptedResultService $encryptedStorage */
         $encryptedStorage = $this->getServiceLocator()->get(SyncEncryptedResultService::SERVICE_ID);
 
-        return $encryptedStorage->getPersistence()->del($reference);
+        return $encryptedStorage->deleteVariable($reference);
     }
 
     /**
@@ -480,5 +481,13 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         }
 
         return $service;
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    protected function isDeleteAfterDecryptEnabled()
+    {
+        return (bool)$this->getOption(static::OPTION_REMOVE_VARIABLE_AFTER_DECRYPT);
     }
 }

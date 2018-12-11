@@ -79,6 +79,16 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @throws \Exception
+     */
+    public function testDeleteVariable()
+    {
+        $service = $this->getService();
+
+        $this->assertTrue($service->deleteVariable('some ref'));
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function mockResource()

@@ -28,13 +28,13 @@ use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Service\Mapper\TestSessionSyncMapper;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 use oat\taoEncryption\Service\Result\StoreVariableServiceInterface;
+use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
 use oat\taoResultServer\models\classes\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
 use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 use taoResultServer_models_classes_Variable;
 use taoResultServer_models_classes_WritableResultStorage;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 class DecryptResultServiceTest extends TestCase
 {
@@ -42,6 +42,7 @@ class DecryptResultServiceTest extends TestCase
     public function testDecrypt()
     {
         $service = $this->getService();
+
         $service->setServiceLocator($this->mockServiceLocator());
 
         $this->assertInstanceOf(\common_report_Report::class, $service->decrypt('delivery id'));
@@ -79,13 +80,22 @@ class DecryptResultServiceTest extends TestCase
             ->method('getDeliveryExecution')
             ->willReturn($this->mockDeliveryExecution());
 
+        $storeVariableService = $this->getMockForAbstractClass(StoreVariableServiceInterface::class);
+        $storeVariableService
+            ->method('save')
+            ->willReturn(true);
+
         $service
             ->method('getStoreVariableService')
-            ->willReturn($this->getMockForAbstractClass(StoreVariableServiceInterface::class));
+            ->willReturn($storeVariableService);
 
         $service
             ->method('getUserIdClientToUserIdCentralMapper')
             ->willReturn($this->getMockForAbstractClass(MapperClientUserIdToCentralUserIdInterface::class));
+
+        $service->setOption(DecryptResultService::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL, MapperClientUserIdToCentralUserIdInterface::class);
+        $service->setOption(DecryptResultService::OPTION_ENCRYPTION_SERVICE, EncryptionServiceInterface::class);
+        $service->setOption(DecryptResultService::OPTION_REMOVE_VARIABLE_AFTER_DECRYPT, true);
 
         return $service;
     }
@@ -93,14 +103,38 @@ class DecryptResultServiceTest extends TestCase
     protected function mockServiceLocator()
     {
         $serviceLocator = $this->getServiceLocatorMock([
+            MapperClientUserIdToCentralUserIdInterface::class => $this->mockMapperClientToServer(),
             ResultServerService::SERVICE_ID => $this->mockResultService(),
             common_persistence_Manager::SERVICE_ID => $this->mockPersistence(),
             EncryptionServiceInterface::class =>$this->mockEncryptionService(),
             TestSessionSyncMapper::SERVICE_ID => $this->mockTestSessionSyncMapper(),
-            SyncTestSessionServiceInterface::SERVICE_ID => $this->mockSyncTestSessionService()
+            SyncTestSessionServiceInterface::SERVICE_ID => $this->mockSyncTestSessionService(),
+            SyncEncryptedResultService::SERVICE_ID => $this->mockSyncEncryptedResultService()
         ]);
 
         return $serviceLocator;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function mockSyncEncryptedResultService()
+    {
+        $service = $this->getMockBuilder(SyncEncryptedResultService::class)->disableOriginalConstructor()->getMock();
+
+        $service
+            ->method('deleteVariable')
+            ->willReturn(true);
+
+        return $service;
+    }
+
+    /**
+     * @return MapperClientUserIdToCentralUserIdInterface
+     */
+    protected function mockMapperClientToServer()
+    {
+        return $this->getMockForAbstractClass(MapperClientUserIdToCentralUserIdInterface::class);
     }
 
     /**

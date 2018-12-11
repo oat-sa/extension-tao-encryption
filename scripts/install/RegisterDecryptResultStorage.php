@@ -63,6 +63,7 @@ class RegisterDecryptResultStorage extends InstallAction
             DecryptResultService::OPTION_ENCRYPTION_SERVICE => EncryptionAsymmetricService::SERVICE_ID,
             DecryptResultService::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL => DummyMapper::SERVICE_ID,
             DecryptResultService::OPTION_STORE_VARIABLE_SERVICE => StoreVariableService::SERVICE_ID,
+            DecryptResultService::OPTION_REMOVE_VARIABLE_AFTER_DECRYPT => false,
         ]);
 
         $this->registerService(DecryptResultService::SERVICE_ID, $decrypt);

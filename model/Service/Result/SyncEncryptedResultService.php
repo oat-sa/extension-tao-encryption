@@ -149,6 +149,16 @@ class SyncEncryptedResultService extends ResultService
     }
 
     /**
+     * @param $reference
+     * @return bool
+     * @throws \Exception
+     */
+    public function deleteVariable($reference)
+    {
+        return $this->getPersistence()->del($reference);
+    }
+
+        /**
      * Get variables of a delivery execution
      *
      * @param $deliveryId
@@ -172,7 +182,7 @@ class SyncEncryptedResultService extends ResultService
      * @throws \Exception
      * @return common_persistence_KeyValuePersistence
      */
-    public function getPersistence()
+    protected function getPersistence()
     {
         if (is_null($this->persistence)){
             $persistenceId = $this->getOption(self::OPTION_PERSISTENCE);
