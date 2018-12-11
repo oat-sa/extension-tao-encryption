@@ -182,6 +182,8 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         } catch (EmptyContentException $exception) {
             $resultsDecrypted[] = $resultId;
             $report->add(Report::createInfo('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
+        } catch (\Exception $exception) {
+            $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
         }
 
         return $report;
