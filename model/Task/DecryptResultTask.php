@@ -46,7 +46,10 @@ class DecryptResultTask extends AbstractAction implements \JsonSerializable
         /** @var DecryptResultService $decryptService */
         $decryptService = $this->getServiceLocator()->get(DecryptResultService::SERVICE_ID);
 
-        return $decryptService->decryptByExecution($deliveryIdentifier, $deliveryResultId);
+        $options = $params;
+        unset($options['deliveryResultId']);
+        unset($options['deliveryIdentifier']);
+        return $decryptService->decryptByExecution($deliveryIdentifier, $deliveryResultId, $options);
     }
 
     /**

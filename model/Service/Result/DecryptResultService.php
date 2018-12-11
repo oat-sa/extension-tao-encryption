@@ -36,6 +36,9 @@ use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
 use \common_report_Report as Report;
 use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
+use oat\taoSync\model\ResultService;
+use oat\taoSync\model\SyncServiceInterface;
+
 
 class DecryptResultService extends ConfigurableService implements DecryptResult
 {
@@ -77,20 +80,20 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      * @return Report
      * @throws \common_exception_Error
      */
-    public function decryptByExecution($deliveryIdentifier, $resultId)
+    public function decryptByExecution($deliveryIdentifier, $resultId, array $options)
     {
         //touch session generate a undefined index notice.
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $resultsDecrypted = [];
 
-        return $this->decryptByResult($deliveryIdentifier, $resultId, $resultsDecrypted);
+        return $this->decryptByResult($deliveryIdentifier, $resultId, $resultsDecrypted, $options);
     }
 
     /**
      * @inheritdoc
      * @throws \Exception
      */
-    public function decrypt($deliveryIdentifier)
+    public function decrypt($deliveryIdentifier, array $options = [])
     {
         //touch session generate a undefined index notice.
         $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -99,7 +102,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
         $resultsDecrypted = [];
 
         foreach ($results as $resultId){
-            $report->add($this->decryptByResult($deliveryIdentifier, $resultId, $resultsDecrypted));
+            $report->add($this->decryptByResult($deliveryIdentifier, $resultId, $resultsDecrypted, $options));
         }
 
         if ($results === $resultsDecrypted){
@@ -121,7 +124,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      * @throws \common_exception_Error
      * @throws \Exception
      */
-    protected function decryptByResult($deliveryIdentifier, $resultId, &$resultsDecrypted)
+    protected function decryptByResult($deliveryIdentifier, $resultId, &$resultsDecrypted, array $options)
     {
         $report  = Report::createInfo('Decrypt Results for delivery execution id: '. $resultId);
         $resultStorage = $this->getResultStorage($deliveryIdentifier);
@@ -164,6 +167,12 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                     $resultStorage
                 );
             }
+
+            $resultService = $this->getServiceLocator()->get(ResultService::SERVICE_ID);
+            $resultService->saveBoxId(
+                $this->getDeliveryExecution($deliveryResultIdentifier),
+                $options[SyncServiceInterface::IMPORT_OPTION_BOX_ID] ?? null
+            );
 
             $this->deleteRelatedDelivery($resultId);
             $this->deleteRelatedTestTaker($resultId);

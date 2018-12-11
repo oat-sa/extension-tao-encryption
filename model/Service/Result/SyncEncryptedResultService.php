@@ -58,7 +58,7 @@ class SyncEncryptedResultService extends ResultService
      * @inheritdoc
      * @throws \Exception
      */
-    public function importDeliveryResults(array $results)
+    public function importDeliveryResults(array $results, array $options = [])
     {
         $importAcknowledgment    = [];
         $resultsOfDeliveryMapper = [];
@@ -141,7 +141,7 @@ class SyncEncryptedResultService extends ResultService
             );
 
             foreach ($resultsIds as $resultId) {
-                $this->dispatchDecryptTask($deliveryId, $resultId);
+                $this->dispatchDecryptTask($deliveryId, $resultId, $options);
             }
         }
 
@@ -272,8 +272,9 @@ class SyncEncryptedResultService extends ResultService
     /**
      * @param $deliveryId
      * @param string $resultId
+     * @param array $resultId
      */
-    protected function dispatchDecryptTask($deliveryId, $resultId)
+    protected function dispatchDecryptTask($deliveryId, $resultId, array $options)
     {
         /** @var QueueDispatcher $queue */
         $queue = $this->getServiceLocator()->get(QueueDispatcher::SERVICE_ID);
@@ -281,10 +282,12 @@ class SyncEncryptedResultService extends ResultService
         $decryptResultTask = new DecryptResultTask();
         $this->propagate($decryptResultTask);
 
-        $queue->createTask($decryptResultTask, [
+        $taskParams = array_merge($options, [
             'deliveryIdentifier' => $deliveryId,
             'deliveryResultId' => $resultId,
-        ], 'Decrypt Results');
+        ]);
+
+        $queue->createTask($decryptResultTask, $taskParams, 'Decrypt Results');
     }
 
     /**
