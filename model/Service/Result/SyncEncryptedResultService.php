@@ -20,15 +20,18 @@
 
 namespace oat\taoEncryption\Service\Result;
 
+use common_report_Report as Report;
 use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\generis\model\OntologyAwareTrait;
+use oat\oatbox\event\EventManager;
 use oat\tao\model\taskQueue\QueueDispatcher;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Task\DecryptResultTask;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
+use oat\taoSync\model\event\SyncResponseEvent;
 use oat\taoSync\model\ResultService;
 use Psr\Log\LogLevel;
 
@@ -58,9 +61,9 @@ class SyncEncryptedResultService extends ResultService
      * @inheritdoc
      * @throws \Exception
      */
-    public function importDeliveryResults(array $results)
+    public function importDeliveryResults(array $results, array $params = [])
     {
-        $importAcknowledgment    = [];
+        $this->initImport($params);
         $resultsOfDeliveryMapper = [];
         $mapper = $this->getUserIdClientToUserIdCentralMapper();
 
@@ -120,15 +123,10 @@ class SyncEncryptedResultService extends ResultService
                 $success = false;
             }
 
-            if (isset($deliveryId)) {
-                $importAcknowledgment[$resultId] = [
-                    'success' => (int) $success,
-                    'deliveryId' => $deliveryId,
-                ];
+            if ($success && isset($deliveryId)) {
+                $this->importAcknowledgment['success'][$resultId] = $deliveryId;
             } else {
-                $importAcknowledgment[$resultId] = [
-                    'success' => (int) $success,
-                ];
+                $this->importAcknowledgment['failed'][] = $resultId;
             }
         }
 
@@ -145,7 +143,9 @@ class SyncEncryptedResultService extends ResultService
             }
         }
 
-        return $importAcknowledgment;
+        $this->reportImportCompleted();
+
+        return $this->importAcknowledgment;
     }
 
     /**
