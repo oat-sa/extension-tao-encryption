@@ -22,21 +22,44 @@ namespace oat\taoEncryption\Test\Service\Result;
 use common_persistence_KeyValuePersistence;
 use common_persistence_Manager;
 use core_kernel_classes_Resource;
+use oat\generis\test\TestCase;
+use oat\oatbox\event\EventManager;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoEncryption\Service\EncryptionAsymmetricService;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
+class SyncEncryptedResultServiceTest extends TestCase
 {
+    /**
+     * @var common_persistence_Manager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $persistenceMock;
+
+    /**
+     * @var EncryptionServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $encryptionServiceMock;
+
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->mockPersistence();
+        $this->mockEncryptionService();
+    }
+
     public function testImportDeliveryResults()
     {
         $service = $this->getService();
 
         $result = $service->importDeliveryResults([
-            'result_id' => [
-                'deliveryId' => 'delivery id',
+            'RESULT_ID_VAL' => [
+                'deliveryId' => 'DELIVERY_ID_VAL',
                 'deliveryExecutionId' => 'delivery execution id',
                 'details' => [
                     'identifier' => 'identifier',
@@ -52,30 +75,29 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
 
-        $this->assertInternalType('array', $result);
-        $this->assertEquals([
-            'result_id' => [
-                'success' => 1,
-                'deliveryId' => 'delivery id',
+        $expectedAcknowlegement = [
+            'success' => [
+                'RESULT_ID_VAL' => 'DELIVERY_ID_VAL'
             ]
-        ], $result);
+        ];
+        $this->assertInternalType('array', $result);
+        $this->assertEquals($expectedAcknowlegement, $result);
     }
 
     public function testImportFailed()
     {
         $service = $this->getService();
         $result = $service->importDeliveryResults([
-            'result_id' => [
-                'deliveryId' => 'delivery id',
+            'RESULT_ID_VAL' => [
+                'deliveryId' => 'DELIVERY_ID_VAL',
             ]
         ]);
 
+        $expectedAcknowledgment = [
+            'failed' => ['RESULT_ID_VAL']
+        ];
         $this->assertInternalType('array', $result);
-        $this->assertEquals([
-            'result_id' => [
-                'success' => 0,
-            ]
-        ], $result);
+        $this->assertEquals($expectedAcknowledgment, $result);
     }
 
     /**
@@ -98,37 +120,34 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getMockBuilder(SyncEncryptedResultService::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getResource', 'getUserIdClientToUserIdCentralMapper', 'dispatchDecryptTask', 'spawnDeliveryExecution', 'updateDeliveryExecution', 'mapOfflineResultIdToOnlineResultId'])
+            ->setMethods(['getOption', 'getResource', 'getUserIdClientToUserIdCentralMapper', 'dispatchDecryptTask', 'spawnDeliveryExecution', 'updateDeliveryExecution', 'mapOfflineResultIdToOnlineResultId'])
             ->getMockForAbstractClass();
 
-        $service
-            ->method('getResource')
+        $eventManagerMock = $this->createMock(EventManager::class);
+        $serviceLocatorMock = $this->getServiceLocatorMock([
+            EventManager::SERVICE_ID => $eventManagerMock,
+            common_persistence_Manager::SERVICE_ID => $this->persistenceMock,
+            EncryptionAsymmetricService::SERVICE_ID => $this->encryptionServiceMock,
+        ]);
+        $service->setServiceLocator($serviceLocatorMock);
+
+        $service->method('getResource')
             ->willReturn($this->mockResource());
-
-        $service
-            ->method('spawnDeliveryExecution')
+        $service->method('spawnDeliveryExecution')
             ->willReturn($this->mockDeliveryExecution());
-
-        $service
-            ->method('updateDeliveryExecution')
+        $service->method('updateDeliveryExecution')
             ->willReturn($this->mockDeliveryExecution());
-
-        $service
-            ->method('mapOfflineResultIdToOnlineResultId')
+        $service->method('mapOfflineResultIdToOnlineResultId')
             ->willReturn(true);
-
-        $service
-            ->method('dispatchDecryptTask')
+        $service->method('dispatchDecryptTask')
             ->willReturn(true);
-        $service
-            ->method('getUserIdClientToUserIdCentralMapper')
+        $service->method('getUserIdClientToUserIdCentralMapper')
             ->willReturn($this->getMockForAbstractClass(MapperClientUserIdToCentralUserIdInterface::class));
-
-
-        $serviceLocator = $this->getMockForAbstractClass(ServiceLocatorInterface::class);
-        $serviceLocator->method('get')
-            ->willReturnOnConsecutiveCalls($this->mockPersistence(), $this->mockEncryptionService());
-        $service->setServiceLocator($serviceLocator);
+        $service->method('getOption')
+            ->will($this->returnValueMap([
+                ['persistence', 'PERSISTENCE_ID'],
+                ['asymmetricEncryptionService', EncryptionAsymmetricService::SERVICE_ID]
+            ]));
 
         return $service;
     }
@@ -159,7 +178,7 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return common_persistence_Manager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function mockPersistence()
     {
@@ -177,24 +196,24 @@ class SyncEncryptedResultServiceTest extends \PHPUnit_Framework_TestCase
             ->method('del')
             ->willReturn(true);
 
-        $persistence = $this->getMockBuilder(common_persistence_Manager::class)->getMock();
-        $persistence
-            ->method('getPersistenceById')
+        $this->persistenceMock = $this->getMockBuilder(common_persistence_Manager::class)->getMock();
+        $this->persistenceMock->method('getPersistenceById')
             ->willReturn($persistenceMock);
 
-        return $persistence;
+        return $this->persistenceMock;
     }
 
+    /**
+     * @return EncryptionServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected function mockEncryptionService()
     {
-        $encryption = $this->getMockBuilder(EncryptionServiceInterface::class)->getMock();
-        $encryption
-            ->method('encrypt')
+        $this->encryptionServiceMock = $this->getMockBuilder(EncryptionServiceInterface::class)->getMock();
+        $this->encryptionServiceMock->method('encrypt')
             ->willReturn('encrypted');
-        $encryption
-            ->method('encrypt')
+        $this->encryptionServiceMock->method('encrypt')
             ->willReturn('decrypted');
 
-        return $encryption;
+        return $this->encryptionServiceMock;
     }
 }
