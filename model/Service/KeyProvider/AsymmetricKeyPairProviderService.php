@@ -27,7 +27,7 @@ use oat\taoEncryption\controller\EncryptionApi;
 use oat\taoEncryption\Model\Asymmetric\AsymmetricRSAKeyPairProvider;
 use oat\taoEncryption\Model\PrivateKey;
 use oat\taoEncryption\Model\PublicKey;
-use oat\taoSync\model\event\DataSynchronisationStarted;
+use oat\taoSync\model\event\SynchronisationStart;
 
 class AsymmetricKeyPairProviderService extends ConfigurableService
 {
@@ -91,10 +91,10 @@ class AsymmetricKeyPairProviderService extends ConfigurableService
     /**
      * Event listener for synchronisation start event
      *
-     * @param DataSynchronisationStarted $event
+     * @param SynchronisationStart $event
      * @throws \common_Exception
      */
-    static public function onSynchronisationStarted(DataSynchronisationStarted $event)
+    static public function onSynchronisationStarted(SynchronisationStart $event)
     {
         /** @var AsymmetricKeyPairProviderService $keyPairService */
         $keyPairService = ServiceManager::getServiceManager()->get(self::SERVICE_ID);

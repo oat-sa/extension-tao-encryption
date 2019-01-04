@@ -26,7 +26,7 @@ use oat\taoEncryption\Service\EncryptionAsymmetricService;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 use oat\taoEncryption\Service\Mapper\DummyMapper;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
-use oat\taoSync\model\event\DataSynchronisationStarted;
+use oat\taoSync\model\event\SynchronisationStart;
 use oat\taoSync\model\ResultService;
 use common_report_Report as Report;
 
@@ -90,7 +90,7 @@ class SetupEncryptedSyncResult extends InstallAction
     protected function setupSynchronizationListener()
     {
         $this->registerEvent(
-            DataSynchronisationStarted::class,
+            SynchronisationStart::class,
             [AsymmetricKeyPairProviderService::class, 'onSynchronisationStarted']
         );
 
