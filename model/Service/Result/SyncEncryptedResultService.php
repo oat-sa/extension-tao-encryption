@@ -58,8 +58,9 @@ class SyncEncryptedResultService extends ResultService
      * @inheritdoc
      * @throws \Exception
      */
-    public function importDeliveryResults(array $results)
+    public function importDeliveryResults(array $results, array $params = [])
     {
+        $this->initImport($params);
         $importAcknowledgment    = [];
         $resultsOfDeliveryMapper = [];
         $mapper = $this->getUserIdClientToUserIdCentralMapper();
@@ -144,6 +145,8 @@ class SyncEncryptedResultService extends ResultService
                 $this->dispatchDecryptTask($deliveryId, $resultId);
             }
         }
+
+        $this->reportImportCompleted($importAcknowledgment);
 
         return $importAcknowledgment;
     }
