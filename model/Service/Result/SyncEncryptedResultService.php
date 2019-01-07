@@ -126,10 +126,12 @@ class SyncEncryptedResultService extends ResultService
                     'success' => (int) $success,
                     'deliveryId' => $deliveryId,
                 ];
+                $this->report->add(\common_report_Report::createInfo("Delivery execution {$resultId} successfully imported."));
             } else {
                 $importAcknowledgment[$resultId] = [
                     'success' => (int) $success,
                 ];
+                $this->report->add(\common_report_Report::createFailure("Import failed for delivery execution {$resultId}."));
             }
         }
 
