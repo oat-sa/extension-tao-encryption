@@ -12,6 +12,7 @@ use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\user\LtiUserInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
+use oat\taoEncryption\Rdf\EncryptedUserRdf;
 
 class EncryptedLtiUser extends EncryptedUser implements LtiUserInterface, ServiceLocatorAwareInterface
 {
@@ -41,18 +42,6 @@ class EncryptedLtiUser extends EncryptedUser implements LtiUserInterface, Servic
     public function getLaunchData()
     {
         return $this->realUser->getLaunchData();
-    }
-
-    /**
-     * @param $property
-     * @return array
-     * @throws \Exception
-     */
-    public function getPropertyValues($property)
-    {
-        $values = $this->realUser->getPropertyValues($property);
-
-        return $values;
     }
 
     /**
