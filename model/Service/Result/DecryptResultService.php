@@ -35,6 +35,7 @@ use oat\taoResultServer\models\classes\implementation\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
 use \common_report_Report as Report;
+use oat\taoResultServer\models\Exceptions\DuplicateVariableException;
 use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 
 class DecryptResultService extends ConfigurableService implements DecryptResult
@@ -158,11 +159,18 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             );
 
             foreach ($itemsTestsRefs as $ref) {
-                $variableStoreService->save(
-                    $deliveryResultIdentifier,
-                    $this->getResultRow($ref),
-                    $resultStorage
-                );
+                try {
+                    $variableStoreService->save(
+                        $deliveryResultIdentifier,
+                        $this->getResultRow($ref),
+                        $resultStorage
+                    );
+                } catch (DuplicateVariableException $e) {
+                    $this->logInfo(sprintf(
+                        'Variable for result `%s` already exists. Synchronisation of that variable was skipped.',
+                        $deliveryResultIdentifier
+                    ));
+                }
             }
 
             $this->deleteRelatedDelivery($resultId);

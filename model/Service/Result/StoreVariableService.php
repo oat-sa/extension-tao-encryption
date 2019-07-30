@@ -25,6 +25,7 @@ use oat\oatbox\service\ConfigurableService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
 use oat\taoResultServer\models\Entity\VariableStorable;
+use oat\taoResultServer\models\Exceptions\DuplicateVariableException;
 use taoResultServer_models_classes_WritableResultStorage;
 
 class StoreVariableService extends ConfigurableService implements StoreVariableServiceInterface
@@ -34,6 +35,7 @@ class StoreVariableService extends ConfigurableService implements StoreVariableS
      * @param VariableStorable $resultRow
      * @param taoResultServer_models_classes_WritableResultStorage $resultStorage
      * @return bool
+     * @throws DuplicateVariableException
      */
     public function save($deliveryResultIdentifier, VariableStorable $resultRow, taoResultServer_models_classes_WritableResultStorage $resultStorage)
     {
