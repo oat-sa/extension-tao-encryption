@@ -167,7 +167,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
                     );
                 } catch (DuplicateVariableException $e) {
                     $this->logInfo(sprintf(
-                        'Variable for result `%s` already exists. Synchronisation of that variable was skipped.',
+                        'Variable for result `%s` already exists. Decryption of that variable was skipped.',
                         $deliveryResultIdentifier
                     ));
                 }
