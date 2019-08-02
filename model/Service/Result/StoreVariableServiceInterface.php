@@ -21,6 +21,7 @@
 namespace oat\taoEncryption\Service\Result;
 
 use oat\taoResultServer\models\Entity\VariableStorable;
+use oat\taoResultServer\models\Exceptions\DuplicateVariableException;
 use taoResultServer_models_classes_WritableResultStorage;
 
 interface StoreVariableServiceInterface
@@ -31,6 +32,7 @@ interface StoreVariableServiceInterface
      * @param string $deliveryResultIdentifier
      * @param VariableStorable $variableStorable
      * @param taoResultServer_models_classes_WritableResultStorage $storage
+     * @throws DuplicateVariableException
      * @return bool
      */
     public function save($deliveryResultIdentifier, VariableStorable $variableStorable,taoResultServer_models_classes_WritableResultStorage $storage);
