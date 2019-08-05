@@ -31,6 +31,7 @@ use oat\taoEncryption\scripts\tools\SetupDecryptDeliveryLogFormatterService;
 use oat\taoEncryption\Service\Mapper\DummyMapper;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 use oat\taoEncryption\Service\Result\StoreVariableService;
+use oat\taoEncryption\Service\Result\SyncEncryptedResultDataFormatter;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
 use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\TestSession\EncryptSyncTestSessionService;
@@ -149,6 +150,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('1.2.0');
         }
 
-        $this->skip('1.2.0', '2.0.1');
+        $this->skip('1.2.0', '2.0.1.1');
     }
 }
