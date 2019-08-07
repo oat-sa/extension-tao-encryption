@@ -34,13 +34,13 @@ return array(
     'label' => 'TAO encryption',
     'description' => 'TAO encryption',
     'license' => 'GPL-2.0',
-    'version' => '3.0.0',
+    'version' => '3.1.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.7.0',
         'generis' => '>=7.11.0',
         'taoResultServer' => '>=9.3.0',
-        'taoSync' => '>=4.0.0',
+        'taoSync' => '>=6.6.0',
         'taoProctoring' => '>=12.3.0',
         'taoTestCenter' => '>=4.1.0'
     ),

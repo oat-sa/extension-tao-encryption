@@ -27,8 +27,6 @@ use oat\tao\model\taskQueue\QueueDispatcher;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Task\DecryptResultTask;
-use oat\taoResultServer\models\Entity\ItemVariableStorable;
-use oat\taoResultServer\models\Entity\TestVariableStorable;
 use oat\taoSync\model\ResultService;
 use Psr\Log\LogLevel;
 
@@ -156,26 +154,6 @@ class SyncEncryptedResultService extends ResultService
     }
 
     /**
-     * Get variables of a delivery execution
-     *
-     * @param $deliveryId
-     * @param $deliveryExecutionId
-     * @return array
-     * @throws \Exception
-     */
-    protected function getDeliveryExecutionVariables($deliveryId, $deliveryExecutionId)
-    {
-        $refs = $this->getDeliveryResultVarsRefsModel()->getResultsVariablesRefs($deliveryExecutionId);
-        $resultRows = [];
-
-        foreach ($refs as $ref) {
-            $resultRows[$ref] = $this->getResultRow($ref);
-        }
-
-        return $resultRows;
-    }
-
-    /**
      * @throws \Exception
      * @return common_persistence_KeyValuePersistence
      */
@@ -219,16 +197,6 @@ class SyncEncryptedResultService extends ResultService
         }
 
         return $this->deliveryResultVarsRefs;
-    }
-
-    /**
-     * @param $ref
-     * @return bool|DecryptResultService|ItemVariableStorable|TestVariableStorable
-     * @throws \Exception
-     */
-    protected function getResultRow($ref)
-    {
-        return $this->getPersistence()->get($ref);
     }
 
     /**
