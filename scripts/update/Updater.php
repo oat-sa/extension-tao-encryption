@@ -40,6 +40,8 @@ use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\User\EncryptedUserFactoryService;
 use oat\taoEncryption\scripts\install\RegisterTestSessionSyncMapper;
+use oat\taoSync\model\Result\SyncResultDataFormatter;
+use oat\taoSync\model\ResultService;
 use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 use oat\taoTestCenter\model\event\ProctorCreatedEvent;
 
@@ -150,6 +152,23 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('1.2.0');
         }
 
-        $this->skip('1.2.0', '3.1.0');
+        $this->skip('1.2.0', '3.0.0');
+
+        if ($this->isVersion('3.0.0')) {
+            $service = $this->getServiceManager()->get(ResultService::SERVICE_ID);
+            // register 'SyncEncryptedResultDataFormatter' if 'SetupEncryptedSyncResult' script was already executed
+            if (is_object($service) && $service instanceof SyncEncryptedResultService) {
+                /** @var SyncResultDataFormatter $formatter */
+                $dataFormatter = $this->getServiceManager()->get(SyncResultDataFormatter::SERVICE_ID);
+                $options = $dataFormatter->getOptions();
+
+                $encryptedDataFormatter = new SyncEncryptedResultDataFormatter(array_merge([
+                    SyncEncryptedResultDataFormatter::OPTION_PERSISTENCE => 'encryptedResults'
+                ], $options));
+                $this->getServiceManager()->register(SyncEncryptedResultDataFormatter::SERVICE_ID, $encryptedDataFormatter);
+            }
+
+            $this->setVersion('3.1.0');
+        }
     }
 }
