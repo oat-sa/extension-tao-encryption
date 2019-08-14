@@ -78,12 +78,12 @@ class EncryptedAssemblerService extends AssemblerService implements EncryptionAw
     }
 
     /**
-     * @return EncryptionAwareInterface|EncryptionServiceInterface
+     * @return EncryptionServiceInterface
      * @throws AssemblyExportFailedException
      */
     public function getEncryptionService()
     {
-        if (!$this->encryptionService instanceof EncryptionAwareInterface) {
+        if (!$this->encryptionService instanceof EncryptionServiceInterface) {
             throw new AssemblyExportFailedException('Encryption service is not set up.');
         }
 
