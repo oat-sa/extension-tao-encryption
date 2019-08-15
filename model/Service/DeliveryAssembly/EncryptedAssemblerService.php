@@ -41,7 +41,7 @@ class EncryptedAssemblerService extends AssemblerService implements EncryptionAw
      */
     protected function getFileSource(tao_models_classes_service_StorageDirectory $directory,$file)
     {
-        $stream = parent::getFileSource($directory,$file);
+        $stream = parent::getFileSource($directory, $file);
         if ($directory->isPublic()) {
             return $stream;
         }

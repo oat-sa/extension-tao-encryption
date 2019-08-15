@@ -46,7 +46,6 @@ class EncryptionServiceFactory
         $encryptionService->setAlgorithm($algorithmService);
         $encryptionService->setKeyProvider($keyProvider);
 
-
         return $encryptionService;
     }
 }
