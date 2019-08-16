@@ -25,8 +25,10 @@ use oat\oatbox\extension\InstallAction;
 use oat\taoEncryption\Service\EncryptionAsymmetricService;
 use oat\taoEncryption\Service\KeyProvider\AsymmetricKeyPairProviderService;
 use oat\taoEncryption\Service\Mapper\DummyMapper;
+use oat\taoEncryption\Service\Result\SyncEncryptedResultDataFormatter;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
 use oat\taoSync\model\event\SynchronisationStart;
+use oat\taoSync\model\Result\SyncResultDataFormatter;
 use oat\taoSync\model\ResultService;
 use common_report_Report as Report;
 
@@ -74,10 +76,20 @@ class SetupEncryptedSyncResult extends InstallAction
         $this->registerService(SyncEncryptedResultService::SERVICE_ID, $encrypted);
 
         $report->add(Report::createSuccess('SyncEncryptedResultService successfully registered.'));
+
+        /** @var SyncResultDataFormatter $formatter */
+        $dataFormatter = $this->getServiceLocator()->get(SyncResultDataFormatter::SERVICE_ID);
+        $options = $dataFormatter->getOptions();
+
+        $encryptedDataFormatter = new SyncEncryptedResultDataFormatter(array_merge([
+            SyncEncryptedResultDataFormatter::OPTION_PERSISTENCE => 'encryptedResults'
+        ], $options));
+        $this->registerService(SyncEncryptedResultDataFormatter::SERVICE_ID, $encryptedDataFormatter);
+
+        $report->add(Report::createSuccess('SyncEncryptedResultDataFormatter successfully registered.'));
         $report->add(Report::createSuccess($this->setupSynchronizationListener()));
 
         return $report;
-
     }
 
     /**
