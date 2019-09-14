@@ -34,6 +34,7 @@ class DecryptResultTask extends AbstractAction implements \JsonSerializable
      */
     public function __invoke($params)
     {
+
         if (!isset($params['deliveryResultId'])){
             throw new \Exception('The delivery result id it is not in the params');
         }

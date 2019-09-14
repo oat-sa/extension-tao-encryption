@@ -24,6 +24,7 @@ use common_persistence_KeyValuePersistence;
 use common_persistence_KvDriver;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\tao\model\taskQueue\QueueDispatcher;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoEncryption\Model\Exception\DecryptionFailedException;
@@ -31,6 +32,7 @@ use oat\taoEncryption\Model\Exception\EmptyContentException;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Service\Mapper\TestSessionSyncMapper;
+use oat\taoEncryption\Task\DecryptDeliveryExecutionTask;
 use oat\taoResultServer\models\classes\implementation\ResultServerService;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
@@ -77,6 +79,7 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
      * @param $resultId
      * @return Report
      * @throws \common_exception_Error
+     * @throws \Exception
      */
     public function decryptByExecution($deliveryIdentifier, $resultId)
     {
@@ -188,9 +191,13 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
         }
 
-        return $report;
+        $newResults = $this->getDeliveryResultsModel()->getResultsReferences($deliveryIdentifier);
+        $remainingResults = array_diff($newResults, $resultsDecrypted);
+        $this->setResultsReferences($deliveryIdentifier, $remainingResults);
 
+        return $report;
     }
+
     /**
      * @return EncryptionServiceInterface
      */
