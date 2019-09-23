@@ -57,8 +57,7 @@ class EncryptLtiUserFactoryService extends ConfigurableService implements LtiUse
         $this->propagate($encryptedLtiContext);
 
         $this->getLtiLaunchDataStorage()->save($encryptedLtiContext);
-
-        return new LtiUser($encryptedLtiContext, $userId);
+        return $this->propagate(new LtiUser($encryptedLtiContext, $userId));
     }
 
     /**
