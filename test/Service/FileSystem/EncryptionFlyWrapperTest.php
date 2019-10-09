@@ -25,8 +25,9 @@ use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\FileSystem\EncryptionFlyWrapper;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
 
-class EncryptionFlyWrapperTest extends \PHPUnit_Framework_TestCase
+class EncryptionFlyWrapperTest extends TestCase
 {
     public function testGetAdapter()
     {
