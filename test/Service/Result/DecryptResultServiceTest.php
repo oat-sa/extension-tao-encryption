@@ -35,6 +35,7 @@ use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 use taoResultServer_models_classes_Variable;
 use taoResultServer_models_classes_WritableResultStorage;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\MockObject;
 
 class DecryptResultServiceTest extends TestCase
 {
@@ -104,7 +105,7 @@ class DecryptResultServiceTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     protected function mockDeliveryExecution()
     {
@@ -175,7 +176,7 @@ class DecryptResultServiceTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     protected function mockPersistence()
     {

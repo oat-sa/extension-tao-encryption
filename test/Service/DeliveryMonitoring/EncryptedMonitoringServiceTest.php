@@ -25,8 +25,9 @@ use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoEncryption\Service\DeliveryMonitoring\EncryptedMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
+use oat\generis\test\TestCase;
 
-class EncryptedMonitoringServiceTest extends \PHPUnit_Framework_TestCase
+class EncryptedMonitoringServiceTest extends TestCase
 {
     public function testMonitoring()
     {
