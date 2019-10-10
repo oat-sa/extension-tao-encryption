@@ -194,6 +194,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('3.2.1');
         }
 
-        $this->skip('3.2.1', '3.3.0');
+        $this->skip('3.2.1', '4.0.0');
     }
 }
