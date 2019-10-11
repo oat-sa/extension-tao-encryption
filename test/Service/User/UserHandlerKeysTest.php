@@ -25,8 +25,9 @@ use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\User\UserHandlerKeys;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
 
-class UserHandlerKeysTest extends \PHPUnit_Framework_TestCase
+class UserHandlerKeysTest extends TestCase
 {
 
     public function testGenerateUserKey()

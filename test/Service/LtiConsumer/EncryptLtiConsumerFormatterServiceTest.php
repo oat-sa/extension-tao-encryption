@@ -26,8 +26,9 @@ use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\LtiConsumer\EncryptedLtiConsumer;
 use oat\taoEncryption\Service\LtiConsumer\EncryptLtiConsumerFormatterService;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
 
-class EncryptLtiConsumerFormatterServiceTest extends \PHPUnit_Framework_TestCase
+class EncryptLtiConsumerFormatterServiceTest extends TestCase
 {
     /**
      * @throws \Exception

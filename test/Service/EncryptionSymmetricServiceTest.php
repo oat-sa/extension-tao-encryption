@@ -23,8 +23,9 @@ use oat\taoEncryption\Service\Algorithm\AlgorithmSymmetricService;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SymmetricKeyProviderService;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
 
-class EncryptionSymmetricServiceTest extends \PHPUnit_Framework_TestCase
+class EncryptionSymmetricServiceTest extends TestCase
 {
     public function testFlow()
     {

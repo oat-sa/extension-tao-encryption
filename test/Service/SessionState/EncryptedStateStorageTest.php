@@ -27,8 +27,10 @@ use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\EncryptedUser;
 use oat\taoEncryption\Service\SessionState\EncryptedStateStorage;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
+use oat\generis\test\MockObject;
 
-class EncryptedStateStorageTest extends \PHPUnit_Framework_TestCase
+class EncryptedStateStorageTest extends TestCase
 {
     /**
      * @throws \Exception
@@ -63,7 +65,7 @@ class EncryptedStateStorageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $encrypted
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     public function getService($encrypted = true)
     {

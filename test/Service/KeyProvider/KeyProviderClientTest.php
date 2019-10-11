@@ -24,8 +24,9 @@ namespace oat\taoEncryption\Test\Service\KeyProvider;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use oat\generis\test\TestCase;
 
-class KeyProviderClientTest extends \PHPUnit_Framework_TestCase
+class KeyProviderClientTest extends TestCase
 {
 
     public function testUpdatePublicKey()

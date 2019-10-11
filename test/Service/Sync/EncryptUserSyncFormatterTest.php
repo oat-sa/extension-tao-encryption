@@ -25,8 +25,9 @@ use oat\generis\model\OntologyRdfs;
 use oat\taoEncryption\Rdf\EncryptedUserRdf;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\Sync\EncryptUserSyncFormatter;
+use oat\generis\test\TestCase;
 
-class EncryptUserSyncFormatterTest extends \PHPUnit_Framework_TestCase
+class EncryptUserSyncFormatterTest extends TestCase
 {
     protected $encryptString;
 

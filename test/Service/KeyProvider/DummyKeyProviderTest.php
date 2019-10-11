@@ -22,8 +22,9 @@ namespace oat\taoEncryption\Test\Service\KeyProvider;
 
 use oat\taoEncryption\Model\Key;
 use oat\taoEncryption\Service\KeyProvider\DummyKeyProvider;
+use oat\generis\test\TestCase;
 
-class DummyKeyProviderTest extends \PHPUnit_Framework_TestCase
+class DummyKeyProviderTest extends TestCase
 {
     public function testGetKey()
     {

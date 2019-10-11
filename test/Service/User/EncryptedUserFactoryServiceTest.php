@@ -23,8 +23,10 @@ namespace oat\taoEncryption\Test\Service\User;
 use core_kernel_classes_Resource;
 use oat\taoEncryption\Service\Session\EncryptedUser;
 use oat\taoEncryption\Service\User\EncryptedUserFactoryService;
+use oat\generis\test\TestCase;
+use oat\generis\test\MockObject;
 
-class EncryptedUserFactoryServiceTest extends \PHPUnit_Framework_TestCase
+class EncryptedUserFactoryServiceTest extends TestCase
 {
 
     /**
@@ -76,7 +78,7 @@ class EncryptedUserFactoryServiceTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     protected function mockResource()
     {
