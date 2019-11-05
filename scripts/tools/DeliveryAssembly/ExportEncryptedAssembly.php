@@ -19,7 +19,9 @@
 
 namespace oat\taoEncryption\scripts\tools\DeliveryAssembly;
 
+use common_exception_Error;
 use common_report_Report as Report;
+use Exception;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\extension\script\ScriptAction;
 use oat\taoDeliveryRdf\model\AssemblerServiceInterface;
@@ -27,6 +29,7 @@ use oat\taoEncryption\Service\DeliveryAssembly\EncryptedAssemblerFactory;
 use oat\taoEncryption\Service\EncryptionAwareInterface;
 use oat\taoEncryption\Service\EncryptionServiceFactory;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
+use tao_helpers_File;
 
 class ExportEncryptedAssembly extends ScriptAction
 {
@@ -94,6 +97,7 @@ class ExportEncryptedAssembly extends ScriptAction
 
     /**
      * @return Report
+     * @throws common_exception_Error
      */
     protected function run()
     {
@@ -115,12 +119,12 @@ class ExportEncryptedAssembly extends ScriptAction
             $exportedAssemblyPath = $assembler->exportCompiledDelivery($delivery);
 
             if ($this->hasOption(self::OPTION_OUTPUT)) {
-                \tao_helpers_File::move($exportedAssemblyPath, $this->getOption(self::OPTION_OUTPUT));
+                tao_helpers_File::move($exportedAssemblyPath, $this->getOption(self::OPTION_OUTPUT));
                 $exportedAssemblyPath = $this->getOption(self::OPTION_OUTPUT);
             }
 
             $this->report->add(Report::createSuccess(sprintf("Delivery assembly '%s' exported to %s", $delivery->getLabel(), $exportedAssemblyPath)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->report->add(Report::createFailure("Export failed: " . $e->getMessage()));
         }
 
@@ -156,7 +160,7 @@ class ExportEncryptedAssembly extends ScriptAction
      * @param $algorithmName
      * @param $key
      * @return EncryptionSymmetricService
-     * @throws \Exception
+     * @throws Exception
      */
     private function getEncryptionService($algorithmName, $key)
     {
