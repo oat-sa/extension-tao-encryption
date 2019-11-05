@@ -28,6 +28,8 @@ class EncryptedAssemblerFactory extends ConfigurableService
 {
     use ServiceLocatorAwareTrait;
 
+    const OPTION_STATIC = 'static';
+
     /**
      * @return AssemblerServiceInterface|EncryptionAwareInterface
      */
@@ -36,7 +38,9 @@ class EncryptedAssemblerFactory extends ConfigurableService
         $assembler = $this->getServiceLocator()->get(AssemblerServiceInterface::SERVICE_ID);
         $assemblerOptions = $assembler->getOptions();
 
-        $encryptedAssembler = new EncryptedAssemblerService($assemblerOptions);
+        $encryptedAssembler = $this->hasOption(self::OPTION_STATIC) && $this->getOption(self::OPTION_STATIC)
+         ? new EncryptedStaticAssemblerService($assemblerOptions)
+         : new EncryptedAssemblerService($assemblerOptions);
         $encryptedAssembler->setServiceLocator($this->getServiceLocator());
 
         return $encryptedAssembler;

@@ -40,6 +40,8 @@ class ExportEncryptedAssembly extends ScriptAction
 
     const OPTION_ENCRYPTION_KEY = 'encryption-key';
 
+    const OPTION_STATIC = 'static-content';
+
     /**
      * @var Report
      */
@@ -81,6 +83,11 @@ class ExportEncryptedAssembly extends ScriptAction
                 'prefix' => 'out',
                 'longPrefix' => self::OPTION_OUTPUT,
                 'description' => 'Destination file path',
+            ],
+            self::OPTION_STATIC => [
+                'prefix' => 's',
+                'longPrefix' => self::OPTION_STATIC,
+                'description' => 'Avoid PHP in the exported data (json to the manifest and xml instead of compact-test.php)'
             ]
         ];
     }
@@ -137,7 +144,9 @@ class ExportEncryptedAssembly extends ScriptAction
      */
     private function getAssemblerService()
     {
-        $factory = new EncryptedAssemblerFactory();
+        $factory = new EncryptedAssemblerFactory([
+            EncryptedAssemblerFactory::OPTION_STATIC => $this->getOption(self::OPTION_STATIC),
+        ]);
         $this->propagate($factory);
 
         return $factory->create();
