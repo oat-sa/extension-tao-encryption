@@ -24,9 +24,12 @@ use common_report_Report as Report;
 use Exception;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\extension\script\ScriptAction;
-use oat\taoDeliveryRdf\model\AssemblerServiceInterface;
-use oat\taoEncryption\Service\DeliveryAssembly\EncryptedAssemblerFactory;
-use oat\taoEncryption\Service\EncryptionAwareInterface;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\AssemblerFileReader;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\AssemblerFileReaderCollection;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\XmlAssemblerFileReader;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\JsonServiceCallConverter;
+use oat\taoDeliveryRdf\model\import\AssemblerService;
+use oat\taoEncryption\Service\DeliveryAssembly\import\assemblerDataProviders\EncryptedFileReader;
 use oat\taoEncryption\Service\EncryptionServiceFactory;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use tao_helpers_File;
@@ -106,14 +109,8 @@ class ExportEncryptedAssembly extends ScriptAction
         try {
             $deliveryUri = $this->getOption(self::OPTION_DELIVERY_URI);
             $this->report->add(Report::createInfo('Export delivery ' . $deliveryUri));
-            $encryptionService = $this->getEncryptionService(
-                $this->getOption(self::OPTION_ENCRYPTION_ALGORITHM),
-                $this->getOption(self::OPTION_ENCRYPTION_KEY)
-            );
 
             $assembler = $this->getAssemblerService();
-            $assembler->setEncryptionService($encryptionService);
-
             $delivery = $this->getResource($deliveryUri);
 
             $exportedAssemblyPath = $assembler->exportCompiledDelivery($delivery);
@@ -123,9 +120,9 @@ class ExportEncryptedAssembly extends ScriptAction
                 $exportedAssemblyPath = $this->getOption(self::OPTION_OUTPUT);
             }
 
-            $this->report->add(Report::createSuccess(sprintf("Delivery assembly '%s' exported to %s", $delivery->getLabel(), $exportedAssemblyPath)));
+            $this->report->add(Report::createSuccess(sprintf('Delivery assembly "%s" exported to %s', $delivery->getLabel(), $exportedAssemblyPath)));
         } catch (Exception $e) {
-            $this->report->add(Report::createFailure("Export failed: " . $e->getMessage()));
+            $this->report->add(Report::createFailure('Export failed: ' . $e->getMessage()));
         }
 
         return $this->report;
@@ -144,16 +141,44 @@ class ExportEncryptedAssembly extends ScriptAction
     }
 
     /**
-     * @return AssemblerServiceInterface|EncryptionAwareInterface
+     * @return AssemblerService
+     * @throws common_exception_Error
+     * @throws Exception
      */
     private function getAssemblerService()
     {
-        $factory = new EncryptedAssemblerFactory([
-            EncryptedAssemblerFactory::OPTION_STATIC => $this->getOption(self::OPTION_STATIC),
-        ]);
-        $this->propagate($factory);
+        /** @var AssemblerService $assemblerService */
+        $assemblerService = $this->getServiceLocator()->get(AssemblerService::SERVICE_ID);
+        $options = $assemblerService->getOptions();
 
-        return $factory->create();
+        $encryptionService = $this->getEncryptionService(
+            $this->getOption(self::OPTION_ENCRYPTION_ALGORITHM),
+            $this->getOption(self::OPTION_ENCRYPTION_KEY)
+        );
+
+        $encryptedFileReader = new EncryptedFileReader();
+        $this->propagate($encryptedFileReader);
+        $encryptedFileReader->setOption(EncryptedFileReader::OPTION_ENCRYPTION_SERVICE, $encryptionService);
+
+        if ($this->getOption(self::OPTION_STATIC)) {
+            // replace default assembler service to use static configured
+            // compact-test.xml instead of compact-test.php and json instead of serialized runtime in the manifest
+            $options[AssemblerService::OPTION_FILE_READER] = new AssemblerFileReaderCollection([
+                new XmlAssemblerFileReader(),
+                $encryptedFileReader,
+            ]);
+            $options[AssemblerService::OPTION_SERVICE_CALL_CONVERTER] = new JsonServiceCallConverter();
+        } else {
+            $options[AssemblerService::OPTION_FILE_READER] = new AssemblerFileReaderCollection([
+                new AssemblerFileReader(),
+                $encryptedFileReader,
+            ]);
+        }
+
+        // I do not want to replace default configuration, new configuration is important for the export only
+        $assemblerService = new AssemblerService($options);
+        $this->propagate($assemblerService);
+        return $assemblerService;
     }
 
     /**

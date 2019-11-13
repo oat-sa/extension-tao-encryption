@@ -14,47 +14,44 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019  (original work) Open Assessment Technologies SA;
+ *
+ * @author Oleksandr Zagovorychev <zagovorichev@gmail.com>
  */
 
-namespace oat\taoEncryption\Service\DeliveryAssembly;
+namespace oat\taoEncryption\Service\DeliveryAssembly\import\assemblerDataProviders;
 
 
-use oat\taoDeliveryRdf\model\import\StaticAssemblerService;
-use tao_models_classes_service_StorageDirectory;
+use GuzzleHttp\Psr7\Stream;
+use oat\oatbox\filesystem\File;
 use oat\taoDeliveryRdf\model\export\AssemblyExportFailedException;
-use oat\taoEncryption\Service\EncryptionAwareInterface;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\AssemblerFileReaderAbstract;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use Psr\Http\Message\StreamInterface;
+use tao_models_classes_service_StorageDirectory;
 
-class EncryptedStaticAssemblerService extends StaticAssemblerService implements EncryptionAwareInterface
+class EncryptedFileReader extends AssemblerFileReaderAbstract
 {
-    /**
-     * @var EncryptionServiceInterface
-     */
-    private $encryptionService;
+    const OPTION_ENCRYPTION_SERVICE = 'encryptionService';
 
     /**
+     * @param File $file
      * @param tao_models_classes_service_StorageDirectory $directory
-     * @param string $file
-     * @return StreamInterface|resource
+     * @return Stream|StreamInterface|resource
      * @throws AssemblyExportFailedException
      */
-    protected function getFileSource(tao_models_classes_service_StorageDirectory $directory,$file)
+    protected function stream(File $file, tao_models_classes_service_StorageDirectory $directory)
     {
-        $stream = parent::getFileSource($directory, $file);
-        if ($directory->isPublic()) {
-            return $stream;
-        }
-
-        return $this->encryptStream($stream);
+        return $directory->isPublic()
+            ? $file->readPsrStream()
+            : $this->encryptStream($file->readPsrStream());
     }
 
     /**
      * TODO: switch to another encryption library which supports stream encryption and encrypt stream.
      *
      * @param StreamInterface $stream
-     * @return resource|StreamInterface
+     * @return StreamInterface
      * @throws AssemblyExportFailedException
      */
     private function encryptStream(StreamInterface $stream)
@@ -67,15 +64,7 @@ class EncryptedStaticAssemblerService extends StaticAssemblerService implements 
         fwrite($fp, $contents);
         rewind($fp);
 
-        return $fp;
-    }
-
-    /**
-     * @param EncryptionServiceInterface $encryptionService
-     */
-    public function setEncryptionService(EncryptionServiceInterface $encryptionService)
-    {
-        $this->encryptionService = $encryptionService;
+        return new Stream($fp);
     }
 
     /**
@@ -84,10 +73,10 @@ class EncryptedStaticAssemblerService extends StaticAssemblerService implements 
      */
     public function getEncryptionService()
     {
-        if (!$this->encryptionService instanceof EncryptionServiceInterface) {
-            throw new AssemblyExportFailedException('Encryption service is not set up.');
+        if ($this->hasOption(self::OPTION_ENCRYPTION_SERVICE) && $this->getOption(self::OPTION_ENCRYPTION_SERVICE) instanceof EncryptionServiceInterface) {
+            return $this->getOption(self::OPTION_ENCRYPTION_SERVICE);
         }
 
-        return $this->encryptionService;
+        throw new AssemblyExportFailedException('Encryption service is not set up.');
     }
 }
