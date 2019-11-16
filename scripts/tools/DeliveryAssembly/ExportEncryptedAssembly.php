@@ -24,10 +24,10 @@ use common_report_Report as Report;
 use Exception;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\extension\script\ScriptAction;
-use oat\taoDeliveryRdf\model\import\assemblerDataProviders\AssemblerFileReader;
-use oat\taoDeliveryRdf\model\import\assemblerDataProviders\AssemblerFileReaderCollection;
-use oat\taoDeliveryRdf\model\import\assemblerDataProviders\XmlAssemblerFileReader;
-use oat\taoDeliveryRdf\model\import\assemblerDataProviders\JsonServiceCallConverter;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\assemblerFileReaders\AssemblerFileReader;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\assemblerFileReaders\AssemblerFileReaderCollection;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\assemblerFileReaders\XmlAssemblerFileReader;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\serviceCallConverters\JsonServiceCallConverter;
 use oat\taoDeliveryRdf\model\import\AssemblerService;
 use oat\taoEncryption\Service\DeliveryAssembly\import\assemblerDataProviders\EncryptedFileReader;
 use oat\taoEncryption\Service\EncryptionServiceFactory;
@@ -142,7 +142,6 @@ class ExportEncryptedAssembly extends ScriptAction
 
     /**
      * @return AssemblerService
-     * @throws common_exception_Error
      * @throws Exception
      */
     private function getAssemblerService()
@@ -164,14 +163,18 @@ class ExportEncryptedAssembly extends ScriptAction
             // replace default assembler service to use static configured
             // compact-test.xml instead of compact-test.php and json instead of serialized runtime in the manifest
             $options[AssemblerService::OPTION_FILE_READER] = new AssemblerFileReaderCollection([
-                new XmlAssemblerFileReader(),
-                $encryptedFileReader,
+                AssemblerFileReaderCollection::OPTION_FILE_READERS => [
+                    new XmlAssemblerFileReader(),
+                    $encryptedFileReader,
+                ]
             ]);
             $options[AssemblerService::OPTION_SERVICE_CALL_CONVERTER] = new JsonServiceCallConverter();
         } else {
             $options[AssemblerService::OPTION_FILE_READER] = new AssemblerFileReaderCollection([
-                new AssemblerFileReader(),
-                $encryptedFileReader,
+                AssemblerFileReaderCollection::OPTION_FILE_READERS => [
+                    new AssemblerFileReader(),
+                    $encryptedFileReader,
+                ]
             ]);
         }
 

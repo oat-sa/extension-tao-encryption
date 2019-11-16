@@ -25,7 +25,7 @@ namespace oat\taoEncryption\Service\DeliveryAssembly\import\assemblerDataProvide
 use GuzzleHttp\Psr7\Stream;
 use oat\oatbox\filesystem\File;
 use oat\taoDeliveryRdf\model\export\AssemblyExportFailedException;
-use oat\taoDeliveryRdf\model\import\assemblerDataProviders\AssemblerFileReaderAbstract;
+use oat\taoDeliveryRdf\model\import\assemblerDataProviders\assemblerFileReaders\AssemblerFileReaderAbstract;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use Psr\Http\Message\StreamInterface;
 use tao_models_classes_service_StorageDirectory;
