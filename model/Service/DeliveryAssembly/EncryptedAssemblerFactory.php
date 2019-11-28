@@ -20,7 +20,7 @@
 namespace oat\taoEncryption\Service\DeliveryAssembly;
 
 use oat\oatbox\service\ConfigurableService;
-use oat\taoDeliveryRdf\model\AssemblerServiceInterface;
+use oat\taoDeliveryRdf\model\export\AssemblyExporterService;
 use oat\taoEncryption\Service\EncryptionAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
@@ -29,11 +29,11 @@ class EncryptedAssemblerFactory extends ConfigurableService
     use ServiceLocatorAwareTrait;
 
     /**
-     * @return AssemblerServiceInterface|EncryptionAwareInterface
+     * @return AssemblyExporterService|EncryptionAwareInterface
      */
     public function create()
     {
-        $assembler = $this->getServiceLocator()->get(AssemblerServiceInterface::SERVICE_ID);
+        $assembler = $this->getServiceLocator()->get(AssemblyExporterService::class);
         $assemblerOptions = $assembler->getOptions();
 
         $encryptedAssembler = new EncryptedAssemblerService($assemblerOptions);

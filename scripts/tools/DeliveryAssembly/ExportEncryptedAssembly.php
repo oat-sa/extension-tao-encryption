@@ -23,6 +23,7 @@ use common_report_Report as Report;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\extension\script\ScriptAction;
 use oat\taoDeliveryRdf\model\AssemblerServiceInterface;
+use oat\taoDeliveryRdf\model\export\AssemblyExporterService;
 use oat\taoEncryption\Service\DeliveryAssembly\EncryptedAssemblerFactory;
 use oat\taoEncryption\Service\EncryptionAwareInterface;
 use oat\taoEncryption\Service\EncryptionServiceFactory;
@@ -133,7 +134,7 @@ class ExportEncryptedAssembly extends ScriptAction
     }
 
     /**
-     * @return AssemblerServiceInterface|EncryptionAwareInterface
+     * @return AssemblyExporterService|EncryptionAwareInterface
      */
     private function getAssemblerService()
     {

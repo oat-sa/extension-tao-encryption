@@ -19,14 +19,14 @@
 
 namespace oat\taoEncryption\Service\DeliveryAssembly;
 
+use oat\taoDeliveryRdf\model\export\AssemblyExporterService;
 use tao_models_classes_service_StorageDirectory;
 use oat\taoDeliveryRdf\model\export\AssemblyExportFailedException;
-use oat\taoDeliveryRdf\model\import\AssemblerService;
 use oat\taoEncryption\Service\EncryptionAwareInterface;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use Psr\Http\Message\StreamInterface;
 
-class EncryptedAssemblerService extends AssemblerService implements EncryptionAwareInterface
+class EncryptedAssemblerService extends AssemblyExporterService implements EncryptionAwareInterface
 {
     /**
      * @var EncryptionServiceInterface
