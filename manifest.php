@@ -43,7 +43,7 @@ return array(
         'taoSync' => '>=6.6.0',
         'taoProctoring' => '>=12.3.0',
         'taoTestCenter' => '>=4.1.0',
-        'taoDeliveryRdf' => '>=8.3.0.1'
+        'taoDeliveryRdf' => '>=9.2.0'
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#EncryptionRole',
     'acl' => array(
