@@ -19,13 +19,15 @@
 
 namespace oat\taoEncryption\scripts\tools\DeliveryAssembly;
 
+use Exception;
+use tao_helpers_File;
 use common_report_Report as Report;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\extension\script\ScriptAction;
-use oat\taoDeliveryRdf\model\AssemblerServiceInterface;
-use oat\taoEncryption\Service\DeliveryAssembly\EncryptedAssemblerFactory;
-use oat\taoEncryption\Service\EncryptionAwareInterface;
+use oat\taoDeliveryRdf\model\export\AssemblyExporterService;
+use oat\taoEncryption\Service\DeliveryAssembly\EncryptedAssemblyFilesReaderDecorator;
 use oat\taoEncryption\Service\EncryptionServiceFactory;
+use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 
 class ExportEncryptedAssembly extends ScriptAction
@@ -100,20 +102,18 @@ class ExportEncryptedAssembly extends ScriptAction
                 $this->getOption(self::OPTION_ENCRYPTION_KEY)
             );
 
-            $assembler = $this->getAssemblerService();
-            $assembler->setEncryptionService($encryptionService);
-
+            $assembler = $this->getAssemblyExporter($encryptionService);
             $delivery = $this->getResource($deliveryUri);
 
             $exportedAssemblyPath = $assembler->exportCompiledDelivery($delivery);
 
             if ($this->hasOption(self::OPTION_OUTPUT)) {
-                \tao_helpers_File::move($exportedAssemblyPath, $this->getOption(self::OPTION_OUTPUT));
+                tao_helpers_File::move($exportedAssemblyPath, $this->getOption(self::OPTION_OUTPUT));
                 $exportedAssemblyPath = $this->getOption(self::OPTION_OUTPUT);
             }
 
             $this->report->add(Report::createSuccess(sprintf("Delivery assembly '%s' exported to %s", $delivery->getLabel(), $exportedAssemblyPath)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->report->add(Report::createFailure("Export failed: " . $e->getMessage()));
         }
 
@@ -133,14 +133,18 @@ class ExportEncryptedAssembly extends ScriptAction
     }
 
     /**
-     * @return AssemblerServiceInterface|EncryptionAwareInterface
+     * @param EncryptionServiceInterface $encryptionService
+     *
+     * @return AssemblyExporterService
      */
-    private function getAssemblerService()
+    private function getAssemblyExporter(EncryptionServiceInterface $encryptionService)
     {
-        $factory = new EncryptedAssemblerFactory();
-        $this->propagate($factory);
+        $assemblerService = $this->getServiceLocator()->get(AssemblyExporterService::SERVICE_ID);
+        $filesReader = $this->propagate($assemblerService->getOption(AssemblyExporterService::OPTION_ASSEMBLY_FILES_READER));
+        $encryptedFilesReader = new EncryptedAssemblyFilesReaderDecorator($filesReader, $encryptionService);
+        $assemblerService->setOption(AssemblyExporterService::OPTION_ASSEMBLY_FILES_READER, $encryptedFilesReader);
 
-        return $factory->create();
+        return $assemblerService;
     }
 
     /**
