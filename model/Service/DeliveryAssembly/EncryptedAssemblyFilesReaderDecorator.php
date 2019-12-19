@@ -21,6 +21,7 @@ namespace oat\taoEncryption\Service\DeliveryAssembly;
 
 
 use Generator;
+use GuzzleHttp\Psr7\Stream;
 use oat\taoDeliveryRdf\model\assembly\AssemblyFilesReaderInterface;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use Psr\Http\Message\StreamInterface;
@@ -57,6 +58,7 @@ class EncryptedAssemblyFilesReaderDecorator implements AssemblyFilesReaderInterf
     {
         if ($directory->isPublic()) {
             yield from $this->filesReader->getFiles($directory);
+            return;
         }
 
         foreach ($this->filesReader->getFiles($directory) as $filePath => $fileStream) {
@@ -78,6 +80,6 @@ class EncryptedAssemblyFilesReaderDecorator implements AssemblyFilesReaderInterf
         fwrite($fp, $contents);
         rewind($fp);
 
-        return $fp;
+        return new Stream($fp);
     }
 }
