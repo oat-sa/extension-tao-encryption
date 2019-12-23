@@ -19,10 +19,10 @@
 
 namespace oat\taoEncryption\Service\DeliveryAssembly;
 
-
 use Generator;
 use GuzzleHttp\Psr7\Stream;
 use oat\taoDeliveryRdf\model\assembly\AssemblyFilesReaderInterface;
+use oat\taoDeliveryRdf\model\assembly\CompiledTestConverterService;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use Psr\Http\Message\StreamInterface;
 use tao_models_classes_service_StorageDirectory;
@@ -50,6 +50,14 @@ class EncryptedAssemblyFilesReaderDecorator implements AssemblyFilesReaderInterf
     }
 
     /**
+     * @param CompiledTestConverterService $compiledTestConverter
+     */
+    public function setCompiledTestConverter(CompiledTestConverterService $compiledTestConverter)
+    {
+        $this->filesReader->setCompiledTestConverter($compiledTestConverter);
+    }
+
+    /**
      * @param tao_models_classes_service_StorageDirectory $directory
      *
      * @return Generator In format: [string $filePath => StreamInterface $fileStream]
@@ -70,14 +78,14 @@ class EncryptedAssemblyFilesReaderDecorator implements AssemblyFilesReaderInterf
      * TODO: switch to another encryption library which supports stream encryption
      *
      * @param StreamInterface $fileStream
-     * @return resource
+     * @return StreamInterface
      */
     private function encryptStream(StreamInterface $fileStream)
     {
-        $cont = $fileStream->getContents();
-        $contents = $this->encryptionService->encrypt($cont);
+        $streamContent = $fileStream->getContents();
+        $encryptedContent = $this->encryptionService->encrypt($streamContent);
         $fp = fopen('php://temp','r+');
-        fwrite($fp, $contents);
+        fwrite($fp, $encryptedContent);
         rewind($fp);
 
         return new Stream($fp);
