@@ -68,31 +68,31 @@ class ExportEncryptedAssembly extends ScriptAction
                 'prefix' => 'uri',
                 'required' => true,
                 'longPrefix' => self::OPTION_DELIVERY_URI,
-                'description' => 'Delivery URI',
+                'description' => 'Compiled delivery RDF resource URI.',
             ],
             self::OPTION_ENCRYPTION_ALGORITHM => [
                 'prefix' => 'alg',
                 'longPrefix' => self::OPTION_ENCRYPTION_ALGORITHM,
-                'description' => 'Encryption algorithm',
+                'description' => 'Encryption algorithm.',
                 'defaultValue' => 'AES'
             ],
             self::OPTION_ENCRYPTION_KEY => [
                 'prefix' => 'key',
                 'required' => true,
                 'longPrefix' => self::OPTION_ENCRYPTION_KEY,
-                'description' => 'Encryption key',
+                'description' => 'Encryption key.',
             ],
             self::OPTION_OUTPUT => [
                 'prefix' => 'out',
                 'longPrefix' => self::OPTION_OUTPUT,
-                'description' => 'Destination file path',
+                'description' => 'Filepath for compiled assembly package.',
             ],
             self::OPTION_OUTPUT_TEST_FORMAT => [
                 'prefix' => 'format',
                 'required' => false,
                 'defaultValue' => CompiledTestConverterFactory::COMPILED_TEST_FORMAT_XML,
                 'longPrefix' => self::OPTION_OUTPUT_TEST_FORMAT,
-                'description' => 'Use delivery URI from assembly package.',
+                'description' => 'Output format for compiled test data file.',
             ],
         ];
     }
