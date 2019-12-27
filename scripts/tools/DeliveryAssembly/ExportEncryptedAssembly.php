@@ -19,13 +19,16 @@
 
 namespace oat\taoEncryption\scripts\tools\DeliveryAssembly;
 
+use Exception;
+use oat\taoDeliveryRdf\model\assembly\CompiledTestConverterFactory;
+use tao_helpers_File;
 use common_report_Report as Report;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\extension\script\ScriptAction;
-use oat\taoDeliveryRdf\model\AssemblerServiceInterface;
-use oat\taoEncryption\Service\DeliveryAssembly\EncryptedAssemblerFactory;
-use oat\taoEncryption\Service\EncryptionAwareInterface;
+use oat\taoDeliveryRdf\model\export\AssemblyExporterService;
+use oat\taoEncryption\Service\DeliveryAssembly\EncryptedAssemblyFilesReaderDecorator;
 use oat\taoEncryption\Service\EncryptionServiceFactory;
+use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 
 class ExportEncryptedAssembly extends ScriptAction
@@ -39,6 +42,8 @@ class ExportEncryptedAssembly extends ScriptAction
     const OPTION_ENCRYPTION_ALGORITHM = 'encryption-algorithm';
 
     const OPTION_ENCRYPTION_KEY = 'encryption-key';
+
+    const OPTION_OUTPUT_TEST_FORMAT = 'output-test-format';
 
     /**
      * @var Report
@@ -63,25 +68,32 @@ class ExportEncryptedAssembly extends ScriptAction
                 'prefix' => 'uri',
                 'required' => true,
                 'longPrefix' => self::OPTION_DELIVERY_URI,
-                'description' => 'Delivery URI',
+                'description' => 'Compiled delivery RDF resource URI.',
             ],
             self::OPTION_ENCRYPTION_ALGORITHM => [
                 'prefix' => 'alg',
                 'longPrefix' => self::OPTION_ENCRYPTION_ALGORITHM,
-                'description' => 'Encryption algorithm',
+                'description' => 'Encryption algorithm.',
                 'defaultValue' => 'AES'
             ],
             self::OPTION_ENCRYPTION_KEY => [
                 'prefix' => 'key',
                 'required' => true,
                 'longPrefix' => self::OPTION_ENCRYPTION_KEY,
-                'description' => 'Encryption key',
+                'description' => 'Encryption key.',
             ],
             self::OPTION_OUTPUT => [
                 'prefix' => 'out',
                 'longPrefix' => self::OPTION_OUTPUT,
-                'description' => 'Destination file path',
-            ]
+                'description' => 'Filepath for compiled assembly package.',
+            ],
+            self::OPTION_OUTPUT_TEST_FORMAT => [
+                'prefix' => 'format',
+                'required' => false,
+                'defaultValue' => CompiledTestConverterFactory::COMPILED_TEST_FORMAT_XML,
+                'longPrefix' => self::OPTION_OUTPUT_TEST_FORMAT,
+                'description' => 'Output format for compiled test data file.',
+            ],
         ];
     }
 
@@ -94,26 +106,26 @@ class ExportEncryptedAssembly extends ScriptAction
 
         try {
             $deliveryUri = $this->getOption(self::OPTION_DELIVERY_URI);
+            $outputCompiledTestFormat = $this->getOption(self::OPTION_OUTPUT_TEST_FORMAT);
+
             $this->report->add(Report::createInfo('Export delivery ' . $deliveryUri));
             $encryptionService = $this->getEncryptionService(
                 $this->getOption(self::OPTION_ENCRYPTION_ALGORITHM),
                 $this->getOption(self::OPTION_ENCRYPTION_KEY)
             );
 
-            $assembler = $this->getAssemblerService();
-            $assembler->setEncryptionService($encryptionService);
-
+            $assembler = $this->getAssemblyExporter($encryptionService);
             $delivery = $this->getResource($deliveryUri);
 
-            $exportedAssemblyPath = $assembler->exportCompiledDelivery($delivery);
+            $exportedAssemblyPath = $assembler->exportCompiledDelivery($delivery, $outputCompiledTestFormat);
 
             if ($this->hasOption(self::OPTION_OUTPUT)) {
-                \tao_helpers_File::move($exportedAssemblyPath, $this->getOption(self::OPTION_OUTPUT));
+                tao_helpers_File::move($exportedAssemblyPath, $this->getOption(self::OPTION_OUTPUT));
                 $exportedAssemblyPath = $this->getOption(self::OPTION_OUTPUT);
             }
 
             $this->report->add(Report::createSuccess(sprintf("Delivery assembly '%s' exported to %s", $delivery->getLabel(), $exportedAssemblyPath)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->report->add(Report::createFailure("Export failed: " . $e->getMessage()));
         }
 
@@ -133,14 +145,19 @@ class ExportEncryptedAssembly extends ScriptAction
     }
 
     /**
-     * @return AssemblerServiceInterface|EncryptionAwareInterface
+     * @param EncryptionServiceInterface $encryptionService
+     *
+     * @return AssemblyExporterService
      */
-    private function getAssemblerService()
+    private function getAssemblyExporter(EncryptionServiceInterface $encryptionService)
     {
-        $factory = new EncryptedAssemblerFactory();
-        $this->propagate($factory);
+        $assemblerService = $this->getServiceLocator()->get(AssemblyExporterService::SERVICE_ID);
+        $filesReader = $assemblerService->getOption(AssemblyExporterService::OPTION_ASSEMBLY_FILES_READER);
 
-        return $factory->create();
+        $encryptedFilesReader = new EncryptedAssemblyFilesReaderDecorator($filesReader, $encryptionService);
+        $assemblerService->setOption(AssemblyExporterService::OPTION_ASSEMBLY_FILES_READER, $encryptedFilesReader);
+
+        return $assemblerService;
     }
 
     /**
