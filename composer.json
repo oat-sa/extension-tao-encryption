@@ -25,9 +25,6 @@
         "tao-extension-name": "taoEncryption"
     },
     "minimum-stability" : "dev",
-    "require-dev":{
-        "phpunit/phpunit": "6.5.0"
-    },
     "require": {
         "php" : ">=5.5",
         "phpseclib/phpseclib": "~2.0.0"
