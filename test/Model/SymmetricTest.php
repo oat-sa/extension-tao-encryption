@@ -43,7 +43,7 @@ class SymmetricTest extends TestCase
 
     public function testUnSuccessFlow()
     {
-        $this->setExpectedException(DecryptionFailedException::class);
+        $this->expectException(DecryptionFailedException::class);
 
         $sym = new Symmetric(new AES());
 

@@ -39,7 +39,7 @@ class EncryptLtiConsumerFormatterServiceTest extends TestCase
 
         $result = $service->filterProperties(['property1' => 'value1']);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray( $result);
         $this->assertArrayHasKey(EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY, $result);
         $this->assertEquals(base64_encode('encryptContent'), $result[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]);
     }
