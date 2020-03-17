@@ -40,7 +40,7 @@ class AlgorithmSymmetricServiceTest extends TestCase
         $service->setKeyProvider($keyProvider);
 
         $encrypted = $service->encrypt('secret');
-        $this->assertInternalType('string', $encrypted);
+        $this->assertIsString($encrypted);
         $this->assertEquals('secret', $service->decrypt($encrypted));
     }
 }

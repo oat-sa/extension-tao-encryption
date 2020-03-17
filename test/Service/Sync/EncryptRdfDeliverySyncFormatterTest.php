@@ -37,7 +37,7 @@ class EncryptRdfDeliverySyncFormatterTest extends TestCase
 
         $result = $service->filterProperties(['property1' => 'value1']);
 
-        $this->assertisarray($result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(EncryptedDeliveryRdf::PROPERTY_APPLICATION_KEY, $result);
     }
 
