@@ -46,7 +46,6 @@ class EncryptedUserFactoryServiceTest extends TestCase
     }
 
     /**
-     * @throws Exception
      */
     public function testCreateUserWithWrongClassFailed()
     {
