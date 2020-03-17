@@ -56,12 +56,12 @@ class EncryptUserSyncFormatterTest extends TestCase
             ],
         ]);
 
-        $this->assertIsArray( $values);
+        $this->assertisarray($values);
         $this->assertSame('do not encrypted', (string)$values['not_encrypt_property']);
         $this->assertSame('decrypted', (string)$values[OntologyRdfs::RDFS_LABEL]);
         $this->assertSame('decrypted', (string)$values[GenerisRdf::PROPERTY_USER_FIRSTNAME]);
         $this->assertSame('decrypted', (string)$values[GenerisRdf::PROPERTY_USER_LASTNAME]);
-        $this->assertIsArray( $values[GenerisRdf::PROPERTY_USER_ROLES]);
+        $this->assertisarray($values[GenerisRdf::PROPERTY_USER_ROLES]);
         $this->assertSame('decrypted', (string)$values[GenerisRdf::PROPERTY_USER_ROLES][0]);
         $this->assertSame('decrypted', (string)$values[GenerisRdf::PROPERTY_USER_ROLES][1]);
     }
@@ -78,7 +78,7 @@ class EncryptUserSyncFormatterTest extends TestCase
             OntologyRdfs::RDFS_LABEL => $this->encryptString,
         ]);
 
-        $this->assertIsArray( $values);
+        $this->assertisarray($values);
         $this->assertSame('do not encrypted', (string)$values['not_encrypt_property']);
         $this->assertSame($this->encryptString, (string)$values[OntologyRdfs::RDFS_LABEL]);
     }
@@ -102,12 +102,12 @@ class EncryptUserSyncFormatterTest extends TestCase
             ]
         );
 
-        $this->assertIsArray( $values);
+        $this->assertisarray($values);
         $this->assertSame('do not encrypt', (string)$values['not_encrypt_property']);
         $this->assertSame($this->encryptString, (string)$values[OntologyRdfs::RDFS_LABEL]);
         $this->assertSame($this->encryptString, (string)$values[GenerisRdf::PROPERTY_USER_FIRSTNAME]);
         $this->assertSame($this->encryptString, (string)$values[GenerisRdf::PROPERTY_USER_LASTNAME]);
-        $this->assertIsArray( $values[GenerisRdf::PROPERTY_USER_ROLES]);
+        $this->assertisarray($values[GenerisRdf::PROPERTY_USER_ROLES]);
         $this->assertSame($this->encryptString, (string)$values[GenerisRdf::PROPERTY_USER_ROLES][0]);
         $this->assertSame($this->encryptString, (string)$values[GenerisRdf::PROPERTY_USER_ROLES][1]);
     }
@@ -124,7 +124,7 @@ class EncryptUserSyncFormatterTest extends TestCase
             OntologyRdfs::RDFS_LABEL => 'value1',
         ]);
 
-        $this->assertIsArray( $values);
+        $this->assertisarray($values);
         $this->assertSame('do not encrypted', (string)$values['not_encrypt_property']);
         $this->assertSame('value1', (string)$values[OntologyRdfs::RDFS_LABEL]);
     }
@@ -141,7 +141,7 @@ class EncryptUserSyncFormatterTest extends TestCase
             OntologyRdfs::RDFS_LABEL => 'to_encrypt',
         ]);
 
-        $this->assertIsArray( $values);
+        $this->assertisarray($values);
         $this->assertSame('do not encrypt', (string)$values['not_encrypt_property']);
         $this->assertSame($this->encryptString, (string)$values[OntologyRdfs::RDFS_LABEL]);
     }

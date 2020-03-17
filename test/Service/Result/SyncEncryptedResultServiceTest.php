@@ -76,7 +76,7 @@ class SyncEncryptedResultServiceTest extends TestCase
             ]
         ]);
 
-        $this->assertIsArray( $result);
+        $this->assertisarray($result);
         $this->assertEquals([
             'result_id' => [
                 'success' => 1,
@@ -94,7 +94,7 @@ class SyncEncryptedResultServiceTest extends TestCase
             ]
         ]);
 
-        $this->assertIsArray( $result);
+        $this->assertisarray($result);
         $this->assertEquals([
             'result_id' => [
                 'success' => 0,

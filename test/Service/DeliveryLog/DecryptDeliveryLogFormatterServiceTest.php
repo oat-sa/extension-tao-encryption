@@ -29,7 +29,7 @@ class DecryptDeliveryLogFormatterServiceTest extends TestCase
     {
         $service = $this->getService();
 
-        $this->assertIsArray( $service->format([
+        $this->assertisarray($service->format([
             'data' => 'something encrypted'
         ])) ;
     }
