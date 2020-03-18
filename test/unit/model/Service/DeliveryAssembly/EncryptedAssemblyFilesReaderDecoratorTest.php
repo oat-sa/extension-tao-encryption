@@ -51,7 +51,7 @@ class EncryptedAssemblyFilesReaderDecoratorTest extends TestCase
      */
     private $directoryMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->directoryMock = $this->createMock(tao_models_classes_service_StorageDirectory::class);

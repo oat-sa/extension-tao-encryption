@@ -47,7 +47,7 @@ class SyncEncryptedResultServiceTest extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->mockPersistence();
@@ -76,7 +76,7 @@ class SyncEncryptedResultServiceTest extends TestCase
             ]
         ]);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals([
             'result_id' => [
                 'success' => 1,
@@ -94,7 +94,7 @@ class SyncEncryptedResultServiceTest extends TestCase
             ]
         ]);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals([
             'result_id' => [
                 'success' => 0,

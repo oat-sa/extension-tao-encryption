@@ -20,6 +20,7 @@
 namespace oat\taoEncryption\Test\Model;
 
 use oat\taoEncryption\Model\AlgorithmFactory;
+use oat\taoEncryption\Model\Exception\AlgorithmNotAvailableException;
 use phpseclib\Crypt\Base;
 use PHPUnit\Framework\TestCase;
 
@@ -32,11 +33,9 @@ class AlgorithmFactoryTest extends TestCase
         $this->assertInstanceOf(Base::class, $algorithm);
     }
 
-    /**
-     * @expectedException \oat\taoEncryption\Model\Exception\AlgorithmNotAvailableException
-     */
     public function testIncorectAlgorithm()
     {
+        $this->expectException(AlgorithmNotAvailableException::class);
         $algorithm = AlgorithmFactory::create('not existed');
     }
 }

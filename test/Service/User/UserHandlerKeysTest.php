@@ -34,7 +34,7 @@ class UserHandlerKeysTest extends TestCase
     {
         $handler = new UserHandlerKeys();
 
-        $this->assertInternalType('string', $handler->generateUserKey('hash', 'salt'));
+        $this->assertIsString($handler->generateUserKey('hash', 'salt'));
     }
 
     /**
@@ -55,7 +55,7 @@ class UserHandlerKeysTest extends TestCase
             );
         $handler->setServiceLocator($serviceLocator);
 
-        $this->assertInternalType('string', $handler->encryptApplicationKey('key to encrypt'));
+        $this->assertIsString($handler->encryptApplicationKey('key to encrypt'));
     }
 
     protected function mockEncryptionService()

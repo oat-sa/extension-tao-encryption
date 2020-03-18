@@ -134,7 +134,7 @@ class FileKeyProviderServiceTest extends TestCase
 
         $service->setServiceLocator($serviceLocator);
 
-        $this->assertInternalType('string', $service->getKeyFromFileSystem());
+        $this->assertIsString($service->getKeyFromFileSystem());
     }
 
     /**
