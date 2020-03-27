@@ -62,7 +62,7 @@ EOD;
 
         $encrypted = $rsa->encrypt(new PublicKey($this->publicKey), $content);
 
-        $this->assertInternalType('string', $encrypted);
+        $this->assertIsString($encrypted);
 
         $decrypted = $rsa->decrypt(new PrivateKey($this->privateKey), $encrypted);
 

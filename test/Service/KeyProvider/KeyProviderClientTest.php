@@ -21,6 +21,7 @@
 namespace oat\taoEncryption\Test\Service\KeyProvider;
 
 
+use common_Exception;
 use oat\taoEncryption\Service\KeyProvider\KeyProviderClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -50,11 +51,9 @@ class KeyProviderClientTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $service->updatePublicKey('some key'));
     }
 
-    /**
-     * @expectedException \common_Exception
-     */
     public function testUpdatePublicKeyFailed()
     {
+        $this->expectException(common_Exception::class);
         $service = $this->getMockBuilder(KeyProviderClient::class)->disableOriginalConstructor()
             ->setMethods(['call', 'logError'])
             ->getMockForAbstractClass();

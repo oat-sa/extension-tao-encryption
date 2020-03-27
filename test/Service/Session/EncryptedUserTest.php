@@ -39,9 +39,9 @@ class EncryptedUserTest extends TestCase
         $encryptUser = new EncryptedUser($this->mockCommonUser('user identifier', 'some hash'), 'some hash');
 
         $this->assertSame('user identifier', $encryptUser->getIdentifier());
-        $this->assertInternalType('string', $encryptUser->getKey());
-        $this->assertInternalType('string', $encryptUser->getApplicationKey());
-        $this->assertInternalType('string', serialize($encryptUser));
+        $this->assertIsString($encryptUser->getKey());
+        $this->assertIsString($encryptUser->getApplicationKey());
+        $this->assertIsString(serialize($encryptUser));
     }
 
     /**

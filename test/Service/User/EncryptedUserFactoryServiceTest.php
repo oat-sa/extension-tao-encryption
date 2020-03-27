@@ -21,6 +21,7 @@ namespace oat\taoEncryption\Test\Service\User;
 
 
 use core_kernel_classes_Resource;
+use Exception;
 use oat\taoEncryption\Service\Session\EncryptedUser;
 use oat\taoEncryption\Service\User\EncryptedUserFactoryService;
 use oat\generis\test\TestCase;
@@ -30,7 +31,7 @@ class EncryptedUserFactoryServiceTest extends TestCase
 {
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testCreateUser()
     {
@@ -45,11 +46,10 @@ class EncryptedUserFactoryServiceTest extends TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @throws \Exception
      */
     public function testCreateUserWithWrongClassFailed()
     {
+        $this->expectException(Exception::class);
         $factory = new EncryptedUserFactoryService([
             EncryptedUserFactoryService::OPTION_USER_CLASS_WRAPPED => 'core_kernel_users_Exception'
         ]);
@@ -61,11 +61,10 @@ class EncryptedUserFactoryServiceTest extends TestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @throws \Exception
      */
     public function testCreateUserWithNonExistingClass()
     {
+        $this->expectException(Exception::class);
         $factory = new EncryptedUserFactoryService([
             EncryptedUserFactoryService::OPTION_USER_CLASS_WRAPPED => 'some non existing class'
         ]);

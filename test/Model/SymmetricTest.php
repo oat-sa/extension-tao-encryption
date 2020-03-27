@@ -36,14 +36,14 @@ class SymmetricTest extends TestCase
 
         $encrypted = $sym->encrypt($myKey, 'secret banana');
 
-        $this->assertInternalType('string', $encrypted);
+        $this->assertIsString($encrypted);
 
         $this->assertSame('secret banana',  $sym->decrypt($myKey, $encrypted));
     }
 
     public function testUnSuccessFlow()
     {
-        $this->setExpectedException(DecryptionFailedException::class);
+        $this->expectException(DecryptionFailedException::class);
 
         $sym = new Symmetric(new AES());
 
@@ -51,7 +51,7 @@ class SymmetricTest extends TestCase
 
         $encrypted = $sym->encrypt($myKey, 'secret banana');
 
-        $this->assertInternalType('string', $encrypted);
+        $this->assertIsString($encrypted);
 
         $sym->decrypt(new Key('anotherkey'), $encrypted);
     }

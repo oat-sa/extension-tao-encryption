@@ -22,6 +22,7 @@ namespace oat\taoEncryption\Test\Service\SessionState;
 
 use common_persistence_KeyValuePersistence;
 use core_kernel_users_GenerisUser;
+use Exception;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\EncryptedUser;
@@ -33,7 +34,7 @@ use oat\generis\test\MockObject;
 class EncryptedStateStorageTest extends TestCase
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testEncryptedStateSet()
     {
@@ -43,7 +44,7 @@ class EncryptedStateStorageTest extends TestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testEncryptedStateGet()
     {
@@ -52,11 +53,9 @@ class EncryptedStateStorageTest extends TestCase
         $this->assertEquals('some secret data', $state->get('call id', 'some secret data'));
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testUserNotEncrypted()
     {
+        $this->expectException(Exception::class);
         $state = $this->getService(false);
 
         $state->get('call id', 'some secret data');
