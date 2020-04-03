@@ -24,7 +24,7 @@ use common_persistence_Manager;
 use core_kernel_classes_Resource;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoDeliveryRdf\helper\DetectTestAndItemIdentifiersHelper;
+use oat\taoSync\helper\DetectTestAndItemIdentifiersHelper;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Result\EncryptResultService;
 use PHPUnit\Framework\TestCase;
