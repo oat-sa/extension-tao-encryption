@@ -40,7 +40,7 @@ return array(
         'tao' => '>=17.7.0',
         'generis' => '>=12.15.0',
         'taoResultServer' => '>=9.3.0',
-        'taoSync' => '>=6.6.0',
+        'taoSync' => '>=7.4.0',
         'taoProctoring' => '>=12.3.0',
         'taoTestCenter' => '>=4.1.0',
         'taoDeliveryRdf' => '>=9.2.0'
