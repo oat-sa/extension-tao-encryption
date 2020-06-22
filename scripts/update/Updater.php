@@ -46,6 +46,9 @@ use oat\taoSync\model\ResultService;
 use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 use oat\taoTestCenter\model\event\ProctorCreatedEvent;
 
+/**
+ * @deprecated use migrations instead. See https://github.com/oat-sa/generis/wiki/Tao-Update-Process
+ */
 class Updater extends common_ext_ExtensionUpdater
 {
     /**
@@ -195,5 +198,10 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('3.2.1', '5.2.0');
+        
+        //Updater files are deprecated. Please use migrations.
+        //See: https://github.com/oat-sa/generis/wiki/Tao-Update-Process
+
+        $this->setVersion($this->getExtension()->getManifest()->getVersion());
     }
 }
