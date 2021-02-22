@@ -27,7 +27,20 @@
     "minimum-stability" : "dev",
     "require": {
         "php" : ">=5.5",
-        "phpseclib/phpseclib": "~2.0.0"
+        "phpseclib/phpseclib": "~2.0.0",
+        "oat-sa/generis" : ">=14.0.0",
+        "oat-sa/tao-core" : ">=47.0.0",
+        "oat-sa/extension-tao-delivery" : ">=15.0.0",
+        "oat-sa/extension-tao-delivery-rdf" : ">=14.0.0",
+        "oat-sa/extension-tao-lti" : ">=12.0.0",
+        "oat-sa/extension-tao-outcome" : ">=13.0.0",
+        "oat-sa/extension-tao-sync" : ">=8.0.0",
+        "oat-sa/extension-tao-proctoring" : ">=20.0.0",
+        "oat-sa/extension-tao-oauth" : ">=6.0.0",
+        "oat-sa/extension-tao-testtaker" : ">=8.0.0",
+        "oat-sa/extension-tao-testqti" : ">=41.0.0",
+        "oat-sa/extension-tao-testcenter" : ">=10.0.0",
+        "oat-sa/extension-tao-publishing" : ">=6.0.0"
     },
     "autoload" : {
         "psr-4" : {
