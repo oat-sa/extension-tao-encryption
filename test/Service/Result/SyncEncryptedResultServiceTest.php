@@ -30,23 +30,24 @@ use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
 use oat\taoEncryption\Service\Result\SyncEncryptedResultService;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\MockObject;
 
 class SyncEncryptedResultServiceTest extends TestCase
 {
     /**
-     * @var common_persistence_Manager|\PHPUnit_Framework_MockObject_MockObject
+     * @var common_persistence_Manager|MockObject
      */
     private $persistenceMock;
 
     /**
-     * @var EncryptionServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EncryptionServiceInterface|MockObject
      */
     private $encryptionServiceMock;
 
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->mockPersistence();
@@ -75,7 +76,7 @@ class SyncEncryptedResultServiceTest extends TestCase
             ]
         ]);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals([
             'result_id' => [
                 'success' => 1,
@@ -93,7 +94,7 @@ class SyncEncryptedResultServiceTest extends TestCase
             ]
         ]);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals([
             'result_id' => [
                 'success' => 0,
@@ -102,7 +103,7 @@ class SyncEncryptedResultServiceTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     protected function mockResource()
     {
@@ -179,7 +180,7 @@ class SyncEncryptedResultServiceTest extends TestCase
     }
 
     /**
-     * @return common_persistence_Manager|\PHPUnit_Framework_MockObject_MockObject
+     * @return common_persistence_Manager|MockObject
      */
     protected function mockPersistence()
     {
@@ -205,7 +206,7 @@ class SyncEncryptedResultServiceTest extends TestCase
     }
 
     /**
-     * @return EncryptionServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return EncryptionServiceInterface|MockObject
      */
     protected function mockEncryptionService()
     {

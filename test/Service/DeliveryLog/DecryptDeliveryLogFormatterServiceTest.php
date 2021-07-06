@@ -21,14 +21,15 @@ namespace oat\taoEncryption\Test\Service\DeliveryLog;
 
 use oat\taoEncryption\Service\DeliveryLog\DecryptDeliveryLogFormatterService;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
+use oat\generis\test\TestCase;
 
-class DecryptDeliveryLogFormatterServiceTest extends \PHPUnit_Framework_TestCase
+class DecryptDeliveryLogFormatterServiceTest extends TestCase
 {
     public function testFormat()
     {
         $service = $this->getService();
 
-        $this->assertInternalType('array', $service->format([
+        $this->assertIsArray($service->format([
             'data' => 'something encrypted'
         ])) ;
     }

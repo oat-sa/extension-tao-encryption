@@ -28,8 +28,10 @@ use oat\taoEncryption\Model\Key;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\Session\EncryptedUser;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
+use oat\generis\test\MockObject;
 
-class FileKeyProviderServiceTest extends \PHPUnit_Framework_TestCase
+class FileKeyProviderServiceTest extends TestCase
 {
 
     public function testGetKey()
@@ -132,11 +134,11 @@ class FileKeyProviderServiceTest extends \PHPUnit_Framework_TestCase
 
         $service->setServiceLocator($serviceLocator);
 
-        $this->assertInternalType('string', $service->getKeyFromFileSystem());
+        $this->assertIsString($service->getKeyFromFileSystem());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     protected function getService()
     {

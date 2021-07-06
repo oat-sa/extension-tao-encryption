@@ -26,8 +26,9 @@ use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\LtiConsumer\EncryptedLtiConsumer;
 use oat\taoEncryption\Service\LtiConsumer\EncryptLtiConsumerFormatterService;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
 
-class EncryptLtiConsumerFormatterServiceTest extends \PHPUnit_Framework_TestCase
+class EncryptLtiConsumerFormatterServiceTest extends TestCase
 {
     /**
      * @throws \Exception
@@ -38,7 +39,7 @@ class EncryptLtiConsumerFormatterServiceTest extends \PHPUnit_Framework_TestCase
 
         $result = $service->filterProperties(['property1' => 'value1']);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY, $result);
         $this->assertEquals(base64_encode('encryptContent'), $result[EncryptedLtiConsumer::PROPERTY_ENCRYPTED_APPLICATION_KEY]);
     }

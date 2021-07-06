@@ -28,6 +28,7 @@ use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoEncryption\Event\ProctorCreatedHandler;
 use oat\taoEncryption\scripts\tools\SetupDecryptDeliveryLogFormatterService;
+use oat\taoEncryption\Service\EncryptionAsymmetricService;
 use oat\taoEncryption\Service\Mapper\DummyMapper;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 use oat\taoEncryption\Service\Result\StoreVariableService;
@@ -45,6 +46,9 @@ use oat\taoSync\model\ResultService;
 use oat\taoSync\model\TestSession\SyncTestSessionServiceInterface;
 use oat\taoTestCenter\model\event\ProctorCreatedEvent;
 
+/**
+ * @deprecated use migrations instead. See https://github.com/oat-sa/generis/wiki/Tao-Update-Process
+ */
 class Updater extends common_ext_ExtensionUpdater
 {
     /**
@@ -128,7 +132,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('1.0.0');
         }
         $this->skip('1.0.0', '1.1.0');
-      
+
         if ($this->isVersion('1.1.0')) {
             $dummyMapper = new DummyMapper();
             $this->getServiceManager()->register(DummyMapper::SERVICE_ID, $dummyMapper);
@@ -172,5 +176,32 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('3.1.0', '3.2.0');
+
+        if ($this->isVersion('3.2.0')) {
+            // several config option values of SyncEncryptedResultService might have been lost during taoSync '6.6.0' update
+            // this restores any missing default values
+            $service = $this->getServiceManager()->get(ResultService::SERVICE_ID);
+            if (is_object($service) && $service instanceof SyncEncryptedResultService) {
+                $options = $service->getOptions();
+
+                $encryptedService = new SyncEncryptedResultService(array_merge([
+                        SyncEncryptedResultService::OPTION_PERSISTENCE => 'encryptedResults',
+                        SyncEncryptedResultService::OPTION_USER_ID_CLIENT_TO_USER_ID_CENTRAL => DummyMapper::SERVICE_ID,
+                        SyncEncryptedResultService::OPTION_ENCRYPTION_SERVICE => EncryptionAsymmetricService::SERVICE_ID,
+                    ], $options)
+                );
+
+                $this->getServiceManager()->register(SyncEncryptedResultService::SERVICE_ID, $encryptedService);
+            }
+
+            $this->setVersion('3.2.1');
+        }
+
+        $this->skip('3.2.1', '5.2.0');
+        
+        //Updater files are deprecated. Please use migrations.
+        //See: https://github.com/oat-sa/generis/wiki/Tao-Update-Process
+
+        $this->setVersion($this->getExtension()->getManifest()->getVersion());
     }
 }

@@ -25,8 +25,10 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\EncryptedUser;
+use oat\generis\test\TestCase;
+use oat\generis\test\MockObject;
 
-class EncryptedUserTest extends \PHPUnit_Framework_TestCase
+class EncryptedUserTest extends TestCase
 {
 
     /**
@@ -37,15 +39,15 @@ class EncryptedUserTest extends \PHPUnit_Framework_TestCase
         $encryptUser = new EncryptedUser($this->mockCommonUser('user identifier', 'some hash'), 'some hash');
 
         $this->assertSame('user identifier', $encryptUser->getIdentifier());
-        $this->assertInternalType('string', $encryptUser->getKey());
-        $this->assertInternalType('string', $encryptUser->getApplicationKey());
-        $this->assertInternalType('string', serialize($encryptUser));
+        $this->assertIsString($encryptUser->getKey());
+        $this->assertIsString($encryptUser->getApplicationKey());
+        $this->assertIsString(serialize($encryptUser));
     }
 
     /**
      * @param $userIdentifier
      * @param $hashForEncryption
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      * @throws \Exception
      */
     protected function mockCommonUser($userIdentifier, $hashForEncryption)

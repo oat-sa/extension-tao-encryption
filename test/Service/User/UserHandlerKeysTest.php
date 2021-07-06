@@ -25,15 +25,16 @@ use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\User\UserHandlerKeys;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
 
-class UserHandlerKeysTest extends \PHPUnit_Framework_TestCase
+class UserHandlerKeysTest extends TestCase
 {
 
     public function testGenerateUserKey()
     {
         $handler = new UserHandlerKeys();
 
-        $this->assertInternalType('string', $handler->generateUserKey('hash', 'salt'));
+        $this->assertIsString($handler->generateUserKey('hash', 'salt'));
     }
 
     /**
@@ -54,7 +55,7 @@ class UserHandlerKeysTest extends \PHPUnit_Framework_TestCase
             );
         $handler->setServiceLocator($serviceLocator);
 
-        $this->assertInternalType('string', $handler->encryptApplicationKey('key to encrypt'));
+        $this->assertIsString($handler->encryptApplicationKey('key to encrypt'));
     }
 
     protected function mockEncryptionService()

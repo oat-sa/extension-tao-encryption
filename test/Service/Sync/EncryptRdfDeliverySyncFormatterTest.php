@@ -23,8 +23,9 @@ use oat\taoEncryption\Rdf\EncryptedDeliveryRdf;
 use oat\taoEncryption\Service\KeyProvider\FileKeyProviderService;
 use oat\taoEncryption\Service\Sync\EncryptRdfDeliverySyncFormatter;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
 
-class EncryptRdfDeliverySyncFormatterTest extends \PHPUnit_Framework_TestCase
+class EncryptRdfDeliverySyncFormatterTest extends TestCase
 {
     /**
      * @throws \common_exception_Error
@@ -36,7 +37,7 @@ class EncryptRdfDeliverySyncFormatterTest extends \PHPUnit_Framework_TestCase
 
         $result = $service->filterProperties(['property1' => 'value1']);
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey(EncryptedDeliveryRdf::PROPERTY_APPLICATION_KEY, $result);
     }
 

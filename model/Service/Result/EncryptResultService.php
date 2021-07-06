@@ -25,7 +25,7 @@ use oat\oatbox\log\LoggerAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoDeliveryRdf\helper\DetectTestAndItemIdentifiersHelper;
+use oat\taoSync\helper\DetectTestAndItemIdentifiersHelper;
 use oat\taoResultServer\models\Entity\ItemVariableStorable;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoResultServer\models\Entity\TestVariableStorable;
