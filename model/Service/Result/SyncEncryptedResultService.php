@@ -26,7 +26,7 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\tao\model\taskQueue\QueueDispatcher;
 use oat\taoEncryption\Service\EncryptionServiceInterface;
 use oat\taoEncryption\Service\Mapper\MapperClientUserIdToCentralUserIdInterface;
-use oat\taoEncryption\Task\DecryptResultTask;
+use oat\taoEncryption\Task\DecryptDeliveryExecutionTask;
 use oat\taoSync\model\ResultService;
 use Psr\Log\LogLevel;
 
@@ -245,21 +245,22 @@ class SyncEncryptedResultService extends ResultService
     }
 
     /**
-     * @param $deliveryId
-     * @param string $resultId
+     * @param string $deliveryId
+     * @param $deliveryExecutionId
      */
-    protected function dispatchDecryptTask($deliveryId, $resultId)
+    protected function dispatchDecryptTask($deliveryId, $deliveryExecutionId)
     {
         /** @var QueueDispatcher $queue */
         $queue = $this->getServiceLocator()->get(QueueDispatcher::SERVICE_ID);
 
-        $decryptResultTask = new DecryptResultTask();
+        $decryptResultTask = new DecryptDeliveryExecutionTask();
         $this->propagate($decryptResultTask);
 
-        $queue->createTask($decryptResultTask, [
-            'deliveryIdentifier' => $deliveryId,
-            'deliveryResultId' => $resultId,
-        ], 'Decrypt Results');
+        $queue->createTask($decryptResultTask,
+            [
+                'deliveryId' => $deliveryId,
+                'deliveryExecutionId' => $deliveryExecutionId
+            ], 'Decrypt Delivery Execution');
     }
 
     /**

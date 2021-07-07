@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +19,14 @@
  *
  */
 
+declare(strict_types=1);
 
 namespace oat\taoEncryption\Task;
 
 use oat\oatbox\extension\AbstractAction;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 
-class DecryptResultTask extends AbstractAction implements \JsonSerializable
+class DecryptDeliveryExecutionTask extends AbstractAction implements \JsonSerializable
 {
     /**
      * @param $params
@@ -34,19 +36,20 @@ class DecryptResultTask extends AbstractAction implements \JsonSerializable
      */
     public function __invoke($params)
     {
-        if (!isset($params['deliveryResultId'])){
-            throw new \Exception('The delivery result id it is not in the params');
-        }
-        if (!isset($params['deliveryIdentifier'])){
-            throw new \Exception('The delivery id it is not in the params');
+        if (!isset($params['deliveryExecutionId'])) {
+            throw new \Exception('The deliveryExecutionId it is not in the params');
         }
 
-        $deliveryResultId = $params['deliveryResultId'];
-        $deliveryIdentifier = $params['deliveryIdentifier'];
+        if (!isset($params['deliveryId'])) {
+            throw new \Exception('The deliveryId it is not in the params');
+        }
+
+        $deliveryExecutionId = $params['deliveryExecutionId'];
+        $deliveryId = $params['deliveryId'];
         /** @var DecryptResultService $decryptService */
         $decryptService = $this->getServiceLocator()->get(DecryptResultService::SERVICE_ID);
 
-        return $decryptService->decryptByExecution($deliveryIdentifier, $deliveryResultId);
+        return $decryptService->decryptByExecution($deliveryId, $deliveryExecutionId);
     }
 
     /**
