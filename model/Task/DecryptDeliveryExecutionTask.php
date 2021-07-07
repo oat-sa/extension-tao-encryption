@@ -15,11 +15,11 @@ class DecryptDeliveryExecutionTask extends AbstractAction
      */
     public function __invoke($params)
     {
-        if (!isset($params['deliveryExecutionId'])){
+        if (!isset($params['deliveryExecutionId'])) {
             throw new \Exception('The deliveryExecutionId it is not in the params');
         }
 
-        if (!isset($params['deliveryId'])){
+        if (!isset($params['deliveryId'])) {
             throw new \Exception('The deliveryId it is not in the params');
         }
 
