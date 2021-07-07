@@ -19,6 +19,8 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace oat\taoEncryption\Task;
 
 use oat\oatbox\extension\AbstractAction;
