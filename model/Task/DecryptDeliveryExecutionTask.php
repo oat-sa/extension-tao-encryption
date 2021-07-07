@@ -24,7 +24,7 @@ namespace oat\taoEncryption\Task;
 use oat\oatbox\extension\AbstractAction;
 use oat\taoEncryption\Service\Result\DecryptResultService;
 
-class DecryptDeliveryExecutionTask extends AbstractAction
+class DecryptDeliveryExecutionTask extends AbstractAction implements \JsonSerializable
 {
     /**
      * @param $params
