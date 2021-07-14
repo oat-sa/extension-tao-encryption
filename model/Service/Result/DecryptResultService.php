@@ -188,9 +188,13 @@ class DecryptResultService extends ConfigurableService implements DecryptResult
             $report->add(Report::createFailure('Result decrypted FAILED:'. $resultId . ' '. $exception->getMessage()));
         }
 
-        return $report;
+        $newResults = $this->getDeliveryResultsModel()->getResultsReferences($deliveryIdentifier);
+        $remainingResults = array_diff($newResults, $resultsDecrypted);
+        $this->setResultsReferences($deliveryIdentifier, $remainingResults);
 
+        return $report;
     }
+
     /**
      * @return EncryptionServiceInterface
      */
