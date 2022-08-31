@@ -24,9 +24,9 @@ use oat\taoEncryption\Service\EncryptionSymmetricService;
 use oat\taoEncryption\Service\KeyProvider\SimpleKeyProviderService;
 use oat\taoEncryption\Service\Session\EncryptedLtiUser;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
+use oat\taoProctoring\model\repository\MonitoringRepository;
 
-class EncryptedLtiMonitoringService extends MonitorCacheService
+class EncryptedLtiMonitoringService extends MonitoringRepository
 {
     /**
      * @param array $criteria
@@ -38,9 +38,9 @@ class EncryptedLtiMonitoringService extends MonitorCacheService
      * @throws \core_kernel_classes_EmptyProperty
      * @throws \oat\taoLti\models\classes\LtiVariableMissingException
      */
-    public function find(array $criteria = [], array $options = [], $together = false)
+    public function find(array $criteria = [], array $options = []): array
     {
-        $result = parent::find($criteria, $options, $together);
+        $result = parent::find($criteria, $options);
 
         foreach ($result as &$deliveryMonitoringData) {
             $isObject = is_object($deliveryMonitoringData);
