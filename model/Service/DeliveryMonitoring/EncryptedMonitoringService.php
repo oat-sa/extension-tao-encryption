@@ -21,9 +21,9 @@
 namespace oat\taoEncryption\Service\DeliveryMonitoring;
 
 use oat\generis\model\GenerisRdf;
-use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
+use oat\taoProctoring\model\repository\MonitoringRepository;
 
-class EncryptedMonitoringService extends MonitorCacheService
+class EncryptedMonitoringService extends MonitoringRepository
 {
     const TEST_TAKER_LOGIN = 'test_taker_login';
     /**
